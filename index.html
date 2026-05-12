@@ -2,10 +2,887 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <title>えなまなび</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>さんすうのもり</title>
+
+  <!-- ========================================
+    TODO: Firebase接続時にここを追加する
+    <script type="module" src="firebase.js"></script>
+  ======================================== -->
+
+  <style>
+    /* ============================================================
+       リセット・基本設定
+    ============================================================ */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Hiragino Maru Gothic ProN', 'M PLUS Rounded 1c', sans-serif;
+      background: #FFFBF4;
+      color: #1a1a1a;
+      min-height: 100vh;
+    }
+
+    .app {
+      max-width: 480px;
+      margin: 0 auto;
+      padding: 1rem 1rem 4rem;
+    }
+
+    /* 画面の切り替え */
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* ============================================================
+       共通パーツ
+    ============================================================ */
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      font-weight: 500;
+      background: #EF9F27;
+      color: #412402;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      transition: opacity 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.85; }
+    .btn-primary:disabled { opacity: 0.4; cursor: default; }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 12px;
+      font-size: 15px;
+      font-weight: 500;
+      background: #F0EDE8;
+      color: #333;
+      border: 0.5px solid #D9D3C8;
+      border-radius: 12px;
+      cursor: pointer;
+      font-family: inherit;
+      margin-top: 8px;
+    }
+    .btn-secondary:hover { background: #E8E4DE; }
+
+    .back-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: none;
+      color: #666;
+      font-size: 14px;
+      cursor: pointer;
+      padding: 0 0 0.75rem;
+      font-family: inherit;
+    }
+
+    /* ============================================================
+       ログイン画面
+    ============================================================ */
+    .login-card {
+      background: #fff;
+      border: 0.5px solid #E0D8CC;
+      border-radius: 20px;
+      padding: 2rem;
+      margin: 1.5rem auto;
+      text-align: center;
+      max-width: 340px;
+    }
+    .logo { font-size: 52px; margin-bottom: 8px; }
+    .app-title { font-size: 24px; font-weight: 500; margin-bottom: 4px; }
+    .app-sub { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
+
+    .name-input {
+      width: 100%;
+      padding: 12px;
+      font-size: 18px;
+      border: 2px solid #FAC775;
+      border-radius: 12px;
+      text-align: center;
+      background: #fff;
+      outline: none;
+      margin-bottom: 1rem;
+      font-family: inherit;
+    }
+    .name-input:focus { border-color: #EF9F27; }
+
+    /* ============================================================
+       ホーム画面
+    ============================================================ */
+    .home-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0.5rem 0 1rem;
+    }
+    .avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: #FAEEDA;
+      border: 2px solid #FAC775;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; flex-shrink: 0;
+    }
+    .welcome-name { font-size: 15px; font-weight: 500; }
+    .welcome-sub { font-size: 12px; color: #888; }
+    .logout-btn {
+      margin-left: auto;
+      padding: 5px 10px;
+      font-size: 12px;
+      border: 0.5px solid #D9D3C8;
+      border-radius: 8px;
+      background: transparent;
+      color: #888;
+      cursor: pointer;
+    }
+
+    /* 単元グリッド */
+    .units-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .unit-card {
+      background: #fff;
+      border: 0.5px solid #E0D8CC;
+      border-radius: 14px;
+      padding: 12px;
+      cursor: pointer;
+      transition: transform 0.1s, border-color 0.15s;
+    }
+    .unit-card:hover { transform: translateY(-2px); border-color: #FAC775; }
+    .unit-icon { font-size: 26px; margin-bottom: 4px; }
+    .unit-name { font-size: 13px; font-weight: 500; line-height: 1.3; margin-bottom: 3px; }
+    .unit-chapter { font-size: 11px; color: #888; margin-bottom: 5px; }
+    .unit-stars span { font-size: 13px; }
+
+    /* ============================================================
+       単元選択画面
+    ============================================================ */
+    .unit-header { text-align: center; padding: 0.75rem 0 1rem; }
+    .unit-big-icon { font-size: 52px; margin-bottom: 4px; }
+    .unit-title { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+    .unit-desc { font-size: 13px; color: #888; margin-bottom: 1rem; }
+
+    .progress-bar {
+      background: #EEE9E0;
+      border-radius: 8px;
+      height: 8px;
+      overflow: hidden;
+      margin-bottom: 4px;
+    }
+    .progress-fill {
+      height: 100%;
+      background: #EF9F27;
+      border-radius: 8px;
+      transition: width 0.4s;
+    }
+    .progress-label { font-size: 12px; color: #888; margin-bottom: 1.25rem; }
+
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .mode-card {
+      background: #fff;
+      border: 1.5px solid #D9D3C8;
+      border-radius: 14px;
+      padding: 1rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .mode-card:hover { border-color: #EF9F27; background: #FAEEDA; }
+    .mode-icon { font-size: 32px; margin-bottom: 6px; }
+    .mode-name { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+    .mode-desc { font-size: 11px; color: #888; line-height: 1.4; }
+
+    /* ============================================================
+       問題画面
+    ============================================================ */
+    .quiz-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 0.75rem;
+      border-bottom: 0.5px solid #E0D8CC;
+      margin-bottom: 1rem;
+    }
+    .tutor-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: #E1F5EE;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+    .quiz-title { font-size: 14px; font-weight: 500; }
+    .quiz-sub { font-size: 11px; color: #888; }
+    .score-badge {
+      margin-left: auto;
+      font-size: 13px;
+      font-weight: 500;
+      color: #633806;
+      background: #FAEEDA;
+      padding: 5px 10px;
+      border-radius: 20px;
+    }
+
+    /* フクロウ先生のふきだし */
+    .tutor-bubble {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+      padding: 12px 14px;
+      background: #F5F1EB;
+      border-radius: 14px;
+    }
+    .tutor-icon { font-size: 22px; flex-shrink: 0; }
+    .tutor-text { font-size: 14px; line-height: 1.6; }
+
+    /* 問題カード */
+    .problem-card {
+      background: #fff;
+      border: 0.5px solid #E0D8CC;
+      border-radius: 16px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .problem-number { font-size: 11px; color: #888; margin-bottom: 8px; }
+
+    /* 進行ドット */
+    .progress-dots { display: flex; gap: 5px; margin-bottom: 12px; }
+    .pdot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #D9D3C8;
+    }
+    .pdot.done { background: #1D9E75; }
+    .pdot.current { background: #EF9F27; }
+
+    .problem-text {
+      font-size: 17px;
+      font-weight: 500;
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    /* 筆算表示 */
+    .calc-display {
+      background: #F5F1EB;
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 12px;
+      font-family: monospace;
+      font-size: 22px;
+      line-height: 1.9;
+    }
+    .calc-row { display: flex; justify-content: flex-end; align-items: center; }
+    .calc-op { color: #EF9F27; font-weight: 500; width: 24px; }
+    .calc-divider { border: none; border-top: 2px solid #D9D3C8; margin: 4px 0; }
+    .calc-answer { color: #aaa; }
+
+    /* 答え入力 */
+    .answer-row { display: flex; gap: 8px; align-items: center; }
+    .answer-label { font-size: 14px; color: #666; white-space: nowrap; }
+    .answer-input {
+      width: 100px;
+      padding: 11px;
+      font-size: 20px;
+      font-weight: 500;
+      border: 2px solid #D9D3C8;
+      border-radius: 10px;
+      text-align: center;
+      background: #fff;
+      outline: none;
+      font-family: monospace;
+    }
+    .answer-input:focus { border-color: #EF9F27; }
+    .answer-input.correct { border-color: #1D9E75; background: #E1F5EE; }
+    .answer-input.wrong { border-color: #E24B4A; background: #FCEBEB; }
+
+    .check-btn {
+      padding: 11px 18px;
+      font-size: 15px;
+      font-weight: 500;
+      background: #EF9F27;
+      color: #412402;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .check-btn:hover { opacity: 0.85; }
+    .check-btn:disabled { opacity: 0.4; cursor: default; }
+
+    /* フィードバック */
+    .feedback {
+      padding: 11px 13px;
+      border-radius: 10px;
+      margin-top: 9px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .feedback.correct { background: #E1F5EE; color: #085041; }
+    .feedback.wrong { background: #FCEBEB; color: #501313; }
+    .feedback.hint { background: #FAEEDA; color: #412402; }
+
+    /* 数字キーパッド */
+    .numpad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 7px;
+      margin-top: 12px;
+    }
+    .np-btn {
+      padding: 13px;
+      font-size: 18px;
+      font-weight: 500;
+      background: #F0EDE8;
+      border: 0.5px solid #D9D3C8;
+      border-radius: 10px;
+      cursor: pointer;
+      font-family: monospace;
+      transition: background 0.1s;
+    }
+    .np-btn:hover { background: #E8E4DE; }
+    .np-btn.del { color: #E24B4A; font-size: 13px; font-family: inherit; }
+    .np-btn.ok { background: #EF9F27; color: #412402; border-color: #EF9F27; }
+
+    /* ============================================================
+       結果画面
+    ============================================================ */
+    .result-wrap {
+      max-width: 360px;
+      margin: 2rem auto;
+      text-align: center;
+    }
+    .result-icon { font-size: 64px; margin-bottom: 8px; }
+    .result-title { font-size: 22px; font-weight: 500; margin-bottom: 4px; }
+    .result-sub { font-size: 14px; color: #888; margin-bottom: 1.25rem; }
+    .result-score { font-size: 52px; font-weight: 500; color: #EF9F27; }
+    .result-detail { font-size: 13px; color: #888; margin-bottom: 1.5rem; }
+  </style>
 </head>
 <body>
-  <h1>えなまなび 🌟</h1>
-  <p>まもなくこうかい！</p>
+<div class="app">
+
+  <!-- ========================================
+    ログイン画面
+  ======================================== -->
+  <div id="S_login" class="screen active">
+    <div class="login-card">
+      <div class="logo">🌟</div>
+      <div class="app-title">さんすうのもり</div>
+      <div class="app-sub">2年生の算数を、いっしょに学ぼう！</div>
+      <input id="nameInput" class="name-input" type="text"
+             placeholder="なまえを入れてね" maxlength="10"/>
+      <button id="startBtn" class="btn-primary" disabled>はじめる ✨</button>
+    </div>
+  </div>
+
+  <!-- ========================================
+    ホーム画面
+  ======================================== -->
+  <div id="S_home" class="screen">
+    <div class="home-header">
+      <div class="avatar">🐻</div>
+      <div>
+        <div class="welcome-name" id="welcomeName"></div>
+        <div class="welcome-sub">どの単元にする？</div>
+      </div>
+      <button class="logout-btn" id="logoutBtn">ログアウト</button>
+    </div>
+    <div class="units-grid" id="unitGrid"></div>
+  </div>
+
+  <!-- ========================================
+    単元選択画面
+  ======================================== -->
+  <div id="S_unit" class="screen">
+    <button class="back-btn" id="backHome">← もどる</button>
+    <div class="unit-header">
+      <div class="unit-big-icon" id="uIcon"></div>
+      <div class="unit-title" id="uTitle"></div>
+      <div class="unit-desc" id="uDesc"></div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="uProgress" style="width:0%"></div>
+      </div>
+      <div class="progress-label" id="uProgressLabel"></div>
+    </div>
+    <div class="mode-grid">
+      <div class="mode-card" id="previewBtn">
+        <div class="mode-icon">📖</div>
+        <div class="mode-name">よしゅう</div>
+        <div class="mode-desc">授業の前に<br>やさしく説明</div>
+      </div>
+      <div class="mode-card" id="reviewBtn">
+        <div class="mode-icon">✏️</div>
+        <div class="mode-name">ふくしゅう</div>
+        <div class="mode-desc">問題を解いて<br>実力チェック！</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========================================
+    問題画面
+  ======================================== -->
+  <div id="S_quiz" class="screen">
+    <div class="quiz-header">
+      <div class="tutor-avatar">🦉</div>
+      <div>
+        <div class="quiz-title" id="quizTitle"></div>
+        <div class="quiz-sub" id="quizSub"></div>
+      </div>
+      <div class="score-badge">⭐ <span id="scoreTxt">0</span>/5</div>
+    </div>
+    <div id="quizBody"></div>
+  </div>
+
+  <!-- ========================================
+    結果画面
+  ======================================== -->
+  <div id="S_result" class="screen">
+    <div class="result-wrap">
+      <div class="result-icon" id="resultIcon"></div>
+      <div class="result-title" id="resultTitle"></div>
+      <div class="result-sub" id="resultSub"></div>
+      <div class="result-score" id="resultScore"></div>
+      <div class="result-detail" id="resultDetail"></div>
+      <button class="btn-primary" id="retryBtn">もう一度 🔁</button>
+      <button class="btn-secondary" id="homeBtn">ホームにもどる 🏠</button>
+    </div>
+  </div>
+
+</div><!-- /.app -->
+
+<script>
+  /* ============================================================
+     単元データ
+     TODO: Firebase接続後はFirestoreから取得する
+  ============================================================ */
+  const UNITS = [
+    { id: 'add',   icon: '➕', name: 'たし算の筆算',   chapter: 'だい1しょう', desc: 'くり上がりのあるたし算' },
+    { id: 'sub',   icon: '➖', name: 'ひき算の筆算',   chapter: 'だい2しょう', desc: 'くり下がりのあるひき算' },
+    { id: 'num',   icon: '🔢', name: '1000までの数',  chapter: 'だい3しょう', desc: '大きい数のしくみ' },
+    { id: 'len',   icon: '📏', name: '長さ',           chapter: 'だい4しょう', desc: 'cmとmmをつかおう' },
+    { id: 'vol',   icon: '🫙', name: 'かさ',           chapter: 'だい5しょう', desc: 'L・dLのたんい' },
+    { id: 'time',  icon: '⏰', name: '時こくと時間',   chapter: 'だい6しょう', desc: '時間のけいさん' },
+    { id: 'mul',   icon: '✖️', name: 'かけ算（九九）', chapter: 'だい7しょう', desc: '九九をマスター！' },
+    { id: 'shape', icon: '🔷', name: '三角形と四角形', chapter: 'だい8しょう', desc: '図形のとくちょう' },
+  ];
+
+  /* フクロウ先生のひとこと */
+  const INTRO = {
+    add:   ['たし算の筆算では、一の位から順に計算するよ。くり上がりに気をつけよう！', 'まず一の位をたして、10以上になったら十の位に1くり上げるよ。'],
+    sub:   ['ひき算の筆算では、一の位から引いていくよ。引けないときはくり下げを使ってね！', '上の数が小さいときは、十の位から10かりてくるよ。'],
+    num:   ['100が10こ集まると1000になるよ。数のしくみを覚えよう！', '数直線で数の大きさをくらべてみよう。'],
+    len:   ['1cmは10mmだよ。ものさしで長さをはかるときに使うよ。', 'cmとmmを合わせた長さの計算ができるようになろう！'],
+    vol:   ['1Lは10dLだよ。牛乳パックが1Lくらいの大きさだね。', 'dLとLをあわせたかさの計算をやってみよう！'],
+    time:  ['時間は60分で1時間だよ。時こくと時間のちがいに気をつけてね。', '何時から何時間後は何時？いっしょに考えよう！'],
+    mul:   ['かけ算は同じ数をくり返したすことだよ。2×3は2を3回たすことと同じ！', '九九はリズムにのって覚えよう♪'],
+    shape: ['三角形は辺が3本、四角形は辺が4本だよ。', '長方形は角がみんな直角になっているよ。'],
+  };
+
+  const HINTS = {
+    add:   '一の位から計算してみよう。くり上がりはあるかな？',
+    sub:   '一の位から引いてみよう。引けないときはくり下げを使ってね。',
+    num:   '百のくらい、十のくらい、一のくらいに分けて考えてみよう。',
+    len:   '1cmは何mmかな？まずそれを思い出してみて。',
+    vol:   '1Lは何dLかな？まずそれを思い出してみて。',
+    time:  '60分で1時間だよ。何分たすと1時間になるかな？',
+    mul:   'かけ算のだんを順番にとなえてみよう。',
+    shape: '辺の数と角の数を数えてみよう。',
+  };
+
+  /* ============================================================
+     問題生成
+     TODO: Firebase接続後はFirestoreから取得する
+  ============================================================ */
+  function rnd(a, b) { return Math.floor(Math.random() * (b - a + 1)) + a; }
+
+  function makeProblem(unitId, level) {
+    let q, ans, a, b, display = null, expl = '';
+    switch (unitId) {
+      case 'add':
+        a = level <= 2 ? rnd(11, 49) : rnd(50, 99);
+        b = level <= 2 ? rnd(11, 49) : rnd(10, 50);
+        ans = a + b;
+        q = `${a} ＋ ${b} は いくつですか？`;
+        display = { left: a, op: '+', right: b };
+        expl = `${a}＋${b}＝${ans} だよ。一の位から計算するのがポイント！`;
+        break;
+
+      case 'sub':
+        a = level <= 2 ? rnd(20, 60) : rnd(50, 99);
+        b = level <= 2 ? rnd(11, 19) : rnd(10, 40);
+        if (a < b) [a, b] = [b, a];
+        ans = a - b;
+        q = `${a} ー ${b} は いくつですか？`;
+        display = { left: a, op: '−', right: b };
+        expl = `${a}－${b}＝${ans} だよ。くり下がりに気をつけよう！`;
+        break;
+
+      case 'num':
+        { const h = rnd(1,9), t = rnd(0,9), o = rnd(0,9);
+          ans = h * 100 + t * 10 + o;
+          q = `百のくらいが ${h}、十のくらいが ${t}、一のくらいが ${o} の数は？`;
+          expl = `${h}×100＋${t}×10＋${o}＝${ans} だよ。`; }
+        break;
+
+      case 'len':
+        a = rnd(1, 5); b = rnd(1, 9);
+        ans = a * 10 + b;
+        q = `${a}cm${b}mm は なんmmですか？`;
+        expl = `${a}cm＝${a * 10}mm なので、${a * 10}＋${b}＝${ans}mm だよ。`;
+        break;
+
+      case 'vol':
+        a = rnd(1, 4); b = rnd(1, 9);
+        ans = a * 10 + b;
+        q = `${a}L${b}dL は なんdLですか？`;
+        expl = `${a}L＝${a * 10}dL なので、${a * 10}＋${b}＝${ans}dL だよ。`;
+        break;
+
+      case 'time':
+        { const h = rnd(7, 11), m = rnd(1, 5) * 10, add = rnd(1, 3) * 10;
+          ans = h + Math.floor((m + add) / 60);
+          q = `${h}じ ${m}ふん の ${add}ふん あとは なんじ ですか？`;
+          expl = `${m}＋${add}分たつと ${ans}じ だよ。`; }
+        break;
+
+      case 'mul':
+        a = rnd(2, 9); b = rnd(1, 9);
+        ans = a * b;
+        q = `${a} × ${b} は いくつですか？`;
+        expl = `${a}×${b}＝${ans} だよ。${a}のだんを覚えよう！`;
+        break;
+
+      case 'shape':
+        { const shapes = [
+            { name: '三角形', sides: 3 },
+            { name: '四角形', sides: 4 },
+            { name: '長方形', sides: 4 },
+          ];
+          const s = shapes[rnd(0, shapes.length - 1)];
+          ans = s.sides;
+          q = `${s.name} の 辺は なんぼんありますか？`;
+          expl = `${s.name}の辺は${ans}本だよ。`; }
+        break;
+
+      default:
+        a = rnd(10, 50); b = rnd(1, 20); ans = a + b;
+        q = `${a}＋${b}は？`; expl = `答えは${ans}だよ。`;
+    }
+    return { q, ans, display, expl, hint: HINTS[unitId] || 'よく考えてみよう！' };
+  }
+
+  /* ============================================================
+     アプリの状態管理
+  ============================================================ */
+  let currentUser  = '';
+  let currentUnit  = null;
+  let currentMode  = '';
+  let progress     = {};
+  let problems     = [];
+  let problemIdx   = 0;
+  let sessionScore = 0;
+  let attempts     = 0;
+
+  /* ============================================================
+     進捗の保存・読み込み
+     TODO: Firebase接続後はFirestoreに切り替える
+  ============================================================ */
+  function loadProgress() {
+    try {
+      const saved = localStorage.getItem('progress_' + currentUser);
+      progress = saved ? JSON.parse(saved) : {};
+    } catch (e) { progress = {}; }
+  }
+
+  function saveProgress() {
+    try {
+      localStorage.setItem('progress_' + currentUser, JSON.stringify(progress));
+    } catch (e) {}
+  }
+
+  /* ============================================================
+     ⭐ 星の計算（最大3つ）
+  ============================================================ */
+  function getStars(unitId) {
+    const p = progress[unitId] || {};
+    let stars = 0;
+    if (p.previewDone)       stars++;  // よしゅう完了
+    if ((p.bestScore || 0) >= 3) stars++;  // 3問以上正解
+    if ((p.bestScore || 0) >= 5) stars++;  // 全問正解
+    return stars;
+  }
+
+  /* ============================================================
+     画面の切り替え
+  ============================================================ */
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  /* ============================================================
+     ホーム画面：単元一覧を描画
+  ============================================================ */
+  function renderHome() {
+    const grid = document.getElementById('unitGrid');
+    grid.innerHTML = UNITS.map(u => {
+      const s = getStars(u.id);
+      const starHtml = [0, 1, 2].map(i => `<span>${i < s ? '⭐' : '☆'}</span>`).join('');
+      return `
+        <div class="unit-card" onclick="openUnit('${u.id}')">
+          <div class="unit-icon">${u.icon}</div>
+          <div class="unit-name">${u.name}</div>
+          <div class="unit-chapter">${u.chapter}</div>
+          <div class="unit-stars">${starHtml}</div>
+        </div>`;
+    }).join('');
+  }
+
+  /* ============================================================
+     単元選択画面を表示
+  ============================================================ */
+  function openUnit(unitId) {
+    currentUnit = UNITS.find(u => u.id === unitId);
+    const pct = Math.round(getStars(unitId) / 3 * 100);
+    document.getElementById('uIcon').textContent         = currentUnit.icon;
+    document.getElementById('uTitle').textContent        = currentUnit.name;
+    document.getElementById('uDesc').textContent         = currentUnit.desc;
+    document.getElementById('uProgress').style.width     = pct + '%';
+    document.getElementById('uProgressLabel').textContent = `たっせい度：${pct}%`;
+    showScreen('S_unit');
+  }
+
+  /* ============================================================
+     問題を開始する
+  ============================================================ */
+  function startMode(mode) {
+    currentMode  = mode;
+    sessionScore = 0;
+    problemIdx   = 0;
+    problems     = Array.from({ length: 5 }, (_, i) => makeProblem(currentUnit.id, i + 1));
+
+    document.getElementById('quizTitle').textContent = `${currentUnit.icon} ${currentUnit.name}`;
+    document.getElementById('quizSub').textContent   = mode === 'preview' ? 'よしゅう' : 'ふくしゅう';
+    document.getElementById('scoreTxt').textContent  = '0';
+
+    showScreen('S_quiz');
+    renderProblem();
+  }
+
+  /* ============================================================
+     問題を描画する
+  ============================================================ */
+  function renderProblem() {
+    if (problemIdx >= 5) { showResult(); return; }
+    attempts = 0;
+
+    const p = problems[problemIdx];
+    const introList = INTRO[currentUnit.id] || ['いっしょにがんばろう！'];
+    const msg = problemIdx === 0
+      ? introList[rnd(0, introList.length - 1)]
+      : `${problemIdx + 1}もん目だよ。がんばって！`;
+
+    /* 進行ドット */
+    const dots = Array.from({ length: 5 }, (_, i) => {
+      let cls = 'pdot';
+      if (i < problemIdx)     cls += ' done';
+      else if (i === problemIdx) cls += ' current';
+      return `<div class="${cls}"></div>`;
+    }).join('');
+
+    /* 筆算表示（display がある場合のみ） */
+    const calcHtml = p.display ? `
+      <div class="calc-display">
+        <div class="calc-row"><span>${p.display.left}</span></div>
+        <div class="calc-row">
+          <span class="calc-op">${p.display.op}</span>
+          <span>${p.display.right}</span>
+        </div>
+        <hr class="calc-divider">
+        <div class="calc-row calc-answer" id="calcAns">？</div>
+      </div>` : '';
+
+    document.getElementById('quizBody').innerHTML = `
+      <div class="tutor-bubble">
+        <div class="tutor-icon">🦉</div>
+        <div class="tutor-text" id="tutorMsg">${msg}</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-number">${problemIdx + 1}もんめ / 5もん</div>
+        <div class="progress-dots">${dots}</div>
+        <div class="problem-text">${p.q}</div>
+        ${calcHtml}
+        <div class="answer-row">
+          <div class="answer-label">こたえ：</div>
+          <input id="answerInput" class="answer-input" type="number"
+                 placeholder="？" min="0" max="9999"/>
+          <button id="checkBtn" class="check-btn" onclick="checkAnswer()">かくにん</button>
+        </div>
+        <div id="feedback"></div>
+      </div>
+      <div class="numpad">
+        ${[7,8,9,4,5,6,1,2,3].map(n =>
+          `<button class="np-btn" onclick="numPad(${n})">${n}</button>`).join('')}
+        <button class="np-btn del" onclick="numDel()">けす</button>
+        <button class="np-btn" onclick="numPad(0)">0</button>
+        <button class="np-btn ok" onclick="checkAnswer()">OK</button>
+      </div>`;
+
+    document.getElementById('answerInput').focus();
+    document.getElementById('answerInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter') checkAnswer();
+    });
+  }
+
+  /* ============================================================
+     数字キーパッド
+  ============================================================ */
+  function numPad(n) {
+    const inp = document.getElementById('answerInput');
+    if (!inp) return;
+    inp.value = (inp.value || '') + n;
+    const ca = document.getElementById('calcAns');
+    if (ca) ca.textContent = inp.value;
+  }
+
+  function numDel() {
+    const inp = document.getElementById('answerInput');
+    if (!inp) return;
+    inp.value = inp.value.slice(0, -1);
+    const ca = document.getElementById('calcAns');
+    if (ca) ca.textContent = inp.value || '？';
+  }
+
+  /* ============================================================
+     答えを確認する
+  ============================================================ */
+  function checkAnswer() {
+    const inp = document.getElementById('answerInput');
+    if (!inp || inp.value === '') return;
+
+    const userAnswer = parseInt(inp.value);
+    const p = problems[problemIdx];
+    const isCorrect = userAnswer === p.ans;
+    attempts++;
+
+    inp.className = 'answer-input ' + (isCorrect ? 'correct' : 'wrong');
+    const fb = document.getElementById('feedback');
+    const ca = document.getElementById('calcAns');
+
+    if (isCorrect) {
+      /* 正解 */
+      if (ca) ca.textContent = p.ans;
+      sessionScore++;
+      document.getElementById('scoreTxt').textContent = sessionScore;
+      fb.className = 'feedback correct';
+      fb.textContent = '⭕ せいかい！ ' + p.expl;
+      document.getElementById('checkBtn').disabled = true;
+      setTimeout(() => { problemIdx++; renderProblem(); }, 1800);
+
+    } else if (attempts === 1) {
+      /* 1回目の間違い → ヒント */
+      fb.className = 'feedback hint';
+      fb.textContent = '❓ もう少し！ ヒント：' + p.hint;
+      document.getElementById('tutorMsg').textContent = 'もう一かいかんがえてみよう！';
+
+    } else {
+      /* 2回目の間違い → 正解を表示 */
+      if (ca) ca.textContent = p.ans;
+      fb.className = 'feedback wrong';
+      fb.innerHTML = `✕ こたえは <b>${p.ans}</b> だよ。${p.expl}`;
+      document.getElementById('checkBtn').disabled = true;
+      setTimeout(() => { problemIdx++; renderProblem(); }, 2200);
+    }
+  }
+
+  /* ============================================================
+     結果画面を表示する
+  ============================================================ */
+  function showResult() {
+    /* 進捗を保存 */
+    if (!progress[currentUnit.id]) progress[currentUnit.id] = {};
+    if (currentMode === 'preview') progress[currentUnit.id].previewDone = true;
+    if (sessionScore > (progress[currentUnit.id].bestScore || 0)) {
+      progress[currentUnit.id].bestScore = sessionScore;
+    }
+    saveProgress();
+
+    /* 結果メッセージ */
+    let icon, title, sub;
+    if (sessionScore === 5) {
+      icon = '🏆'; title = 'かんぺき！すごい！'; sub = '全問せいかいだよ！おめでとう！';
+    } else if (sessionScore >= 3) {
+      icon = '⭐'; title = 'よくできました！';   sub = 'もう一回で満点ねらえるよ！';
+    } else {
+      icon = '💪'; title = 'つぎはもっとできる！'; sub = 'もう一度チャレンジしよう！';
+    }
+
+    document.getElementById('resultIcon').textContent   = icon;
+    document.getElementById('resultTitle').textContent  = title;
+    document.getElementById('resultSub').textContent    = sub;
+    document.getElementById('resultScore').textContent  = `${sessionScore}/5`;
+    document.getElementById('resultDetail').textContent =
+      `せいかい${sessionScore}もん（${Math.round(sessionScore / 5 * 100)}%）`;
+
+    showScreen('S_result');
+  }
+
+  /* ============================================================
+     イベント設定
+  ============================================================ */
+
+  /* ログイン */
+  document.getElementById('nameInput').addEventListener('input', function () {
+    document.getElementById('startBtn').disabled = !this.value.trim();
+  });
+
+  document.getElementById('startBtn').addEventListener('click', () => {
+    currentUser = document.getElementById('nameInput').value.trim();
+    if (!currentUser) return;
+    loadProgress();
+    document.getElementById('welcomeName').textContent = currentUser + 'さん、こんにちは！';
+    renderHome();
+    showScreen('S_home');
+  });
+
+  document.getElementById('nameInput').addEventListener('keydown', e => {
+    if (e.key === 'Enter') document.getElementById('startBtn').click();
+  });
+
+  /* ログアウト */
+  document.getElementById('logoutBtn').addEventListener('click', () => {
+    currentUser = ''; progress = {};
+    document.getElementById('nameInput').value = '';
+    document.getElementById('startBtn').disabled = true;
+    showScreen('S_login');
+  });
+
+  /* 単元画面 → ホームにもどる */
+  document.getElementById('backHome').addEventListener('click', () => {
+    renderHome(); showScreen('S_home');
+  });
+
+  /* よしゅう・ふくしゅう */
+  document.getElementById('previewBtn').addEventListener('click', () => startMode('preview'));
+  document.getElementById('reviewBtn').addEventListener('click', () => startMode('review'));
+
+  /* 結果画面 */
+  document.getElementById('retryBtn').addEventListener('click', () => startMode(currentMode));
+  document.getElementById('homeBtn').addEventListener('click', () => {
+    renderHome(); showScreen('S_home');
+  });
+
+</script>
 </body>
 </html>
