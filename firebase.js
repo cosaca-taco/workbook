@@ -1,20 +1,25 @@
 /* ============================================================
    firebase.js
    Firebase の初期化・認証・Firestore 操作をまとめたファイル
-   index.html から import して使う
+   ・子ども用：匿名認証 + 進捗の保存/読み込み + 問題の取得
+   ・先生用  ：メール認証 + 問題の追加/編集/削除
 ============================================================ */
 
-// Firebase SDK（CDN経由）
 import { initializeApp }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInAnonymously }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  getAuth, signInAnonymously,
+  signInWithEmailAndPassword, signOut
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore,
+  collection, doc,
+  getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc,
+  query, where, orderBy, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 /* ============================================================
    Firebase 設定
-   ※ APIキーはGitHubに公開されますが、セキュリティルールで保護されているので問題ありません
 ============================================================ */
 const firebaseConfig = {
   apiKey:            "AIzaSyBJ6PmF2zjYf51nC1nWwMMFHyEGGd4wU3g",
@@ -26,14 +31,12 @@ const firebaseConfig = {
   measurementId:     "G-STNDF8HY3X",
 };
 
-const app  = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db   = getFirestore(app);
 
 /* ============================================================
-   匿名サインイン
-   子どもがアカウント作成なしで使えるようにする
-   戻り値: Firebase User オブジェクト（失敗時は null）
+   認証：子ども用（匿名）
 ============================================================ */
 export async function signInUser() {
   try {
@@ -46,8 +49,24 @@ export async function signInUser() {
 }
 
 /* ============================================================
-   ユーザーを初回作成する
-   すでに存在する場合は何もしない
+   認証：先生用（メール/パスワード）
+============================================================ */
+export async function signInTeacher(email, password) {
+  try {
+    const result = await signInWithEmailAndPassword(auth, email, password);
+    return result.user;
+  } catch (e) {
+    console.error("signInTeacher:", e);
+    return null;
+  }
+}
+
+export async function signOutUser() {
+  try { await signOut(auth); } catch (e) { console.error("signOut:", e); }
+}
+
+/* ============================================================
+   ユーザー管理（子ども）
 ============================================================ */
 export async function createUserIfNew(uid, name) {
   try {
@@ -55,53 +74,20 @@ export async function createUserIfNew(uid, name) {
     const snap = await getDoc(ref);
     if (!snap.exists()) {
       await setDoc(ref, {
-        name,
-        gradeId:   "g2",
-        progress:  {},
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp(),
+        name, gradeId: "g2", progress: {},
+        createdAt: serverTimestamp(), updatedAt: serverTimestamp(),
       });
     }
-  } catch (e) {
-    console.error("createUserIfNew:", e);
-  }
+  } catch (e) { console.error("createUserIfNew:", e); }
 }
 
-/* ============================================================
-   進捗を読み込む
-   戻り値: progress オブジェクト（例: { add: { s1: {cleared, bestScore} } }）
-============================================================ */
 export async function loadProgress(uid) {
   try {
     const snap = await getDoc(doc(db, "users", uid));
-    if (snap.exists()) return snap.data().progress || {};
-    return {};
-  } catch (e) {
-    console.error("loadProgress:", e);
-    return {};
-  }
+    return snap.exists() ? (snap.data().progress || {}) : {};
+  } catch (e) { console.error("loadProgress:", e); return {}; }
 }
 
-/* ============================================================
-   進捗を保存する
-   progress オブジェクトごと上書き（merge: true で他フィールドは保持）
-
-   Firestoreのデータ構造:
-   users/{uid}/
-     name: "たろう"
-     gradeId: "g2"
-     progress: {
-       add: {
-         s1: { cleared: true,  bestScore: 5 },
-         s2: { cleared: false, bestScore: 3 },
-         s3: { cleared: false, bestScore: 0 },
-       },
-       sub: { ... },
-       mul: { ... },
-     }
-     createdAt: timestamp
-     updatedAt: timestamp
-============================================================ */
 export async function saveProgress(uid, name, progress) {
   try {
     await setDoc(
@@ -109,7 +95,116 @@ export async function saveProgress(uid, name, progress) {
       { name, progress, updatedAt: serverTimestamp() },
       { merge: true }
     );
+  } catch (e) { console.error("saveProgress:", e); }
+}
+
+/* ============================================================
+   問題の取得（子ども用）
+   unitId・stageId でフィルタして isPublished=true のものを返す
+   問題が5問未満の場合は空配列を返す → JS生成にフォールバック
+
+   Firestoreのデータ構造:
+   problems/{自動ID}
+     unitId:      "add"
+     gradeId:     "g2"
+     stageId:     1
+     question:    "23＋47は？"
+     answer:      70
+     hint:        "一の位から計算しよう"
+     explanation: "くり上がりに注意！"
+     displayType: "calc"  ← "calc" or "text"
+     displayLeft:  23     ← calcのとき
+     displayOp:   "+"     ← calcのとき: "+" or "−"
+     displayRight: 47     ← calcのとき
+     isPublished: true
+     createdAt:   timestamp
+     updatedAt:   timestamp
+============================================================ */
+export async function getProblems(unitId, stageId) {
+  try {
+    const q = query(
+      collection(db, "problems"),
+      where("unitId",      "==", unitId),
+      where("stageId",     "==", stageId),
+      where("isPublished", "==", true)
+    );
+    const snap = await getDocs(q);
+    const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    /* 5問未満なら空配列（JSフォールバック用） */
+    if (list.length < 5) return [];
+
+    /* ランダムに5問選んで返す */
+    return shuffleArray(list).slice(0, 5);
   } catch (e) {
-    console.error("saveProgress:", e);
+    console.error("getProblems:", e);
+    return [];
+  }
+}
+
+/* 配列をシャッフルするユーティリティ */
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ============================================================
+   問題の管理（先生用）
+============================================================ */
+
+/* 全問題を取得（管理画面用） */
+export async function getAllProblems() {
+  try {
+    const snap = await getDocs(
+      query(collection(db, "problems"), orderBy("createdAt", "desc"))
+    );
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) {
+    console.error("getAllProblems:", e);
+    return [];
+  }
+}
+
+/* 問題を追加 */
+export async function addProblem(data) {
+  try {
+    const ref = await addDoc(collection(db, "problems"), {
+      ...data,
+      isPublished: data.isPublished ?? true,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    });
+    return ref.id;
+  } catch (e) {
+    console.error("addProblem:", e);
+    return null;
+  }
+}
+
+/* 問題を更新 */
+export async function updateProblem(id, data) {
+  try {
+    await updateDoc(doc(db, "problems", id), {
+      ...data, updatedAt: serverTimestamp(),
+    });
+    return true;
+  } catch (e) {
+    console.error("updateProblem:", e);
+    return false;
+  }
+}
+
+/* 問題を削除 */
+export async function deleteProblem(id) {
+  try {
+    await deleteDoc(doc(db, "problems", id));
+    return true;
+  } catch (e) {
+    console.error("deleteProblem:", e);
+    return false;
   }
 }

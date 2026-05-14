@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>さんすうのもり｜管理画面</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --amber:#EF9F27;--amber-d:#C97E10;--amber-l:#FAEEDA;
+      --green:#2D7A4F;--green-l:#E1F5EE;
+      --red:#E24B4A;--red-l:#FCEBEB;
+      --blue:#2563EB;--blue-l:#EFF6FF;
+      --bg:#F8F7F4;--card:#FFFFFF;--border:#E0D8CC;
+      --text:#1A1208;--muted:#8A7A60;--shadow:0 2px 8px rgba(0,0,0,.07);
+    }
+    body{font-family:'Hiragino Sans','Yu Gothic UI','Meiryo',sans-serif;background:var(--bg);color:var(--text);font-size:14px;}
+    /* レイアウト */
+    .admin-wrap{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+    .sidebar{background:var(--text);color:#fff;padding:1.5rem 1rem;display:flex;flex-direction:column;gap:1rem}
+    .sidebar-title{font-size:16px;font-weight:700;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.15)}
+    .sidebar-sub{font-size:12px;opacity:.6;margin-bottom:.5rem}
+    .filter-select{width:100%;padding:8px 10px;border-radius:8px;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:13px;cursor:pointer}
+    .filter-select option{background:var(--text)}
+    .sidebar-info{margin-top:auto;font-size:11px;opacity:.5;line-height:1.6}
+    .main{padding:1.5rem;overflow-y:auto}
+    /* ヘッダー */
+    .main-header{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem}
+    .main-title{font-size:20px;font-weight:700}
+    .header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+    .teacher-name{font-size:13px;color:var(--muted)}
+    /* ボタン */
+    .btn{padding:9px 16px;font-size:13px;font-weight:600;border:none;border-radius:9px;cursor:pointer;transition:opacity .15s}
+    .btn:hover{opacity:.85}
+    .btn-add{background:var(--amber);color:#3D2000;box-shadow:0 3px 0 var(--amber-d)}
+    .btn-edit{background:var(--blue-l);color:var(--blue)}
+    .btn-del{background:var(--red-l);color:var(--red)}
+    .btn-save{background:var(--green);color:#fff;width:100%;padding:12px;font-size:14px}
+    .btn-cancel{background:#F0EDE8;color:#555;width:100%;padding:12px;font-size:14px;margin-top:8px}
+    .btn-logout{background:rgba(255,255,255,.1);color:#fff;font-size:12px;padding:7px 12px;border-radius:8px;border:none;cursor:pointer}
+    /* テーブル */
+    .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
+    table{width:100%;border-collapse:collapse}
+    th{background:#F5F1EB;padding:10px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)}
+    td{padding:12px 14px;border-bottom:1px solid #F0EDE8;vertical-align:top}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#FAFAF8}
+    .q-text{font-weight:500;margin-bottom:4px}
+    .q-meta{font-size:12px;color:var(--muted)}
+    .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700}
+    .badge-pub{background:var(--green-l);color:var(--green)}
+    .badge-draft{background:#F0EDE8;color:var(--muted)}
+    .badge-unit{background:var(--amber-l);color:var(--amber-d)}
+    .badge-stage{background:var(--blue-l);color:var(--blue)}
+    .empty-state{text-align:center;padding:3rem;color:var(--muted)}
+    .empty-icon{font-size:40px;margin-bottom:8px}
+    /* フォーム（モーダル） */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+    .modal-overlay.active{display:flex}
+    .modal{background:var(--card);border-radius:20px;padding:1.75rem;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+    .modal-title{font-size:18px;font-weight:700;margin-bottom:1.25rem}
+    .form-group{margin-bottom:1rem}
+    .form-label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:5px}
+    .form-input,.form-select,.form-textarea{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;background:#fff;outline:none;font-family:inherit}
+    .form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--amber)}
+    .form-textarea{resize:vertical;min-height:70px}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .form-row3{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
+    .calc-sep{text-align:center;font-size:18px;font-weight:700;color:var(--amber)}
+    .calc-fields{background:#F8F4EE;border-radius:10px;padding:12px;margin-bottom:1rem}
+    .calc-label{font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:700}
+    .toggle-row{display:flex;align-items:center;gap:10px}
+    .toggle{position:relative;width:44px;height:24px;flex-shrink:0}
+    .toggle input{opacity:0;width:0;height:0}
+    .toggle-slider{position:absolute;inset:0;background:#D9D3C8;border-radius:24px;cursor:pointer;transition:.2s}
+    .toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+    .toggle input:checked+.toggle-slider{background:var(--green)}
+    .toggle input:checked+.toggle-slider:before{transform:translateX(20px)}
+    /* ログイン */
+    .login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh}
+    .login-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2.5rem 2rem;width:100%;max-width:360px;text-align:center;box-shadow:var(--shadow)}
+    .login-logo{font-size:44px;margin-bottom:8px}
+    .login-title{font-size:20px;font-weight:700;margin-bottom:4px}
+    .login-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
+    .login-input{width:100%;padding:11px;font-size:15px;border:1.5px solid var(--border);border-radius:10px;margin-bottom:10px;outline:none;font-family:inherit}
+    .login-input:focus{border-color:var(--amber)}
+    .login-btn{width:100%;padding:13px;font-size:15px;font-weight:700;background:var(--amber);color:#3D2000;border:none;border-radius:12px;cursor:pointer;box-shadow:0 3px 0 var(--amber-d)}
+    .login-err{font-size:13px;color:var(--red);margin-top:8px;min-height:18px}
+    /* ローディング */
+    .loading{display:flex;align-items:center;justify-content:center;height:200px;gap:10px;color:var(--muted)}
+    .spinner{width:28px;height:28px;border:3px solid var(--amber-l);border-top-color:var(--amber);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    /* スナックバー */
+    .snack{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1A1208;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .3s;z-index:200;white-space:nowrap}
+    .snack.show{opacity:1}
+  </style>
+</head>
+<body>
+
+<!-- ログイン画面 -->
+<div id="loginPage">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">🦉</div>
+      <div class="login-title">さんすうのもり</div>
+      <div class="login-sub">先生用・管理画面</div>
+      <input id="emailInput"    class="login-input" type="email"    placeholder="メールアドレス"/>
+      <input id="passwordInput" class="login-input" type="password" placeholder="パスワード"/>
+      <button id="loginBtn" class="login-btn">ログイン</button>
+      <div class="login-err" id="loginErr"></div>
+    </div>
+  </div>
+</div>
+
+<!-- 管理画面 -->
+<div id="adminPage" style="display:none">
+  <div class="admin-wrap">
+    <!-- サイドバー -->
+    <div class="sidebar">
+      <div class="sidebar-title">🌳 さんすうのもり<br><span style="font-size:12px;opacity:.7">管理画面</span></div>
+      <div>
+        <div class="sidebar-sub">学年でしぼる</div>
+        <select id="filterGrade" class="filter-select">
+          <option value="">すべての学年</option>
+          <option value="g2" selected>2年生</option>
+        </select>
+      </div>
+      <div>
+        <div class="sidebar-sub">単元でしぼる</div>
+        <select id="filterUnit" class="filter-select">
+          <option value="">すべての単元</option>
+          <option value="add">➕ たし算の筆算</option>
+          <option value="sub">➖ ひき算の筆算</option>
+          <option value="num">🔢 1000までの数</option>
+          <option value="len">📏 長さ</option>
+          <option value="vol">🫙 かさ</option>
+          <option value="time">⏰ 時こくと時間</option>
+          <option value="mul">✖️ かけ算（九九）</option>
+          <option value="shape">🔷 三角形と四角形</option>
+        </select>
+      </div>
+      <div>
+        <div class="sidebar-sub">ステージでしぼる</div>
+        <select id="filterStage" class="filter-select">
+          <option value="">すべてのステージ</option>
+          <option value="1">🌱 ステージ1「きほん」</option>
+          <option value="2">🌿 ステージ2「れんしゅう」</option>
+          <option value="3">🌟 ステージ3「チャレンジ」</option>
+        </select>
+      </div>
+      <div>
+        <div class="sidebar-sub">公開状態</div>
+        <select id="filterPublished" class="filter-select">
+          <option value="">すべて</option>
+          <option value="true">公開中</option>
+          <option value="false">非公開</option>
+        </select>
+      </div>
+      <div class="sidebar-info">
+        ・5問以上登録すると子どもの画面でFirestoreの問題が使われます<br>
+        ・5問未満の場合は自動生成問題が表示されます
+      </div>
+    </div>
+
+    <!-- メイン -->
+    <div class="main">
+      <div class="main-header">
+        <div class="main-title">問題管理</div>
+        <div class="header-right">
+          <span class="teacher-name" id="teacherEmail"></span>
+          <button id="addBtn" class="btn btn-add">＋ 問題を追加</button>
+          <button id="logoutBtn" class="btn-logout">ログアウト</button>
+        </div>
+      </div>
+
+      <!-- 問題一覧 -->
+      <div id="problemList">
+        <div class="loading"><div class="spinner"></div><div>よみこみ中…</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 追加・編集モーダル -->
+<div id="modal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title" id="modalTitle">問題を追加</div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">単元</label>
+        <select id="f_unitId" class="form-select">
+          <option value="add">➕ たし算の筆算</option>
+          <option value="sub">➖ ひき算の筆算</option>
+          <option value="num">🔢 1000までの数</option>
+          <option value="len">📏 長さ</option>
+          <option value="vol">🫙 かさ</option>
+          <option value="time">⏰ 時こくと時間</option>
+          <option value="mul">✖️ かけ算（九九）</option>
+          <option value="shape">🔷 三角形と四角形</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">ステージ</label>
+        <select id="f_stageId" class="form-select">
+          <option value="1">🌱 ステージ1「きほん」</option>
+          <option value="2">🌿 ステージ2「れんしゅう」</option>
+          <option value="3">🌟 ステージ3「チャレンジ」</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">問題文</label>
+      <textarea id="f_question" class="form-textarea" placeholder="例: 23 ＋ 47 は いくつですか？"></textarea>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">答え（数字）</label>
+        <input id="f_answer" class="form-input" type="number" placeholder="例: 70"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">表示タイプ</label>
+        <select id="f_displayType" class="form-select">
+          <option value="text">テキストのみ</option>
+          <option value="calc">筆算形式で表示</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 筆算フィールド（calcのとき表示） -->
+    <div class="calc-fields" id="calcFields" style="display:none">
+      <div class="calc-label">筆算の設定</div>
+      <div class="form-row3">
+        <div class="form-group" style="margin:0">
+          <label class="form-label">左の数</label>
+          <input id="f_displayLeft" class="form-input" type="number" placeholder="例: 23"/>
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">演算子</label>
+          <select id="f_displayOp" class="form-select">
+            <option value="+">＋</option>
+            <option value="−">－</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">右の数</label>
+          <input id="f_displayRight" class="form-input" type="number" placeholder="例: 47"/>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">ヒント</label>
+      <input id="f_hint" class="form-input" type="text" placeholder="例: 一の位から計算しよう"/>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">解説</label>
+      <input id="f_explanation" class="form-input" type="text" placeholder="例: 3＋7＝10、くり上がりに注意！"/>
+    </div>
+
+    <div class="form-group">
+      <div class="toggle-row">
+        <label class="toggle">
+          <input type="checkbox" id="f_isPublished" checked/>
+          <span class="toggle-slider"></span>
+        </label>
+        <span style="font-size:13px">公開する（子どもの画面に表示される）</span>
+      </div>
+    </div>
+
+    <button class="btn btn-save" id="saveBtn">保存する</button>
+    <button class="btn btn-cancel" id="cancelBtn">キャンセル</button>
+  </div>
+</div>
+
+<!-- スナックバー -->
+<div class="snack" id="snack"></div>
+
+<script type="module">
+import {
+  auth, signInTeacher, signOutUser,
+  getAllProblems, addProblem, updateProblem, deleteProblem
+} from "../firebase.js";
+
+/* ============================================================
+   定数
+============================================================ */
+const UNIT_NAMES = {
+  add:'たし算の筆算',sub:'ひき算の筆算',num:'1000までの数',
+  len:'長さ',vol:'かさ',time:'時こくと時間',mul:'かけ算（九九）',shape:'三角形と四角形',
+};
+const STAGE_NAMES = {1:'きほん',2:'れんしゅう',3:'チャレンジ'};
+const STAGE_ICONS = {1:'🌱',2:'🌿',3:'🌟'};
+
+/* ============================================================
+   状態
+============================================================ */
+let allProblems = [];
+let editingId   = null; // 編集中の問題ID（nullなら新規）
+
+/* ============================================================
+   スナックバー
+============================================================ */
+function showSnack(msg, isError=false){
+  const el=document.getElementById('snack');
+  el.textContent=msg;
+  el.style.background=isError?'#E24B4A':'#1A1208';
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+/* ============================================================
+   ログイン
+============================================================ */
+document.getElementById('loginBtn').addEventListener('click', async()=>{
+  const email    = document.getElementById('emailInput').value.trim();
+  const password = document.getElementById('passwordInput').value;
+  const err      = document.getElementById('loginErr');
+  if(!email||!password){ err.textContent='メールアドレスとパスワードを入力してください'; return; }
+  err.textContent='ログイン中…';
+  const user = await signInTeacher(email, password);
+  if(!user){ err.textContent='メールアドレスまたはパスワードが違います'; return; }
+  document.getElementById('teacherEmail').textContent=user.email;
+  document.getElementById('loginPage').style.display='none';
+  document.getElementById('adminPage').style.display='block';
+  await loadProblems();
+});
+
+document.getElementById('passwordInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginBtn').click();});
+
+document.getElementById('logoutBtn').addEventListener('click', async()=>{
+  await signOutUser();
+  document.getElementById('adminPage').style.display='none';
+  document.getElementById('loginPage').style.display='block';
+  document.getElementById('emailInput').value='';
+  document.getElementById('passwordInput').value='';
+  document.getElementById('loginErr').textContent='';
+});
+
+/* ============================================================
+   問題の読み込み・表示
+============================================================ */
+async function loadProblems(){
+  document.getElementById('problemList').innerHTML='<div class="loading"><div class="spinner"></div><div>よみこみ中…</div></div>';
+  allProblems = await getAllProblems();
+  renderTable();
+}
+
+function getFiltered(){
+  const grade     = document.getElementById('filterGrade').value;
+  const unit      = document.getElementById('filterUnit').value;
+  const stage     = document.getElementById('filterStage').value;
+  const published = document.getElementById('filterPublished').value;
+  return allProblems.filter(p=>{
+    if(grade     && p.gradeId      !== grade)            return false;
+    if(unit      && p.unitId       !== unit)             return false;
+    if(stage     && String(p.stageId) !== stage)         return false;
+    if(published && String(p.isPublished) !== published) return false;
+    return true;
+  });
+}
+
+function renderTable(){
+  const list = getFiltered();
+  const el   = document.getElementById('problemList');
+  if(list.length===0){
+    el.innerHTML=`<div class="table-wrap"><div class="empty-state"><div class="empty-icon">📭</div><div>問題がありません</div><div style="font-size:12px;color:var(--muted);margin-top:4px">「＋ 問題を追加」ボタンで追加してください</div></div></div>`;
+    return;
+  }
+  el.innerHTML=`
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>問題文</th>
+            <th>単元 / ステージ</th>
+            <th>答え</th>
+            <th>公開</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>`;
+  const tbody=document.getElementById('tbody');
+  list.forEach(p=>{
+    const tr=document.createElement('tr');
+    tr.innerHTML=`
+      <td><div class="q-text">${p.question||'（問題文なし）'}</div><div class="q-meta">ヒント：${p.hint||'—'}</div></td>
+      <td>
+        <span class="badge badge-unit">${UNIT_NAMES[p.unitId]||p.unitId}</span><br>
+        <span class="badge badge-stage" style="margin-top:4px">${STAGE_ICONS[p.stageId]||''} ${STAGE_NAMES[p.stageId]||p.stageId}</span>
+      </td>
+      <td><strong>${p.answer}</strong></td>
+      <td><span class="badge ${p.isPublished?'badge-pub':'badge-draft'}">${p.isPublished?'公開中':'非公開'}</span></td>
+      <td style="white-space:nowrap">
+        <button class="btn btn-edit" data-id="${p.id}">編集</button>
+        <button class="btn btn-del"  data-id="${p.id}" style="margin-left:6px">削除</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+
+  /* 編集・削除ボタン */
+  tbody.querySelectorAll('.btn-edit').forEach(btn=>{
+    btn.addEventListener('click',()=>openModal(btn.dataset.id));
+  });
+  tbody.querySelectorAll('.btn-del').forEach(btn=>{
+    btn.addEventListener('click',()=>handleDelete(btn.dataset.id));
+  });
+}
+
+/* フィルター変更 */
+['filterGrade','filterUnit','filterStage','filterPublished'].forEach(id=>{
+  document.getElementById(id).addEventListener('change',renderTable);
+});
+
+/* ============================================================
+   モーダル：追加・編集
+============================================================ */
+document.getElementById('addBtn').addEventListener('click',()=>openModal(null));
+document.getElementById('cancelBtn').addEventListener('click',closeModal);
+document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
+
+/* 筆算フィールドの表示切替 */
+document.getElementById('f_displayType').addEventListener('change',function(){
+  document.getElementById('calcFields').style.display=this.value==='calc'?'block':'none';
+});
+
+function openModal(id){
+  editingId=id;
+  const modal=document.getElementById('modal');
+  document.getElementById('modalTitle').textContent=id?'問題を編集':'問題を追加';
+  if(id){
+    /* 編集：既存データを埋める */
+    const p=allProblems.find(p=>p.id===id);
+    if(!p)return;
+    document.getElementById('f_unitId').value      = p.unitId    ||'add';
+    document.getElementById('f_stageId').value     = p.stageId   ||1;
+    document.getElementById('f_question').value    = p.question  ||'';
+    document.getElementById('f_answer').value      = p.answer    ||'';
+    document.getElementById('f_displayType').value = p.displayType||'text';
+    document.getElementById('f_displayLeft').value = p.displayLeft||'';
+    document.getElementById('f_displayOp').value   = p.displayOp ||'+';
+    document.getElementById('f_displayRight').value= p.displayRight||'';
+    document.getElementById('f_hint').value        = p.hint       ||'';
+    document.getElementById('f_explanation').value = p.explanation||'';
+    document.getElementById('f_isPublished').checked=p.isPublished!==false;
+    document.getElementById('calcFields').style.display=p.displayType==='calc'?'block':'none';
+  } else {
+    /* 新規：フォームリセット */
+    ['f_question','f_answer','f_displayLeft','f_displayRight','f_hint','f_explanation'].forEach(id=>document.getElementById(id).value='');
+    document.getElementById('f_unitId').value='add';
+    document.getElementById('f_stageId').value='1';
+    document.getElementById('f_displayType').value='text';
+    document.getElementById('f_displayOp').value='+';
+    document.getElementById('f_isPublished').checked=true;
+    document.getElementById('calcFields').style.display='none';
+  }
+  modal.classList.add('active');
+}
+
+function closeModal(){
+  document.getElementById('modal').classList.remove('active');
+  editingId=null;
+}
+
+/* 保存 */
+document.getElementById('saveBtn').addEventListener('click', async()=>{
+  const question    = document.getElementById('f_question').value.trim();
+  const answer      = parseInt(document.getElementById('f_answer').value);
+  const displayType = document.getElementById('f_displayType').value;
+
+  /* バリデーション */
+  if(!question){ showSnack('問題文を入力してください',true); return; }
+  if(isNaN(answer)){ showSnack('答えを数字で入力してください',true); return; }
+  if(displayType==='calc'){
+    if(!document.getElementById('f_displayLeft').value ||
+       !document.getElementById('f_displayRight').value){
+      showSnack('筆算の左右の数を入力してください',true); return;
+    }
+  }
+
+  const data = {
+    unitId:      document.getElementById('f_unitId').value,
+    gradeId:     'g2',
+    stageId:     parseInt(document.getElementById('f_stageId').value),
+    question,
+    answer,
+    displayType,
+    displayLeft:  displayType==='calc' ? parseInt(document.getElementById('f_displayLeft').value)  : null,
+    displayOp:    displayType==='calc' ? document.getElementById('f_displayOp').value              : null,
+    displayRight: displayType==='calc' ? parseInt(document.getElementById('f_displayRight').value) : null,
+    hint:         document.getElementById('f_hint').value.trim(),
+    explanation:  document.getElementById('f_explanation').value.trim(),
+    isPublished:  document.getElementById('f_isPublished').checked,
+  };
+
+  document.getElementById('saveBtn').textContent='保存中…';
+  document.getElementById('saveBtn').disabled=true;
+
+  let ok=false;
+  if(editingId){
+    ok = await updateProblem(editingId, data);
+  } else {
+    const id = await addProblem(data);
+    ok = !!id;
+  }
+
+  document.getElementById('saveBtn').textContent='保存する';
+  document.getElementById('saveBtn').disabled=false;
+
+  if(ok){
+    showSnack(editingId?'問題を更新しました':'問題を追加しました');
+    closeModal();
+    await loadProblems();
+  } else {
+    showSnack('エラーが発生しました',true);
+  }
+});
+
+/* ============================================================
+   削除
+============================================================ */
+async function handleDelete(id){
+  const p = allProblems.find(p=>p.id===id);
+  if(!p) return;
+  if(!confirm(`「${p.question}」を削除しますか？`)) return;
+  const ok = await deleteProblem(id);
+  if(ok){
+    showSnack('削除しました');
+    await loadProblems();
+  } else {
+    showSnack('削除に失敗しました',true);
+  }
+}
+</script>
+</body>
+</html>
