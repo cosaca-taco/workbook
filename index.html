@@ -3,33 +3,43 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>さんすうのもり</title>
+  <title>えなまなびのもり</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --amber:#EF9F27; --amber-d:#C97E10; --amber-l:#FAEEDA; --amber-ll:#FFF8EC;
-      --green:#2D7A4F; --green-l:#E1F5EE; --red:#E24B4A; --red-l:#FCEBEB;
-      --bg:#FFFBF4; --card:#FFFFFF; --border:#E8E0D0; --text:#1A1208; --muted:#8A7A60;
+      --green:#2D7A4F; --green-l:#E1F5EE;
+      --red:#E24B4A; --red-l:#FCEBEB;
+      --blue:#2563EB; --blue-l:#EFF6FF;
+      --bg:#FFFBF4; --card:#FFFFFF; --border:#E8E0D0;
+      --text:#1A1208; --muted:#8A7A60;
       --shadow:0 2px 12px rgba(0,0,0,.07);
     }
     body { font-family:'Hiragino Maru Gothic ProN','M PLUS Rounded 1c',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
     .app { max-width:480px; margin:0 auto; padding:1rem 1rem 5rem; }
     .screen { display:none; } .screen.active { display:block; }
+
+    /* ローディング */
     .loading { display:flex; flex-direction:column; align-items:center; justify-content:center; height:60vh; gap:16px; color:var(--muted); }
     .spinner { width:36px; height:36px; border:3px solid var(--amber-l); border-top-color:var(--amber); border-radius:50%; animation:spin .8s linear infinite; }
     @keyframes spin { to{transform:rotate(360deg)} }
+
+    /* ボタン */
     .btn-p { width:100%; padding:14px; font-size:16px; font-weight:700; background:var(--amber); color:#3D2000; border:none; border-radius:14px; cursor:pointer; font-family:inherit; box-shadow:0 4px 0 var(--amber-d); transition:transform .1s,opacity .15s; }
     .btn-p:hover{opacity:.9} .btn-p:active{transform:translateY(2px);box-shadow:0 2px 0 var(--amber-d)} .btn-p:disabled{opacity:.4;cursor:default;box-shadow:none}
     .btn-s { width:100%; padding:12px; font-size:15px; font-weight:500; background:#F0EDE8; color:#555; border:1px solid var(--border); border-radius:14px; cursor:pointer; font-family:inherit; margin-top:10px; }
     .btn-s:hover{background:#E8E4DE}
     .back-btn { display:inline-flex; align-items:center; gap:5px; background:transparent; border:none; color:var(--muted); font-size:14px; cursor:pointer; padding:0 0 .75rem; font-family:inherit; }
+
     /* ログイン */
     .login-card { background:var(--card); border:1px solid var(--border); border-radius:24px; padding:2.5rem 2rem; margin:2rem auto; text-align:center; max-width:340px; box-shadow:var(--shadow); }
     .logo { font-size:56px; margin-bottom:8px; animation:float 3s ease-in-out infinite; }
     @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
     .app-title{font-size:26px;font-weight:700;margin-bottom:4px} .app-sub{font-size:13px;color:var(--muted);margin-bottom:1.75rem}
     .name-input { width:100%; padding:13px; font-size:20px; border:2.5px solid #FAC775; border-radius:14px; text-align:center; background:var(--bg); outline:none; margin-bottom:1.25rem; font-family:inherit; font-weight:500; }
-    .name-input:focus{border-color:var(--amber)} .login-status{font-size:12px;color:var(--muted);margin-top:8px;min-height:16px}
+    .name-input:focus{border-color:var(--amber)}
+    .login-status{font-size:12px;color:var(--muted);margin-top:8px;min-height:16px}
+
     /* ホーム */
     .home-hdr{display:flex;align-items:center;gap:10px;padding:.5rem 0 1.25rem}
     .avatar{width:44px;height:44px;border-radius:50%;background:var(--amber-l);border:2.5px solid var(--amber);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
@@ -39,6 +49,7 @@
     .ucard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 12px;cursor:pointer;transition:transform .12s,box-shadow .12s;box-shadow:var(--shadow)}
     .ucard:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,.1)}
     .ui{font-size:28px;margin-bottom:5px} .un{font-size:13px;font-weight:700;line-height:1.3;margin-bottom:3px} .uc{font-size:11px;color:var(--muted);margin-bottom:7px} .ustars span{font-size:14px}
+
     /* 単元 */
     .unit-hdr{text-align:center;padding:.75rem 0 1.25rem} .ubig{font-size:54px;margin-bottom:4px} .utit{font-size:21px;font-weight:700;margin-bottom:4px} .udsc{font-size:13px;color:var(--muted);margin-bottom:.75rem}
     .stages-list{display:flex;flex-direction:column;gap:12px}
@@ -50,6 +61,7 @@
     .stage-info{flex:1} .stage-name{font-size:15px;font-weight:700;margin-bottom:2px} .stage-desc{font-size:12px;color:var(--muted);margin-bottom:5px} .stage-stars{font-size:15px}
     .stage-badge{font-size:11px;font-weight:700;padding:4px 9px;border-radius:20px;flex-shrink:0}
     .stage-badge.clear{background:var(--green-l);color:var(--green)} .stage-badge.lock{background:#EEE;color:#999} .stage-badge.play{background:var(--amber-l);color:var(--amber-d)}
+
     /* 問題 */
     .quiz-hdr{display:flex;align-items:center;gap:10px;padding-bottom:.75rem;border-bottom:1px solid var(--border);margin-bottom:1rem}
     .tav{width:38px;height:38px;border-radius:50%;background:var(--green-l);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
@@ -76,40 +88,92 @@
     .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
     .nb{padding:14px;font-size:20px;font-weight:700;background:#F0EDE8;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-family:'Courier New',monospace;box-shadow:0 3px 0 #D5CFC6;transition:transform .08s}
     .nb:active{transform:translateY(2px);box-shadow:none} .nb.del{color:var(--red);font-size:13px;font-family:inherit} .nb.ok{background:var(--amber);color:#3D2000;border-color:var(--amber);box-shadow:0 3px 0 var(--amber-d)}
-    /* 結果 */
-    .res-wrap{max-width:360px;margin:2rem auto;text-align:center}
-    .ricon{font-size:64px;margin-bottom:8px} .rtit{font-size:22px;font-weight:700;margin-bottom:4px} .rsub{font-size:14px;color:var(--muted);margin-bottom:1.25rem} .rscore{font-size:54px;font-weight:700;color:var(--amber)}
-    .rdetail{background:#F5F1EB;border-radius:14px;padding:14px 16px;margin:1rem 0 1.25rem;text-align:left}
-    .rd-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0} .rd-row span:last-child{font-weight:700}
+
+    /* ============================================================
+       理解度スコアパネル（フェーズ2）
+    ============================================================ */
+    .score-panel {
+      background:var(--card); border:1px solid var(--border);
+      border-radius:20px; padding:1.25rem;
+      margin-bottom:1rem; box-shadow:var(--shadow);
+    }
+    .score-panel-title {
+      font-size:13px; font-weight:700; color:var(--muted);
+      text-align:center; margin-bottom:1rem;
+    }
+
+    /* 円形ゲージ */
+    .gauge-wrap {
+      display:flex; flex-direction:column;
+      align-items:center; margin-bottom:1rem;
+    }
+    .gauge-svg { display:block; }
+    .gauge-label {
+      font-size:12px; color:var(--muted); margin-top:4px; text-align:center;
+    }
+
+    /* スコア内訳バー */
+    .score-breakdown { display:flex; flex-direction:column; gap:8px; }
+    .sb-row { display:flex; align-items:center; gap:8px; }
+    .sb-label { font-size:12px; color:var(--muted); width:80px; flex-shrink:0; }
+    .sb-bar-wrap { flex:1; background:#EEE; border-radius:4px; height:8px; overflow:hidden; }
+    .sb-bar-fill { height:100%; border-radius:4px; transition:width .6s ease; }
+    .sb-val { font-size:12px; font-weight:700; width:36px; text-align:right; flex-shrink:0; }
+
+    /* フクロウ先生のアドバイス */
+    .advice-box {
+      display:flex; gap:10px; align-items:flex-start;
+      padding:13px 15px; background:#F5F1EB;
+      border-radius:16px; margin-bottom:1rem;
+    }
+    .advice-icon { font-size:28px; flex-shrink:0; }
+    .advice-body {}
+    .advice-label { font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px; }
+    .advice-text { font-size:14px; line-height:1.7; color:var(--text); }
+    .advice-loading { font-size:13px; color:var(--muted); display:flex; align-items:center; gap:6px; }
+
+    /* 結果画面 */
+    .res-wrap{max-width:400px;margin:1rem auto}
+    .ricon{font-size:64px;margin-bottom:8px;text-align:center} .rtit{font-size:22px;font-weight:700;margin-bottom:4px;text-align:center} .rsub{font-size:14px;color:var(--muted);margin-bottom:1.25rem;text-align:center}
+
     /* クリア演出 */
-    .celebrate-overlay{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(4px)}
+    .celebrate-overlay{position:fixed;inset:0;z-index:100;display:none;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);overflow-y:auto;padding:1rem}
     .celebrate-overlay.active{display:flex}
-    .confetti-canvas{position:absolute;inset:0;pointer-events:none}
-    .cel-card{background:var(--card);border-radius:28px;padding:2.5rem 2rem;text-align:center;max-width:320px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative;z-index:1;animation:popIn .4s cubic-bezier(.17,.67,.35,1.4) forwards}
+    .confetti-canvas{position:fixed;inset:0;pointer-events:none;z-index:0}
+    .cel-card{background:var(--card);border-radius:28px;padding:2rem 1.5rem;text-align:center;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative;z-index:1;animation:popIn .4s cubic-bezier(.17,.67,.35,1.4) forwards}
     @keyframes popIn{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
-    .cel-icon{font-size:72px;margin-bottom:8px} .cel-title{font-size:26px;font-weight:700;margin-bottom:6px} .cel-sub{font-size:15px;color:var(--muted);margin-bottom:1.25rem}
-    .cel-badge{display:inline-block;padding:8px 20px;background:var(--amber-l);color:var(--amber-d);border-radius:20px;font-size:15px;font-weight:700;margin-bottom:1.5rem}
-    .cel-stars{font-size:32px;letter-spacing:4px;margin-bottom:1.5rem}
-    .trophy-glow{font-size:88px;margin-bottom:8px;animation:trophyPulse 1.2s ease-in-out infinite}
+    .cel-icon{font-size:64px;margin-bottom:6px} .cel-title{font-size:24px;font-weight:700;margin-bottom:4px} .cel-sub{font-size:14px;color:var(--muted);margin-bottom:1rem}
+    .cel-badge{display:inline-block;padding:7px 18px;background:var(--amber-l);color:var(--amber-d);border-radius:20px;font-size:14px;font-weight:700;margin-bottom:1rem}
+    .cel-stars{font-size:28px;letter-spacing:4px;margin-bottom:1rem}
+    .trophy-glow{font-size:80px;margin-bottom:6px;animation:trophyPulse 1.2s ease-in-out infinite}
     @keyframes trophyPulse{0%,100%{text-shadow:0 0 20px #FFD700,0 0 40px #FFA500;transform:scale(1)}50%{text-shadow:0 0 40px #FFD700,0 0 80px #FF6600;transform:scale(1.08)}}
-    .title-badge{background:linear-gradient(135deg,#FFD700,#FF8C00);color:#3D2000;padding:10px 24px;border-radius:20px;font-size:16px;font-weight:700;margin-bottom:1rem;display:inline-block;box-shadow:0 4px 12px rgba(255,165,0,.4)}
-    .firework{position:absolute;pointer-events:none;width:6px;height:6px;border-radius:50%}
+    .title-badge{background:linear-gradient(135deg,#FFD700,#FF8C00);color:#3D2000;padding:9px 22px;border-radius:20px;font-size:15px;font-weight:700;margin-bottom:1rem;display:inline-block;box-shadow:0 4px 12px rgba(255,165,0,.4)}
+    .firework{position:fixed;pointer-events:none;width:6px;height:6px;border-radius:50%;z-index:2}
     @keyframes fw-burst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
+
+    /* フッター */
+    .site-footer{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(255,251,244,.92);backdrop-filter:blur(6px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:12px;padding:6px 16px;}
+    .footer-version{font-size:11px;font-weight:700;background:var(--amber-l);color:var(--amber-d);padding:2px 8px;border-radius:10px;}
+    .footer-license{font-size:11px;color:var(--muted);}
+    .footer-license a{color:var(--amber-d);text-decoration:none;font-weight:500;}
+    .footer-license a:hover{text-decoration:underline;}
   </style>
 </head>
 <body>
 <div class="app">
   <div id="S_loading" class="screen active"><div class="loading"><div class="spinner"></div><div>よみこみ中…</div></div></div>
+
   <div id="S_login" class="screen">
     <div class="login-card">
       <div class="logo">🌳</div>
-      <div class="app-title">さんすうのもり</div>
+      <div class="app-title">えなまなびのもり</div>
       <div class="app-sub">2年生の算数を、いっしょに学ぼう！</div>
       <input id="nameInput" class="name-input" type="text" placeholder="なまえを入れてね" maxlength="10"/>
       <button id="startBtn" class="btn-p" disabled>もりへ入る 🌟</button>
       <div class="login-status" id="loginStatus"></div>
     </div>
   </div>
+
   <div id="S_home" class="screen">
     <div class="home-hdr">
       <div class="avatar">🐻</div>
@@ -118,11 +182,13 @@
     </div>
     <div class="ugrid" id="unitGrid"></div>
   </div>
+
   <div id="S_unit" class="screen">
     <button class="back-btn" id="backHome">← もどる</button>
     <div class="unit-hdr"><div class="ubig" id="uIcon"></div><div class="utit" id="uTitle"></div><div class="udsc" id="uDesc"></div></div>
     <div class="stages-list" id="stagesList"></div>
   </div>
+
   <div id="S_quiz" class="screen">
     <div class="quiz-hdr">
       <div class="tav">🦉</div>
@@ -133,27 +199,37 @@
     <div class="source-badge" id="sourceBadge"></div>
     <div id="quizBody"></div>
   </div>
+
+  <!-- 結果画面（不合格） -->
   <div id="S_result" class="screen">
     <div class="res-wrap">
-      <div class="ricon" id="rIcon"></div><div class="rtit" id="rTitle"></div>
-      <div class="rsub" id="rSub"></div><div class="rscore" id="rScore"></div>
-      <div class="rdetail" id="rDetail"></div>
+      <div class="ricon" id="rIcon"></div>
+      <div class="rtit"  id="rTitle"></div>
+      <div class="rsub"  id="rSub"></div>
+      <!-- 理解度スコアパネル -->
+      <div id="resultScorePanel"></div>
+      <!-- アドバイス -->
+      <div id="resultAdvice"></div>
       <button class="btn-p" id="retryBtn">もう一度チャレンジ！ 🔁</button>
       <button class="btn-s" id="homeBtn">ホームにもどる 🏠</button>
     </div>
   </div>
 </div>
+
+<!-- クリア演出オーバーレイ -->
 <div id="celebrateOverlay" class="celebrate-overlay">
   <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
   <div class="cel-card" id="celCard"></div>
 </div>
 
 <script type="module">
-import { auth, signInUser, createUserIfNew, loadProgress, saveProgress, getProblems }
-  from "./firebase.js";
+import {
+  auth, signInUser, createUserIfNew,
+  loadProgress, saveProgress, saveSession, getProblems
+} from "./firebase.js";
 
 /* ============================================================
-   単元・ステージ定義
+   定数
 ============================================================ */
 const UNITS = [
   {id:'add',  icon:'➕',name:'たし算の筆算',  ch:'だい1しょう',desc:'くり上がりのあるたし算'},
@@ -166,16 +242,15 @@ const UNITS = [
   {id:'shape',icon:'🔷',name:'三角形と四角形',ch:'だい8しょう',desc:'図形のとくちょう'},
 ];
 const STAGES = [
-  {id:1,name:'きほん',    icon:'🌱',desc:'やさしい問題 5問',    clearScore:3,stars:'⭐',   title:'きほんマスター'},
-  {id:2,name:'れんしゅう',icon:'🌿',desc:'すこし難しい問題 5問', clearScore:4,stars:'⭐⭐',  title:'れんしゅう名人'},
-  {id:3,name:'チャレンジ',icon:'🌟',desc:'おうよう問題 5問',    clearScore:5,stars:'⭐⭐⭐', title:'チャレンジ王者'},
+  {id:1,name:'きほん',    icon:'🌱',desc:'やさしい問題 5問',    clearScore:3,stars:'⭐'},
+  {id:2,name:'れんしゅう',icon:'🌿',desc:'すこし難しい問題 5問', clearScore:4,stars:'⭐⭐'},
+  {id:3,name:'チャレンジ',icon:'🌟',desc:'おうよう問題 5問',    clearScore:5,stars:'⭐⭐⭐'},
 ];
 const TUTORS = {
   add:['一の位から計算してみよう。くり上がりに気をつけてね！','10以上になったら十の位に1くり上げるよ！'],
   sub:['一の位から引いてみよう。引けないときはくり下げ！','上の数が小さいときは十の位から10かりてくるよ。'],
   num:['百・十・一のくらいに分けて考えよう！','100が10こで1000になるよ。'],
-  len:['1cmは10mmだよ。ものさしで確認しよう！'],
-  vol:['1Lは10dLだよ。牛乳パックで覚えよう！'],
+  len:['1cmは10mmだよ！'],vol:['1Lは10dLだよ！'],
   time:['60分で1時間！時こくと時間のちがいに注目しよう。'],
   mul:['かけ算は同じ数を何回もたすことだよ。','九九のリズムで覚えよう♪'],
   shape:['辺の数と角の数を数えてみよう！'],
@@ -192,47 +267,168 @@ const HINTS = {
 };
 
 /* ============================================================
-   JS問題生成（Firestoreに問題がない場合のフォールバック）
+   問題生成（JS フォールバック）
 ============================================================ */
 function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
 function makeProblemJS(uid,sid){
   let q,ans,display=null,expl='';
   switch(uid){
-    case 'add':{const a=sid===1?rnd(11,39):sid===2?rnd(20,69):rnd(40,98);const b=sid===1?rnd(11,39):sid===2?rnd(20,69):rnd(20,58);ans=a+b;display={left:a,op:'+',right:b};q=`${a} ＋ ${b} は いくつですか？`;expl=`${a}＋${b}＝${ans}！一の位から計算するのがポイント！`;}break;
-    case 'sub':{let a=sid===1?rnd(20,55):sid===2?rnd(40,80):rnd(60,99);let b=sid===1?rnd(11,19):sid===2?rnd(15,35):rnd(25,55);if(a<b)[a,b]=[b,a];ans=a-b;display={left:a,op:'−',right:b};q=`${a} ー ${b} は いくつですか？`;expl=`${a}－${b}＝${ans}！くり下がりに気をつけよう！`;}break;
-    case 'num':if(sid===1){const h=rnd(1,9),t=rnd(0,9),o=rnd(0,9);ans=h*100+t*10+o;q=`百のくらいが ${h}、十のくらいが ${t}、一のくらいが ${o} の数は？`;expl=`${ans}だよ！`;}else if(sid===2){const x=rnd(100,900);ans=x+100;q=`${x} より 100 大きい数は？`;expl=`${ans}！`;}else{const x=rnd(100,800),y=rnd(100,200);ans=x+y;q=`${x} と ${y} をあわせると？`;expl=`${ans}！`;}break;
+    case 'add':{const a=sid===1?rnd(11,39):sid===2?rnd(20,69):rnd(40,98);const b=sid===1?rnd(11,39):sid===2?rnd(20,69):rnd(20,58);ans=a+b;display={left:a,op:'+',right:b};q=`${a} ＋ ${b} は いくつですか？`;expl=`${a}＋${b}＝${ans}！`;}break;
+    case 'sub':{let a=sid===1?rnd(20,55):sid===2?rnd(40,80):rnd(60,99);let b=sid===1?rnd(11,19):sid===2?rnd(15,35):rnd(25,55);if(a<b)[a,b]=[b,a];ans=a-b;display={left:a,op:'−',right:b};q=`${a} ー ${b} は いくつですか？`;expl=`${a}－${b}＝${ans}！`;}break;
+    case 'num':if(sid===1){const h=rnd(1,9),t=rnd(0,9),o=rnd(0,9);ans=h*100+t*10+o;q=`百のくらいが ${h}、十のくらいが ${t}、一のくらいが ${o} の数は？`;expl=`${ans}！`;}else if(sid===2){const x=rnd(100,900);ans=x+100;q=`${x} より 100 大きい数は？`;expl=`${ans}！`;}else{const x=rnd(100,800),y=rnd(100,200);ans=x+y;q=`${x} と ${y} をあわせると？`;expl=`${ans}！`;}break;
     case 'len':if(sid===1){const a=rnd(1,5),b=rnd(1,9);ans=a*10+b;q=`${a}cm${b}mm は なんmmですか？`;expl=`${ans}mm！`;}else if(sid===2){const a=rnd(2,8),b=rnd(1,5);ans=a+b;q=`${a}cm と ${b}cm をあわせると？`;expl=`${ans}cm！`;}else{const a=rnd(2,5),b=rnd(3,8);ans=a*10+b;q=`${a}cm と ${b}mm をあわせると なんmm？`;expl=`${ans}mm！`;}break;
     case 'vol':if(sid===1){const a=rnd(1,4),b=rnd(1,9);ans=a*10+b;q=`${a}L${b}dL は なんdLですか？`;expl=`${ans}dL！`;}else if(sid===2){const a=rnd(2,6),b=rnd(1,5);ans=a+b;q=`${a}L と ${b}L をあわせると？`;expl=`${ans}L！`;}else{const a=rnd(3,8);ans=a*10;q=`${a}L は なんdLですか？`;expl=`${ans}dL！`;}break;
     case 'time':if(sid===1){const h=rnd(7,11),add=rnd(1,4);ans=h+add;q=`${h}じ から ${add}じかん たつと なんじ？`;expl=`${ans}じ！`;}else if(sid===2){const m=rnd(1,4)*10,add=rnd(1,3)*10;ans=m+add;q=`${m}ふん の ${add}ふん あとは？`;expl=`${ans}ふん！`;}else{const h=rnd(8,11),m=rnd(1,5)*10,add=rnd(1,3)*10;const nm=(m+add)%60,nh=h+Math.floor((m+add)/60);ans=nh*100+nm;q=`${h}じ${m}ふん の ${add}ふん あとは？(じ×100＋ふん)`;expl=`${nh}じ${nm}ふん！`;}break;
     case 'mul':{const a=sid===1?rnd(2,5):sid===2?rnd(2,7):rnd(2,9);const b=sid===1?rnd(1,5):sid===2?rnd(1,7):rnd(1,9);ans=a*b;q=`${a} × ${b} は いくつですか？`;expl=`${ans}！`;}break;
     case 'shape':{const ss=[{n:'三角形',v:3},{n:'四角形',v:4},{n:'長方形',v:4}];const s=ss[rnd(0,ss.length-1)];if(sid===1){ans=s.v;q=`${s.n} の 辺は なんぼん？`;expl=`${ans}本！`;}else if(sid===2){ans=s.v;q=`${s.n} の 角は なんこ？`;expl=`${ans}つ！`;}else{const a=rnd(2,5),b=rnd(2,4);ans=(a+b)*2;q=`たて${a}cm・よこ${b}cm の長方形のまわりの長さは？`;expl=`${ans}cm！`;}}break;
-    default:{const a=rnd(10,50),b=rnd(1,20);ans=a+b;q=`${a}＋${b}は？`;expl=`${ans}だよ！`;}
+    default:{const a=rnd(10,50),b=rnd(1,20);ans=a+b;q=`${a}＋${b}は？`;expl=`${ans}！`;}
   }
   return {q,ans,display,expl,hint:HINTS[uid]||'よく考えてみよう！'};
 }
-
-/* Firestoreの問題データをアプリ形式に変換 */
 function convertFSProblem(p){
   return {
-    q:    p.question,
-    ans:  p.answer,
-    hint: p.hint,
-    expl: p.explanation,
-    display: p.displayType==='calc'
-      ? {left:p.displayLeft, op:p.displayOp, right:p.displayRight}
-      : null,
+    q:p.question, ans:p.answer, hint:p.hint, expl:p.explanation,
+    display:p.displayType==='calc'?{left:p.displayLeft,op:p.displayOp,right:p.displayRight}:null,
   };
+}
+
+/* ============================================================
+   フェーズ2：理解度スコアの計算
+   ・正答率スコア   : 正解数/5 × 50点
+   ・ヒントなし正解 : ヒントなし正解数/5 × 20点
+   ・解答速度      : 平均10秒以下→20点、30秒以上→0点
+   ・クリアボーナス : クリアしたら+10点
+============================================================ */
+function calcUnderstandingScore(results, cleared) {
+  const n = results.length;
+  if (n === 0) return 0;
+
+  const correctCount   = results.filter(r => r.correct).length;
+  const noHintCorrect  = results.filter(r => r.correct && r.hintsUsed === 0).length;
+  const avgTime        = results.reduce((a, r) => a + r.timeSec, 0) / n;
+
+  const accuracyScore  = Math.round((correctCount  / n) * 50);
+  const noHintScore    = Math.round((noHintCorrect / n) * 20);
+  const speedScore     = Math.max(0, Math.min(20, Math.round((1 - Math.max(0, avgTime - 10) / 20) * 20)));
+  const clearBonus     = cleared ? 10 : 0;
+
+  return Math.min(100, accuracyScore + noHintScore + speedScore + clearBonus);
+}
+
+/* ============================================================
+   フェーズ2：スコアレベルの判定
+============================================================ */
+function scoreLevel(score) {
+  if (score >= 90) return { label:'かんぺき！',    color:'#2D7A4F', bg:var_('--green-l') };
+  if (score >= 70) return { label:'よくできました',  color:'#2563EB', bg:'#EFF6FF' };
+  if (score >= 50) return { label:'がんばっているよ', color:'#EF9F27', bg:'#FAEEDA' };
+  return             { label:'もう少し！',        color:'#E24B4A', bg:'#FCEBEB' };
+}
+function var_(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
+
+/* ============================================================
+   フェーズ2：アドバイス生成（スマートルール方式）
+   TODO: Firebase Cloud Functions + Claude API に切り替え可能
+============================================================ */
+function generateAdvice(unitName, stageNum, results, score, cleared) {
+  const correct   = results.filter(r => r.correct).length;
+  const hintUsed  = results.filter(r => r.hintsUsed > 0).length;
+  const avgTime   = (results.reduce((a,r) => a + r.timeSec, 0) / results.length).toFixed(1);
+
+  if (score >= 90) {
+    return `${unitName}はかんぺきだよ！はやく正かいできてすごいね。このちょうしでつぎのステージもがんばろう！`;
+  }
+  if (score >= 70 && cleared) {
+    if (hintUsed === 0) return `${correct}もん全部ヒントなしでせいかい！すばらしいね。つぎのステージにもちょうせんしてみよう！`;
+    return `よくできました！${unitName}の力がついてきたね。ヒントなしでできるようになるともっとすごいよ！`;
+  }
+  if (score >= 50) {
+    return `${correct}もんせいかいできたよ！あと少しでクリアだ。まちがえたところをもう一度かくにんしてみよう！`;
+  }
+  if (correct >= 2) {
+    return `${correct}もんせいかいできたね。むずかしかったかな？もう一度ゆっくりかんがえながらやってみよう！`;
+  }
+  return `むずかしかったね。${unitName}のポイントをもう一度読んでからちょうせんしてみよう！きっとできるよ！`;
+}
+
+/* ============================================================
+   フェーズ2：理解度スコアパネルのHTML生成
+============================================================ */
+function buildScorePanelHTML(score, results, cleared) {
+  const lv     = scoreLevel(score);
+  const circ   = 2 * Math.PI * 46; // 半径46の円周
+  const offset = circ - (score / 100) * circ;
+  const correct   = results.filter(r => r.correct).length;
+  const noHint    = results.filter(r => r.correct && r.hintsUsed === 0).length;
+  const avgTime   = (results.reduce((a,r) => a + r.timeSec, 0) / results.length).toFixed(1);
+  const accuracyPct = Math.round((correct / results.length) * 100);
+  const speedPct    = Math.max(0, Math.min(100, Math.round((1 - Math.max(0, parseFloat(avgTime) - 10) / 20) * 100)));
+  const noHintPct   = Math.round((noHint / results.length) * 100);
+
+  return `
+    <div class="score-panel">
+      <div class="score-panel-title">📊 理解度スコア</div>
+      <div class="gauge-wrap">
+        <svg class="gauge-svg" width="130" height="130" viewBox="0 0 130 130">
+          <circle cx="65" cy="65" r="46" fill="none" stroke="#EEE" stroke-width="10"/>
+          <circle cx="65" cy="65" r="46" fill="none"
+            stroke="${lv.color}" stroke-width="10"
+            stroke-dasharray="${circ.toFixed(1)}"
+            stroke-dashoffset="${offset.toFixed(1)}"
+            stroke-linecap="round"
+            transform="rotate(-90 65 65)"
+            style="transition:stroke-dashoffset .8s ease"/>
+          <text x="65" y="58" text-anchor="middle" font-size="28" font-weight="bold" fill="${lv.color}" font-family="inherit">${score}</text>
+          <text x="65" y="74" text-anchor="middle" font-size="11" fill="#8A7A60" font-family="inherit">てん</text>
+        </svg>
+        <div class="gauge-label" style="color:${lv.color};font-weight:700">${lv.label}</div>
+      </div>
+      <div class="score-breakdown">
+        <div class="sb-row">
+          <div class="sb-label">せいかい率</div>
+          <div class="sb-bar-wrap"><div class="sb-bar-fill" style="width:${accuracyPct}%;background:#2D7A4F"></div></div>
+          <div class="sb-val" style="color:#2D7A4F">${correct}/5</div>
+        </div>
+        <div class="sb-row">
+          <div class="sb-label">ヒントなし</div>
+          <div class="sb-bar-wrap"><div class="sb-bar-fill" style="width:${noHintPct}%;background:#2563EB"></div></div>
+          <div class="sb-val" style="color:#2563EB">${noHint}/5</div>
+        </div>
+        <div class="sb-row">
+          <div class="sb-label">かいとう速度</div>
+          <div class="sb-bar-wrap"><div class="sb-bar-fill" style="width:${speedPct}%;background:#EF9F27"></div></div>
+          <div class="sb-val" style="color:#EF9F27">${avgTime}秒</div>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ============================================================
+   フェーズ2：アドバイスボックスのHTML生成
+============================================================ */
+function buildAdviceHTML(advice) {
+  return `
+    <div class="advice-box">
+      <div class="advice-icon">🦉</div>
+      <div class="advice-body">
+        <div class="advice-label">フクロウ先生からのひとこと</div>
+        <div class="advice-text">${advice}</div>
+      </div>
+    </div>`;
 }
 
 /* ============================================================
    アプリ状態
 ============================================================ */
-let currentUid='',userName='',unit=null,stageNum=0,progress={};
-let problems=[],pidx=0,score=0,attempts=0,totalHints=0,totalTime=0,qStartTime=0;
+let currentUid='', userName='', unit=null, stageNum=0, progress={};
+let problems=[], pidx=0, score=0, attempts=0;
+let totalHints=0, totalTime=0, qStartTime=0;
+let qHintCount=0;                          // フェーズ2：問題ごとのヒント数
+let questionResults=[];                    // フェーズ2：問題ごとの結果
 let timerInterval=null;
 const TIMER_SEC=30;
 
-function stageState(uid,sid){return ((progress[uid]||{})[`s${sid}`])||{cleared:false,bestScore:0};}
+function stageState(uid,sid){return ((progress[uid]||{})[`s${sid}`])||{cleared:false,bestScore:0,bestUnderstandingScore:0};}
 function unitStars(uid){return STAGES.reduce((a,s)=>a+(stageState(uid,s.id).cleared?1:0),0);}
 async function saveProg(){if(currentUid)await saveProgress(currentUid,userName,progress);}
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
@@ -243,7 +439,11 @@ function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.re
 function renderHome(){
   document.getElementById('unitGrid').innerHTML=UNITS.map(u=>{
     const s=unitStars(u.id);
-    return`<div class="ucard" data-uid="${u.id}"><div class="ui">${u.icon}</div><div class="un">${u.name}</div><div class="uc">${u.ch}</div><div class="ustars">${[0,1,2].map(i=>`<span>${i<s?'⭐':'☆'}</span>`).join('')}</div></div>`;
+    return`<div class="ucard" data-uid="${u.id}">
+      <div class="ui">${u.icon}</div><div class="un">${u.name}</div>
+      <div class="uc">${u.ch}</div>
+      <div class="ustars">${[0,1,2].map(i=>`<span>${i<s?'⭐':'☆'}</span>`).join('')}</div>
+    </div>`;
   }).join('');
   document.querySelectorAll('.ucard').forEach(c=>c.addEventListener('click',()=>openUnit(c.dataset.uid)));
 }
@@ -259,36 +459,43 @@ function openUnit(uid){
 function renderStages(){
   document.getElementById('stagesList').innerHTML=STAGES.map((st,i)=>{
     const unlocked=i===0||stageState(unit.id,STAGES[i-1].id).cleared;
-    const cleared=stageState(unit.id,st.id).cleared;
+    const state=stageState(unit.id,st.id);
+    const cleared=state.cleared;
+    const bestUs=state.bestUnderstandingScore||0;
     let cls='stage-card'; if(!unlocked)cls+=' locked'; if(cleared)cls+=' cleared';
     const badge=!unlocked?`<div class="stage-badge lock">🔒 ロック</div>`:cleared?`<div class="stage-badge clear">✅ クリア</div>`:`<div class="stage-badge play">▶ プレイ</div>`;
-    return`<div class="${cls}" data-sid="${st.id}"><div class="stage-num">${cleared?'✅':st.icon}</div><div class="stage-info"><div class="stage-name">ステージ${st.id}「${st.name}」</div><div class="stage-desc">${st.desc}　クリア条件：${st.clearScore}/5問</div><div class="stage-stars">${cleared?st.stars:'☆'.repeat(st.id)}</div></div>${badge}</div>`;
+    const usLabel=cleared&&bestUs>0?`<span style="font-size:11px;color:var(--muted)"> 理解度:${bestUs}点</span>`:'';
+    return`<div class="${cls}" data-sid="${st.id}">
+      <div class="stage-num">${cleared?'✅':st.icon}</div>
+      <div class="stage-info">
+        <div class="stage-name">ステージ${st.id}「${st.name}」</div>
+        <div class="stage-desc">${st.desc}　クリア条件：${st.clearScore}/5問</div>
+        <div class="stage-stars">${cleared?st.stars:'☆'.repeat(st.id)}${usLabel}</div>
+      </div>${badge}
+    </div>`;
   }).join('');
   document.querySelectorAll('.stage-card:not(.locked)').forEach(c=>c.addEventListener('click',()=>startStage(parseInt(c.dataset.sid))));
 }
 
 /* ============================================================
-   問題開始（Firestore優先・JSフォールバック）
+   問題開始
 ============================================================ */
 async function startStage(sid){
-  stageNum=sid; score=0; pidx=0; attempts=0; totalHints=0; totalTime=0;
+  stageNum=sid; score=0; pidx=0; attempts=0;
+  totalHints=0; totalTime=0; questionResults=[];
   document.getElementById('quizTitle').textContent=`${unit.icon} ${unit.name}`;
   document.getElementById('quizSub').textContent=`ステージ${sid}「${STAGES[sid-1].name}」`;
   document.getElementById('scoreTxt').textContent='0';
   show('S_quiz');
-
-  /* ローディング表示 */
   document.getElementById('quizBody').innerHTML=`<div class="loading" style="height:200px"><div class="spinner"></div><div>もんだいをよみこみ中…</div></div>`;
   document.getElementById('sourceBadge').textContent='';
 
-  /* Firestoreから問題を取得 */
-  const fsProblems = await getProblems(unit.id, sid);
+  const fsProblems=await getProblems(unit.id,sid);
   if(fsProblems.length>=5){
-    problems = fsProblems.map(convertFSProblem);
+    problems=fsProblems.map(convertFSProblem);
     document.getElementById('sourceBadge').textContent='📚 先生が用意した問題';
   } else {
-    /* フォールバック：JSで生成 */
-    problems = Array.from({length:5},()=>makeProblemJS(unit.id,sid));
+    problems=Array.from({length:5},()=>makeProblemJS(unit.id,sid));
     document.getElementById('sourceBadge').textContent='🤖 じどうせいせい問題';
   }
   renderProblem();
@@ -299,7 +506,7 @@ async function startStage(sid){
 ============================================================ */
 function renderProblem(){
   if(pidx>=5){endStage();return;}
-  attempts=0; qStartTime=Date.now(); startTimer();
+  qHintCount=0; attempts=0; qStartTime=Date.now(); startTimer();
   const p=problems[pidx];
   const tlist=TUTORS[unit.id]||['がんばろう！'];
   const msg=pidx===0?tlist[rnd(0,tlist.length-1)]:`${pidx+1}もん目！いけるよ！`;
@@ -318,7 +525,7 @@ function renderProblem(){
   const pad=document.getElementById('numpad');
   [7,8,9,4,5,6,1,2,3].forEach(n=>{const b=document.createElement('button');b.className='nb';b.textContent=n;b.addEventListener('click',()=>numInput(n));pad.appendChild(b);});
   const del=document.createElement('button');del.className='nb del';del.textContent='けす';del.addEventListener('click',numDel);pad.appendChild(del);
-  const zero=document.createElement('button');zero.className='nb';zero.textContent='0';zero.addEventListener('click',()=>numInput(0));pad.appendChild(zero);
+  const z=document.createElement('button');z.className='nb';z.textContent='0';z.addEventListener('click',()=>numInput(0));pad.appendChild(z);
   const ok=document.createElement('button');ok.className='nb ok';ok.textContent='OK';ok.addEventListener('click',checkAnswer);pad.appendChild(ok);
   document.getElementById('ckBtn').addEventListener('click',checkAnswer);
   document.getElementById('aInp').addEventListener('keydown',e=>{if(e.key==='Enter')checkAnswer();});
@@ -339,78 +546,149 @@ function stopTimer(){clearInterval(timerInterval);totalTime+=(Date.now()-qStartT
 function numInput(n){const i=document.getElementById('aInp');if(!i)return;i.value=(i.value||'')+n;const c=document.getElementById('cAns');if(c)c.textContent=i.value;}
 function numDel(){const i=document.getElementById('aInp');if(!i)return;i.value=i.value.slice(0,-1);const c=document.getElementById('cAns');if(c)c.textContent=i.value||'？';}
 
+/* ============================================================
+   答え確認（フェーズ2：問題結果を記録）
+============================================================ */
 function checkAnswer(){
   const i=document.getElementById('aInp');if(!i||i.value==='')return;
   const v=parseInt(i.value),p=problems[pidx],ok=v===p.ans;
-  attempts++; i.className='ainp '+(ok?'ok':'ng');
+  attempts++;
+  i.className='ainp '+(ok?'ok':'ng');
   const fb=document.getElementById('fb'),ca=document.getElementById('cAns');
   if(ok){
-    stopTimer();if(ca)ca.textContent=p.ans;
-    score++;document.getElementById('scoreTxt').textContent=score;
+    stopTimer();
+    if(ca)ca.textContent=p.ans;
+    score++;
+    document.getElementById('scoreTxt').textContent=score;
     fb.className='fb ok';fb.textContent='⭕ せいかい！ '+p.expl;
     document.getElementById('ckBtn').disabled=true;
+    /* フェーズ2：正解を記録 */
+    questionResults.push({
+      correct: true,
+      hintsUsed: qHintCount,
+      timeSec: (Date.now()-qStartTime)/1000,
+    });
     setTimeout(()=>{attempts=0;pidx++;renderProblem();},1700);
-  }else if(attempts===1){
-    totalHints++;fb.className='fb hint';fb.textContent='❓ もう少し！ ヒント：'+p.hint;
+  } else if(attempts===1){
+    qHintCount++;    // フェーズ2：ヒント使用を記録
+    totalHints++;
+    fb.className='fb hint';fb.textContent='❓ もう少し！ ヒント：'+p.hint;
     document.getElementById('tutMsg').textContent='もう一かいかんがえてみよう！';
-  }else{
-    stopTimer();if(ca)ca.textContent=p.ans;
+  } else {
+    stopTimer();
+    if(ca)ca.textContent=p.ans;
     fb.className='fb ng';fb.innerHTML=`✕ こたえは <b>${p.ans}</b> だよ。${p.expl}`;
     document.getElementById('ckBtn').disabled=true;
+    /* フェーズ2：不正解を記録 */
+    questionResults.push({
+      correct: false,
+      hintsUsed: qHintCount,
+      timeSec: (Date.now()-qStartTime)/1000,
+    });
     setTimeout(()=>{attempts=0;pidx++;renderProblem();},2200);
   }
 }
 
+/* ============================================================
+   ステージ終了（フェーズ2：スコア計算・アドバイス・保存）
+============================================================ */
 async function endStage(){
   clearInterval(timerInterval);
-  const st=STAGES[stageNum-1];
-  const cleared=score>=st.clearScore;
-  const avg=(totalTime/5).toFixed(1);
-  if(!progress[unit.id])progress[unit.id]={};
+  const st       = STAGES[stageNum-1];
+  const cleared  = score >= st.clearScore;
+  const us       = calcUnderstandingScore(questionResults, cleared);
+  const avgTime  = (totalTime / 5).toFixed(1);
+  const advice   = generateAdvice(unit.name, stageNum, questionResults, us, cleared);
+
+  /* 進捗を更新 */
+  if(!progress[unit.id]) progress[unit.id]={};
   const key=`s${stageNum}`;
-  if(!progress[unit.id][key])progress[unit.id][key]={cleared:false,bestScore:0};
-  if(score>progress[unit.id][key].bestScore)progress[unit.id][key].bestScore=score;
-  if(cleared)progress[unit.id][key].cleared=true;
+  if(!progress[unit.id][key]) progress[unit.id][key]={cleared:false,bestScore:0,bestUnderstandingScore:0};
+  if(score > progress[unit.id][key].bestScore) progress[unit.id][key].bestScore=score;
+  if(us    > (progress[unit.id][key].bestUnderstandingScore||0)) progress[unit.id][key].bestUnderstandingScore=us;
+  if(cleared) progress[unit.id][key].cleared=true;
+
+  /* Firestoreに保存 */
   await saveProg();
-  cleared?showCelebration(stageNum,st):showResult(st,score,avg);
+  if(currentUid){
+    await saveSession(currentUid, {
+      unitId:             unit.id,
+      unitName:           unit.name,
+      stageId:            stageNum,
+      stageName:          st.name,
+      score,
+      understandingScore: us,
+      hintCount:          totalHints,
+      avgTimeSec:         parseFloat(avgTime),
+      cleared,
+      advice,
+    });
+  }
+
+  cleared ? showCelebration(stageNum, st, us, questionResults, advice)
+          : showResult(st, score, us, questionResults, advice);
 }
 
 /* ============================================================
-   クリア演出
+   クリア演出（フェーズ2：スコアパネル＋アドバイスを追加）
 ============================================================ */
 const COLORS=['#EF9F27','#2D7A4F','#E24B4A','#4A90D9','#9B59B6','#F1C40F'];
 let confettiAnim=null;
+
+function showCelebration(sid, st, us, results, advice){
+  const ov=document.getElementById('celebrateOverlay');
+  const card=document.getElementById('celCard');
+
+  let topHTML='';
+  if(sid===1)      topHTML=`<div class="cel-icon">🎊</div><div class="cel-title">ステージ1 クリア！</div><div class="cel-sub">よくできました！すごいよ！</div><div class="cel-stars">${st.stars}</div><div class="cel-badge">✨ ${unit.name} きほんマスター！</div>`;
+  else if(sid===2) topHTML=`<div class="cel-icon">🎆</div><div class="cel-title">ステージ2 クリア！！</div><div class="cel-sub">すばらしい！</div><div class="cel-stars">${st.stars}</div><div class="cel-badge">🌿 ${unit.name} れんしゅう名人！</div>`;
+  else             topHTML=`<div class="trophy-glow">🏆</div><div class="cel-title">全ステージ制覇！！！</div><div class="cel-sub">かんぺきだ！きみはほんものだ！</div><div class="title-badge">👑 ${unit.name} チャレンジ王者</div><div class="cel-stars" style="font-size:36px;letter-spacing:4px">⭐⭐⭐</div>`;
+
+  card.innerHTML=`
+    ${topHTML}
+    ${buildScorePanelHTML(us, results, true)}
+    ${buildAdviceHTML(advice)}
+    <button class="btn-p" id="celBtn">${sid<3?'つぎのステージへ ➡':'もりに帰る 🌳'}</button>`;
+
+  ov.classList.add('active');
+  if(sid===1||sid===3) startConfetti();
+  if(sid===2||sid===3) launchFireworks();
+
+  document.getElementById('celBtn').addEventListener('click',()=>{
+    stopConfetti();
+    ov.classList.remove('active');
+    renderHome(); renderStages(); show('S_unit');
+  });
+}
+
 function startConfetti(){
-  const canvas=document.getElementById('confettiCanvas');const ctx=canvas.getContext('2d');
-  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
-  const ps=Array.from({length:140},()=>({x:Math.random()*canvas.width,y:-10,r:rnd(4,9),d:Math.random()*120,color:COLORS[rnd(0,COLORS.length-1)],tilt:rnd(-10,10),speed:Math.random()*2+1.5}));
+  const canvas=document.getElementById('confettiCanvas');
+  const ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  const ps=Array.from({length:130},()=>({x:Math.random()*canvas.width,y:-10,r:rnd(4,9),d:Math.random()*120,color:COLORS[rnd(0,COLORS.length-1)],tilt:rnd(-10,10),speed:Math.random()*2+1.5}));
   function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ps.forEach(p=>{ctx.beginPath();ctx.lineWidth=p.r;ctx.strokeStyle=p.color;ctx.moveTo(p.x+p.tilt+p.r/3,p.y);ctx.lineTo(p.x+p.tilt,p.y+p.tilt+p.r/5);ctx.stroke();p.y+=p.speed;p.x+=Math.sin(p.d+=.04)*1.5;p.tilt=Math.sin(p.d)*12;if(p.y>canvas.height+20){p.y=-10;p.x=Math.random()*canvas.width;}});confettiAnim=requestAnimationFrame(draw);}
   draw();
 }
 function stopConfetti(){if(confettiAnim){cancelAnimationFrame(confettiAnim);confettiAnim=null;}const c=document.getElementById('confettiCanvas');c.getContext('2d').clearRect(0,0,c.width,c.height);}
 function launchFireworks(){
   const ov=document.getElementById('celebrateOverlay');
-  for(let i=0;i<6;i++){setTimeout(()=>{const fx=rnd(15,85),fy=rnd(10,50),color=COLORS[rnd(0,COLORS.length-1)];for(let j=0;j<18;j++){const el=document.createElement('div');el.className='firework';const angle=(j/18)*360,dist=rnd(60,130);el.style.cssText=`left:${fx}vw;top:${fy}vh;background:${color};--dx:${Math.cos(angle*Math.PI/180)*dist}px;--dy:${Math.sin(angle*Math.PI/180)*dist}px;animation:fw-burst .9s ease-out ${j*.02}s forwards;`;ov.appendChild(el);setTimeout(()=>el.remove(),1400);}},i*280);}
+  for(let i=0;i<5;i++){setTimeout(()=>{const fx=rnd(15,85),fy=rnd(10,50),color=COLORS[rnd(0,COLORS.length-1)];for(let j=0;j<18;j++){const el=document.createElement('div');el.className='firework';const angle=(j/18)*360,dist=rnd(60,120);el.style.cssText=`left:${fx}vw;top:${fy}vh;background:${color};--dx:${Math.cos(angle*Math.PI/180)*dist}px;--dy:${Math.sin(angle*Math.PI/180)*dist}px;animation:fw-burst .9s ease-out ${j*.02}s forwards;`;ov.appendChild(el);setTimeout(()=>el.remove(),1400);}},i*280);}
 }
 
-function showCelebration(sid,st){
-  const ov=document.getElementById('celebrateOverlay'),card=document.getElementById('celCard');
-  if(sid===1){card.innerHTML=`<div class="cel-icon">🎊</div><div class="cel-title">ステージ1 クリア！</div><div class="cel-sub">よくできました！</div><div class="cel-stars">${st.stars}</div><div class="cel-badge">✨ ${unit.name} きほんマスター！</div><button class="btn-p" id="celBtn">つぎのステージへ ➡</button>`;ov.classList.add('active');startConfetti();}
-  else if(sid===2){card.innerHTML=`<div class="cel-icon">🎆</div><div class="cel-title">ステージ2 クリア！！</div><div class="cel-sub">すばらしい！</div><div class="cel-stars">${st.stars}</div><div class="cel-badge">🌿 ${unit.name} れんしゅう名人！</div><button class="btn-p" id="celBtn">ラストステージへ！ 🌟</button>`;ov.classList.add('active');launchFireworks();}
-  else{card.innerHTML=`<div class="trophy-glow">🏆</div><div class="cel-title">全ステージ制覇！！！</div><div class="cel-sub">かんぺきだ！</div><div class="title-badge">👑 ${unit.name} チャレンジ王者</div><div class="cel-stars" style="font-size:40px;letter-spacing:6px">⭐⭐⭐</div><button class="btn-p" style="margin-top:1rem" id="celBtn">もりに帰る 🌳</button>`;ov.classList.add('active');startConfetti();setTimeout(launchFireworks,500);}
-  document.getElementById('celBtn').addEventListener('click',()=>{stopConfetti();document.getElementById('celebrateOverlay').classList.remove('active');renderHome();renderStages();show('S_unit');});
-}
-
-function showResult(st,sc,avg){
+/* ============================================================
+   結果画面（不合格）（フェーズ2：スコアパネル＋アドバイスを追加）
+============================================================ */
+function showResult(st, sc, us, results, advice){
   let icon,title,sub;
-  if(sc>=st.clearScore-1){icon='😊';title='あと少し！';sub=`クリアまであと${st.clearScore-sc}問！`;}
-  else if(sc>=2){icon='💪';title='ファイト！';sub='もう一度やってみよう！';}
+  if(sc>=st.clearScore-1){icon='😊';title='あと少し！';sub=`クリアまであと${st.clearScore-sc}問！もう一度チャレンジしよう！`;}
+  else if(sc>=2){icon='💪';title='ファイト！';sub='もう一度やってみよう！きっとできる！';}
   else{icon='📖';title='もう少しべんきょうしよう！';sub='まえのステージをもう一度やってみてね。';}
+
   document.getElementById('rIcon').textContent=icon;
   document.getElementById('rTitle').textContent=title;
   document.getElementById('rSub').textContent=sub;
-  document.getElementById('rScore').textContent=`${sc}/5`;
-  document.getElementById('rDetail').innerHTML=`<div class="rd-row"><span>せいかい問題</span><span>${sc}もん</span></div><div class="rd-row"><span>クリア条件</span><span>${st.clearScore}もん以上</span></div><div class="rd-row"><span>ヒント使用</span><span>${totalHints}回</span></div><div class="rd-row"><span>平均解答時間</span><span>${avg}秒</span></div>`;
+  document.getElementById('resultScorePanel').innerHTML=buildScorePanelHTML(us, results, false);
+  document.getElementById('resultAdvice').innerHTML=buildAdviceHTML(advice);
   show('S_result');
 }
 
@@ -425,11 +703,11 @@ document.getElementById('startBtn').addEventListener('click',async()=>{
   document.getElementById('loginStatus').textContent='つないでいます…';
   const user=await signInUser();
   if(!user){document.getElementById('loginStatus').textContent='エラーが発生しました。もう一度試してね。';document.getElementById('startBtn').disabled=false;return;}
-  currentUid=user.uid;userName=name;
+  currentUid=user.uid; userName=name;
   await createUserIfNew(currentUid,userName);
   progress=await loadProgress(currentUid);
   document.getElementById('welcomeName').textContent=name+'さん、こんにちは！';
-  renderHome();show('S_home');
+  renderHome(); show('S_home');
 });
 document.getElementById('loBtn').addEventListener('click',()=>{currentUid='';userName='';progress={};document.getElementById('nameInput').value='';document.getElementById('startBtn').disabled=true;document.getElementById('loginStatus').textContent='';show('S_login');});
 document.getElementById('backHome').addEventListener('click',()=>{renderHome();show('S_home');});
@@ -437,5 +715,11 @@ document.getElementById('retryBtn').addEventListener('click',()=>startStage(stag
 document.getElementById('homeBtn').addEventListener('click',()=>{renderHome();show('S_home');});
 show('S_login');
 </script>
+<!-- フッター -->
+<footer class="site-footer">
+  <span class="footer-version">v1.0.0</span>
+  <span class="footer-license">© 2025 <a href="mailto:admin@ena-gifu.com">@ena-gifu.com</a> All rights reserved.</span>
+</footer>
+
 </body>
 </html>

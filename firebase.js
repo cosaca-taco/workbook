@@ -1,8 +1,6 @@
 /* ============================================================
-   firebase.js
-   Firebase の初期化・認証・Firestore 操作をまとめたファイル
-   ・子ども用：匿名認証 + 進捗の保存/読み込み + 問題の取得
-   ・先生用  ：メール認証 + 問題の追加/編集/削除
+   firebase.js — Phase2対応版
+   追加機能: saveSession（理解度スコア・アドバイスを保存）
 ============================================================ */
 
 import { initializeApp }
@@ -15,7 +13,7 @@ import {
   getFirestore,
   collection, doc,
   getDoc, getDocs, setDoc, addDoc, updateDoc, deleteDoc,
-  query, where, orderBy, serverTimestamp
+  query, where, orderBy, limit, serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 /* ============================================================
@@ -66,7 +64,7 @@ export async function signOutUser() {
 }
 
 /* ============================================================
-   ユーザー管理（子ども）
+   ユーザー管理
 ============================================================ */
 export async function createUserIfNew(uid, name) {
   try {
@@ -99,26 +97,50 @@ export async function saveProgress(uid, name, progress) {
 }
 
 /* ============================================================
-   問題の取得（子ども用）
-   unitId・stageId でフィルタして isPublished=true のものを返す
-   問題が5問未満の場合は空配列を返す → JS生成にフォールバック
+   セッション保存（フェーズ2）
+   ステージ終了ごとに理解度スコアと学習結果を保存する
 
    Firestoreのデータ構造:
-   problems/{自動ID}
-     unitId:      "add"
-     gradeId:     "g2"
-     stageId:     1
-     question:    "23＋47は？"
-     answer:      70
-     hint:        "一の位から計算しよう"
-     explanation: "くり上がりに注意！"
-     displayType: "calc"  ← "calc" or "text"
-     displayLeft:  23     ← calcのとき
-     displayOp:   "+"     ← calcのとき: "+" or "−"
-     displayRight: 47     ← calcのとき
-     isPublished: true
-     createdAt:   timestamp
-     updatedAt:   timestamp
+   users/{uid}/sessions/{自動ID}
+     unitId:            "add"
+     unitName:          "たし算の筆算"
+     stageId:           1
+     stageName:         "きほん"
+     score:             4        ← 正解数
+     understandingScore: 78      ← 理解度スコア(0〜100)
+     hintCount:         1        ← ヒント使用回数
+     avgTimeSec:        8.5      ← 平均解答時間(秒)
+     cleared:           true
+     advice:            "よくできました！..."
+     createdAt:         timestamp
+============================================================ */
+export async function saveSession(uid, sessionData) {
+  try {
+    await addDoc(
+      collection(db, "users", uid, "sessions"),
+      { ...sessionData, createdAt: serverTimestamp() }
+    );
+  } catch (e) { console.error("saveSession:", e); }
+}
+
+/* ============================================================
+   セッション履歴を取得（直近10件）
+   管理者ダッシュボード・保護者画面で使う予定
+============================================================ */
+export async function getRecentSessions(uid, count = 10) {
+  try {
+    const q = query(
+      collection(db, "users", uid, "sessions"),
+      orderBy("createdAt", "desc"),
+      limit(count)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+  } catch (e) { console.error("getRecentSessions:", e); return []; }
+}
+
+/* ============================================================
+   問題の取得（子ども用）
 ============================================================ */
 export async function getProblems(unitId, stageId) {
   try {
@@ -130,11 +152,7 @@ export async function getProblems(unitId, stageId) {
     );
     const snap = await getDocs(q);
     const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-
-    /* 5問未満なら空配列（JSフォールバック用） */
     if (list.length < 5) return [];
-
-    /* ランダムに5問選んで返す */
     return shuffleArray(list).slice(0, 5);
   } catch (e) {
     console.error("getProblems:", e);
@@ -142,7 +160,6 @@ export async function getProblems(unitId, stageId) {
   }
 }
 
-/* 配列をシャッフルするユーティリティ */
 function shuffleArray(arr) {
   const a = [...arr];
   for (let i = a.length - 1; i > 0; i--) {
@@ -155,21 +172,15 @@ function shuffleArray(arr) {
 /* ============================================================
    問題の管理（先生用）
 ============================================================ */
-
-/* 全問題を取得（管理画面用） */
 export async function getAllProblems() {
   try {
     const snap = await getDocs(
       query(collection(db, "problems"), orderBy("createdAt", "desc"))
     );
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch (e) {
-    console.error("getAllProblems:", e);
-    return [];
-  }
+  } catch (e) { console.error("getAllProblems:", e); return []; }
 }
 
-/* 問題を追加 */
 export async function addProblem(data) {
   try {
     const ref = await addDoc(collection(db, "problems"), {
@@ -179,32 +190,21 @@ export async function addProblem(data) {
       updatedAt: serverTimestamp(),
     });
     return ref.id;
-  } catch (e) {
-    console.error("addProblem:", e);
-    return null;
-  }
+  } catch (e) { console.error("addProblem:", e); return null; }
 }
 
-/* 問題を更新 */
 export async function updateProblem(id, data) {
   try {
     await updateDoc(doc(db, "problems", id), {
       ...data, updatedAt: serverTimestamp(),
     });
     return true;
-  } catch (e) {
-    console.error("updateProblem:", e);
-    return false;
-  }
+  } catch (e) { console.error("updateProblem:", e); return false; }
 }
 
-/* 問題を削除 */
 export async function deleteProblem(id) {
   try {
     await deleteDoc(doc(db, "problems", id));
     return true;
-  } catch (e) {
-    console.error("deleteProblem:", e);
-    return false;
-  }
+  } catch (e) { console.error("deleteProblem:", e); return false; }
 }
