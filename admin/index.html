@@ -3,7 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>さんすうのもり｜管理画面</title>
+  <title>えなまなびのもり｜管理画面</title>
+  <!-- CSV解析 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <!-- Excel読み込み -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
     :root{
@@ -15,46 +19,58 @@
       --text:#1A1208;--muted:#8A7A60;--shadow:0 2px 8px rgba(0,0,0,.07);
     }
     body{font-family:'Hiragino Sans','Yu Gothic UI','Meiryo',sans-serif;background:var(--bg);color:var(--text);font-size:14px;}
-    /* レイアウト */
-    .admin-wrap{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
-    .sidebar{background:var(--text);color:#fff;padding:1.5rem 1rem;display:flex;flex-direction:column;gap:1rem}
-    .sidebar-title{font-size:16px;font-weight:700;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.15)}
-    .sidebar-sub{font-size:12px;opacity:.6;margin-bottom:.5rem}
-    .filter-select{width:100%;padding:8px 10px;border-radius:8px;border:none;background:rgba(255,255,255,.1);color:#fff;font-size:13px;cursor:pointer}
-    .filter-select option{background:var(--text)}
-    .sidebar-info{margin-top:auto;font-size:11px;opacity:.5;line-height:1.6}
+    .layout{display:grid;grid-template-columns:220px 1fr;min-height:100vh}
+    .sidebar{background:#1A1208;color:#fff;padding:1.25rem 1rem;display:flex;flex-direction:column;gap:.5rem}
+    .sidebar-logo{font-size:15px;font-weight:700;padding-bottom:1rem;border-bottom:1px solid rgba(255,255,255,.12);line-height:1.4}
+    .sidebar-logo span{font-size:11px;opacity:.6;display:block;margin-top:2px}
+    .nav-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:10px;color:rgba(255,255,255,.7);font-size:13px;cursor:pointer;text-decoration:none;transition:background .15s}
+    .nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
+    .nav-item.active{background:var(--amber);color:#3D2000;font-weight:700}
+    .nav-icon{font-size:16px;width:20px;text-align:center}
+    .sidebar-section{font-size:11px;opacity:.4;padding:8px 12px 4px;font-weight:700;letter-spacing:.05em}
+    .btn-logout{background:rgba(255,255,255,.08);color:rgba(255,255,255,.7);border:none;border-radius:8px;padding:7px 12px;font-size:12px;cursor:pointer;width:100%;text-align:left;margin-top:4px}
+    .btn-logout:hover{background:rgba(255,255,255,.15);color:#fff}
+    .sidebar-footer{font-size:11px;opacity:.45;line-height:1.6}
     .main{padding:1.5rem;overflow-y:auto}
-    /* ヘッダー */
-    .main-header{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem}
-    .main-title{font-size:20px;font-weight:700}
-    .header-right{margin-left:auto;display:flex;align-items:center;gap:10px}
-    .teacher-name{font-size:13px;color:var(--muted)}
+    .page{display:none}.page.active{display:block}
+
+    /* ページヘッダー */
+    .page-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:1.5rem}
+    .page-title{font-size:20px;font-weight:700}
+    .page-sub{font-size:13px;color:var(--muted);margin-top:3px}
+    .header-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
+
     /* ボタン */
-    .btn{padding:9px 16px;font-size:13px;font-weight:600;border:none;border-radius:9px;cursor:pointer;transition:opacity .15s}
+    .btn{padding:9px 16px;font-size:13px;font-weight:600;border:none;border-radius:9px;cursor:pointer;transition:opacity .15s;font-family:inherit}
     .btn:hover{opacity:.85}
     .btn-add{background:var(--amber);color:#3D2000;box-shadow:0 3px 0 var(--amber-d)}
     .btn-edit{background:var(--blue-l);color:var(--blue)}
     .btn-del{background:var(--red-l);color:var(--red)}
     .btn-save{background:var(--green);color:#fff;width:100%;padding:12px;font-size:14px}
     .btn-cancel{background:#F0EDE8;color:#555;width:100%;padding:12px;font-size:14px;margin-top:8px}
-    .btn-logout{background:rgba(255,255,255,.1);color:#fff;font-size:12px;padding:7px 12px;border-radius:8px;border:none;cursor:pointer}
+    .btn-dl{background:var(--green-l);color:var(--green);font-size:13px}
+    .btn-import-run{background:var(--green);color:#fff;padding:11px 24px;font-size:14px;font-weight:700}
+    .btn-import-run:disabled{opacity:.4;cursor:default}
+
     /* テーブル */
     .table-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:var(--shadow)}
     table{width:100%;border-collapse:collapse}
-    th{background:#F5F1EB;padding:10px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border)}
-    td{padding:12px 14px;border-bottom:1px solid #F0EDE8;vertical-align:top}
+    th{background:#F5F1EB;padding:10px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
+    td{padding:11px 14px;border-bottom:1px solid #F0EDE8;vertical-align:top}
     tr:last-child td{border-bottom:none}
     tr:hover td{background:#FAFAF8}
-    .q-text{font-weight:500;margin-bottom:4px}
-    .q-meta{font-size:12px;color:var(--muted)}
+    .empty{text-align:center;padding:2.5rem;color:var(--muted)}
+
+    /* バッジ */
     .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700}
     .badge-pub{background:var(--green-l);color:var(--green)}
     .badge-draft{background:#F0EDE8;color:var(--muted)}
     .badge-unit{background:var(--amber-l);color:var(--amber-d)}
     .badge-stage{background:var(--blue-l);color:var(--blue)}
-    .empty-state{text-align:center;padding:3rem;color:var(--muted)}
-    .empty-icon{font-size:40px;margin-bottom:8px}
-    /* フォーム（モーダル） */
+    .badge-ok{background:var(--green-l);color:var(--green)}
+    .badge-err{background:var(--red-l);color:var(--red)}
+
+    /* モーダル（問題追加・編集） */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
     .modal-overlay.active{display:flex}
     .modal{background:var(--card);border-radius:20px;padding:1.75rem;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2)}
@@ -66,7 +82,6 @@
     .form-textarea{resize:vertical;min-height:70px}
     .form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .form-row3{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center}
-    .calc-sep{text-align:center;font-size:18px;font-weight:700;color:var(--amber)}
     .calc-fields{background:#F8F4EE;border-radius:10px;padding:12px;margin-bottom:1rem}
     .calc-label{font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:700}
     .toggle-row{display:flex;align-items:center;gap:10px}
@@ -76,6 +91,52 @@
     .toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
     .toggle input:checked+.toggle-slider{background:var(--green)}
     .toggle input:checked+.toggle-slider:before{transform:translateX(20px)}
+
+    /* ============================================================
+       インポートページ専用スタイル
+    ============================================================ */
+    .import-step{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+    .import-step-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
+    .step-num{width:28px;height:28px;border-radius:50%;background:var(--amber);color:#3D2000;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .step-title{font-size:15px;font-weight:700}
+    .step-sub{font-size:12px;color:var(--muted);margin-top:2px}
+
+    /* テンプレートダウンロード */
+    .template-info{background:#F5F1EB;border-radius:10px;padding:12px 14px;margin-bottom:1rem;font-size:12px;line-height:1.8;color:var(--muted)}
+    .template-info b{color:var(--text)}
+    .unit-ref{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
+    .unit-ref-item{background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:11px;text-align:center}
+    .unit-ref-id{font-weight:700;color:var(--amber-d);font-family:monospace}
+    .unit-ref-name{color:var(--muted);margin-top:2px}
+
+    /* ファイルドロップゾーン */
+    .drop-zone{border:2.5px dashed var(--border);border-radius:14px;padding:2rem;text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
+    .drop-zone:hover,.drop-zone.drag-over{border-color:var(--amber);background:var(--amber-ll)}
+    .drop-icon{font-size:40px;margin-bottom:8px}
+    .drop-label{font-size:14px;font-weight:700;margin-bottom:4px}
+    .drop-sub{font-size:12px;color:var(--muted)}
+    .drop-input{display:none}
+    .drop-filename{font-size:13px;color:var(--green);font-weight:700;margin-top:8px}
+
+    /* プレビュー */
+    .preview-summary{display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
+    .preview-count{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700}
+    .preview-count.ok{background:var(--green-l);color:var(--green)}
+    .preview-count.err{background:var(--red-l);color:var(--red)}
+    .preview-table-wrap{overflow-x:auto;max-height:320px;overflow-y:auto;border:1px solid var(--border);border-radius:12px}
+    .preview-table{width:100%;border-collapse:collapse;min-width:700px}
+    .preview-table th{background:#F5F1EB;padding:8px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);position:sticky;top:0}
+    .preview-table td{padding:8px 12px;border-bottom:1px solid #F5F1EB;font-size:12px;vertical-align:top}
+    .preview-table tr:last-child td{border-bottom:none}
+    .preview-table tr.row-err td{background:#FFF5F5}
+    .err-msg{color:var(--red);font-size:11px;margin-top:2px}
+
+    /* インポート進捗 */
+    .progress-wrap{margin-top:1rem}
+    .progress-bar{height:10px;background:#EEE;border-radius:5px;overflow:hidden;margin-bottom:6px}
+    .progress-fill{height:100%;background:var(--green);border-radius:5px;transition:width .3s}
+    .progress-label{font-size:12px;color:var(--muted);text-align:center}
+
     /* ログイン */
     .login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh}
     .login-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2.5rem 2rem;width:100%;max-width:360px;text-align:center;box-shadow:var(--shadow)}
@@ -86,13 +147,18 @@
     .login-input:focus{border-color:var(--amber)}
     .login-btn{width:100%;padding:13px;font-size:15px;font-weight:700;background:var(--amber);color:#3D2000;border:none;border-radius:12px;cursor:pointer;box-shadow:0 3px 0 var(--amber-d)}
     .login-err{font-size:13px;color:var(--red);margin-top:8px;min-height:18px}
-    /* ローディング */
-    .loading{display:flex;align-items:center;justify-content:center;height:200px;gap:10px;color:var(--muted)}
-    .spinner{width:28px;height:28px;border:3px solid var(--amber-l);border-top-color:var(--amber);border-radius:50%;animation:spin .8s linear infinite}
-    @keyframes spin{to{transform:rotate(360deg)}}
+
     /* スナックバー */
     .snack{position:fixed;bottom:1.5rem;left:50%;transform:translateX(-50%);background:#1A1208;color:#fff;padding:10px 20px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .3s;z-index:200;white-space:nowrap}
     .snack.show{opacity:1}
+
+    /* フッター */
+    .site-footer{text-align:center;padding:1rem;font-size:11px;color:var(--muted);border-top:1px solid var(--border);margin-top:1rem}
+
+    /* ローディング */
+    .loading{display:flex;align-items:center;justify-content:center;height:160px;gap:10px;color:var(--muted)}
+    .spinner{width:28px;height:28px;border:3px solid var(--amber-l);border-top-color:var(--amber);border-radius:50%;animation:spin .8s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
@@ -102,7 +168,7 @@
   <div class="login-wrap">
     <div class="login-card">
       <div class="login-logo">🦉</div>
-      <div class="login-title">さんすうのもり</div>
+      <div class="login-title">えなまなびのもり</div>
       <div class="login-sub">先生用・管理画面</div>
       <input id="emailInput"    class="login-input" type="email"    placeholder="メールアドレス"/>
       <input id="passwordInput" class="login-input" type="password" placeholder="パスワード"/>
@@ -114,69 +180,154 @@
 
 <!-- 管理画面 -->
 <div id="adminPage" style="display:none">
-  <div class="admin-wrap">
+  <div class="layout">
+
     <!-- サイドバー -->
     <div class="sidebar">
-      <div class="sidebar-title">🌳 さんすうのもり<br><span style="font-size:12px;opacity:.7">管理画面</span></div>
-      <div>
-        <div class="sidebar-sub">学年でしぼる</div>
-        <select id="filterGrade" class="filter-select">
-          <option value="">すべての学年</option>
-          <option value="g2" selected>2年生</option>
-        </select>
-      </div>
-      <div>
-        <div class="sidebar-sub">単元でしぼる</div>
-        <select id="filterUnit" class="filter-select">
-          <option value="">すべての単元</option>
-          <option value="add">➕ たし算の筆算</option>
-          <option value="sub">➖ ひき算の筆算</option>
-          <option value="num">🔢 1000までの数</option>
-          <option value="len">📏 長さ</option>
-          <option value="vol">🫙 かさ</option>
-          <option value="time">⏰ 時こくと時間</option>
-          <option value="mul">✖️ かけ算（九九）</option>
-          <option value="shape">🔷 三角形と四角形</option>
-        </select>
-      </div>
-      <div>
-        <div class="sidebar-sub">ステージでしぼる</div>
-        <select id="filterStage" class="filter-select">
-          <option value="">すべてのステージ</option>
-          <option value="1">🌱 ステージ1「きほん」</option>
-          <option value="2">🌿 ステージ2「れんしゅう」</option>
-          <option value="3">🌟 ステージ3「チャレンジ」</option>
-        </select>
-      </div>
-      <div>
-        <div class="sidebar-sub">公開状態</div>
-        <select id="filterPublished" class="filter-select">
-          <option value="">すべて</option>
-          <option value="true">公開中</option>
-          <option value="false">非公開</option>
-        </select>
-      </div>
-      <div class="sidebar-info">
-        ・5問以上登録すると子どもの画面でFirestoreの問題が使われます<br>
-        ・5問未満の場合は自動生成問題が表示されます
+      <div class="sidebar-logo">🌳 えなまなびのもり<span>管理画面</span></div>
+      <div class="sidebar-section">問題管理</div>
+      <div class="nav-item active" data-page="problems"><span class="nav-icon">✏️</span>問題一覧</div>
+      <div class="nav-item" data-page="import"><span class="nav-icon">📥</span>一括インポート</div>
+      <div class="sidebar-section">ダッシュボード</div>
+      <a class="nav-item" href="./dashboard.html"><span class="nav-icon">📊</span>クラス概要</a>
+      <div style="margin-top:auto">
+        <div class="sidebar-footer" id="teacherEmail"></div>
+        <button class="btn-logout" id="logoutBtn">ログアウト</button>
       </div>
     </div>
 
     <!-- メイン -->
     <div class="main">
-      <div class="main-header">
-        <div class="main-title">問題管理</div>
-        <div class="header-right">
-          <span class="teacher-name" id="teacherEmail"></span>
-          <button id="addBtn" class="btn btn-add">＋ 問題を追加</button>
-          <button id="logoutBtn" class="btn-logout">ログアウト</button>
+
+      <!-- 問題一覧ページ -->
+      <div id="page-problems" class="page active">
+        <div class="page-header">
+          <div>
+            <div class="page-title">✏️ 問題一覧</div>
+            <div class="page-sub">単元・ステージで絞り込めます</div>
+          </div>
+          <div class="header-right">
+            <select id="filterUnit" class="form-select" style="width:160px">
+              <option value="">すべての単元</option>
+              <option value="add">➕ たし算の筆算</option>
+              <option value="sub">➖ ひき算の筆算</option>
+              <option value="num">🔢 1000までの数</option>
+              <option value="len">📏 長さ</option>
+              <option value="vol">🫙 かさ</option>
+              <option value="time">⏰ 時こくと時間</option>
+              <option value="mul">✖️ かけ算（九九）</option>
+              <option value="shape">🔷 三角形と四角形</option>
+            </select>
+            <select id="filterStage" class="form-select" style="width:140px">
+              <option value="">すべてのステージ</option>
+              <option value="1">🌱 ステージ1</option>
+              <option value="2">🌿 ステージ2</option>
+              <option value="3">🌟 ステージ3</option>
+            </select>
+            <button id="addBtn" class="btn btn-add">＋ 問題を追加</button>
+          </div>
+        </div>
+        <div id="problemList">
+          <div class="loading"><div class="spinner"></div><div>よみこみ中…</div></div>
         </div>
       </div>
 
-      <!-- 問題一覧 -->
-      <div id="problemList">
-        <div class="loading"><div class="spinner"></div><div>よみこみ中…</div></div>
+      <!-- 一括インポートページ -->
+      <div id="page-import" class="page">
+        <div class="page-header">
+          <div>
+            <div class="page-title">📥 一括インポート</div>
+            <div class="page-sub">スプレッドシートから問題をまとめて登録できます</div>
+          </div>
+        </div>
+
+        <!-- STEP 1: テンプレートダウンロード -->
+        <div class="import-step">
+          <div class="import-step-header">
+            <div class="step-num">1</div>
+            <div>
+              <div class="step-title">テンプレートをダウンロード</div>
+              <div class="step-sub">ExcelやGoogle Sheetsで問題を入力してください</div>
+            </div>
+            <div style="margin-left:auto">
+              <button class="btn btn-dl" id="downloadTemplateBtn">📄 CSVテンプレートをダウンロード</button>
+            </div>
+          </div>
+          <div class="template-info">
+            <b>列の説明：</b><br>
+            <b>単元ID</b>：下の表を参照　　
+            <b>ステージ</b>：1・2・3のいずれか　　
+            <b>問題文</b>：子どもに表示する文章　　
+            <b>答え</b>：半角数字のみ<br>
+            <b>ヒント</b>：1回目のまちがい時に表示　　
+            <b>解説</b>：正解後に表示　　
+            <b>表示タイプ</b>：<code>text</code>（通常）か <code>calc</code>（筆算）<br>
+            <b>筆算（左）・演算子・筆算（右）</b>：表示タイプが <code>calc</code> のときのみ記入　　
+            <b>公開</b>：<code>true</code>（公開）か <code>false</code>（非公開）
+            <div class="unit-ref">
+              <div class="unit-ref-item"><div class="unit-ref-id">add</div><div class="unit-ref-name">たし算の筆算</div></div>
+              <div class="unit-ref-item"><div class="unit-ref-id">sub</div><div class="unit-ref-name">ひき算の筆算</div></div>
+              <div class="unit-ref-item"><div class="unit-ref-id">num</div><div class="unit-ref-name">1000までの数</div></div>
+              <div class="unit-ref-item"><div class="unit-ref-id">len</div><div class="unit-ref-name">長さ</div></div>
+              <div class="unit-ref-item"><div class="unit-ref-id">vol</div><div class="unit-ref-name">かさ</div></div>
+              <div class="unit-ref-item"><div class="unit-ref-id">time</div><div class="unit-ref-name">時こくと時間</div></div>
+              <div class="unit-ref-item"><div class="unit-ref-id">mul</div><div class="unit-ref-name">かけ算（九九）</div></div>
+              <div class="unit-ref-item"><div class="unit-ref-id">shape</div><div class="unit-ref-name">三角形と四角形</div></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: ファイルアップロード -->
+        <div class="import-step">
+          <div class="import-step-header">
+            <div class="step-num">2</div>
+            <div>
+              <div class="step-title">ファイルをアップロード</div>
+              <div class="step-sub">CSV（.csv）またはExcel（.xlsx）に対応しています</div>
+            </div>
+          </div>
+          <div class="drop-zone" id="dropZone">
+            <div class="drop-icon">📂</div>
+            <div class="drop-label">ここにファイルをドロップ</div>
+            <div class="drop-sub">またはクリックして選択　CSV・Excel対応</div>
+            <div class="drop-filename" id="dropFilename"></div>
+            <input type="file" id="fileInput" class="drop-input" accept=".csv,.xlsx,.xls"/>
+          </div>
+        </div>
+
+        <!-- STEP 3: プレビュー＆インポート -->
+        <div class="import-step" id="previewStep" style="display:none">
+          <div class="import-step-header">
+            <div class="step-num">3</div>
+            <div>
+              <div class="step-title">内容を確認してインポート</div>
+              <div class="step-sub">赤くなっている行はエラーです。修正してから再アップロードしてください</div>
+            </div>
+          </div>
+          <div class="preview-summary" id="previewSummary"></div>
+          <div class="preview-table-wrap">
+            <table class="preview-table" id="previewTable">
+              <thead>
+                <tr>
+                  <th>行</th><th>単元</th><th>ST</th><th>問題文</th>
+                  <th>答え</th><th>タイプ</th><th>公開</th><th>状態</th>
+                </tr>
+              </thead>
+              <tbody id="previewBody"></tbody>
+            </table>
+          </div>
+          <div style="margin-top:1rem;display:flex;align-items:center;gap:12px">
+            <button class="btn btn-import-run" id="importRunBtn">✅ インポート実行</button>
+            <button class="btn btn-cancel" style="width:auto;margin:0;padding:9px 20px" id="importCancelBtn">キャンセル</button>
+          </div>
+          <div class="progress-wrap" id="progressWrap" style="display:none">
+            <div class="progress-bar"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+            <div class="progress-label" id="progressLabel">インポート中…</div>
+          </div>
+        </div>
       </div>
+
+      <footer class="site-footer">v1.0.0 © 2025 @ena-gifu.com All rights reserved.</footer>
     </div>
   </div>
 </div>
@@ -185,7 +336,6 @@
 <div id="modal" class="modal-overlay">
   <div class="modal">
     <div class="modal-title" id="modalTitle">問題を追加</div>
-
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">単元</label>
@@ -209,12 +359,10 @@
         </select>
       </div>
     </div>
-
     <div class="form-group">
       <label class="form-label">問題文</label>
       <textarea id="f_question" class="form-textarea" placeholder="例: 23 ＋ 47 は いくつですか？"></textarea>
     </div>
-
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">答え（数字）</label>
@@ -228,8 +376,6 @@
         </select>
       </div>
     </div>
-
-    <!-- 筆算フィールド（calcのとき表示） -->
     <div class="calc-fields" id="calcFields" style="display:none">
       <div class="calc-label">筆算の設定</div>
       <div class="form-row3">
@@ -250,17 +396,14 @@
         </div>
       </div>
     </div>
-
     <div class="form-group">
       <label class="form-label">ヒント</label>
       <input id="f_hint" class="form-input" type="text" placeholder="例: 一の位から計算しよう"/>
     </div>
-
     <div class="form-group">
       <label class="form-label">解説</label>
       <input id="f_explanation" class="form-input" type="text" placeholder="例: 3＋7＝10、くり上がりに注意！"/>
     </div>
-
     <div class="form-group">
       <div class="toggle-row">
         <label class="toggle">
@@ -270,7 +413,6 @@
         <span style="font-size:13px">公開する（子どもの画面に表示される）</span>
       </div>
     </div>
-
     <button class="btn btn-save" id="saveBtn">保存する</button>
     <button class="btn btn-cancel" id="cancelBtn">キャンセル</button>
   </div>
@@ -292,46 +434,57 @@ const UNIT_NAMES = {
   add:'たし算の筆算',sub:'ひき算の筆算',num:'1000までの数',
   len:'長さ',vol:'かさ',time:'時こくと時間',mul:'かけ算（九九）',shape:'三角形と四角形',
 };
+const VALID_UNITS = Object.keys(UNIT_NAMES);
 const STAGE_NAMES = {1:'きほん',2:'れんしゅう',3:'チャレンジ'};
 const STAGE_ICONS = {1:'🌱',2:'🌿',3:'🌟'};
+
+/* CSVの列名マッピング（日本語・英語両対応） */
+const COL_MAP = {
+  '単元id':'unitId','単元id':'unitId','単元':'unitId','unitid':'unitId',
+  'ステージ':'stageId','stageid':'stageId',
+  '問題文':'question','question':'question',
+  '答え':'answer','answer':'answer',
+  'ヒント':'hint','hint':'hint',
+  '解説':'explanation','explanation':'explanation',
+  '表示タイプ':'displayType','displaytype':'displayType',
+  '筆算（左）':'displayLeft','displayleft':'displayLeft',
+  '演算子':'displayOp','displayop':'displayOp',
+  '筆算（右）':'displayRight','displayright':'displayRight',
+  '公開':'isPublished','ispublished':'isPublished',
+};
 
 /* ============================================================
    状態
 ============================================================ */
-let allProblems = [];
-let editingId   = null; // 編集中の問題ID（nullなら新規）
+let allProblems=[], editingId=null, parsedRows=[];
 
 /* ============================================================
    スナックバー
 ============================================================ */
-function showSnack(msg, isError=false){
+function snack(msg,err=false){
   const el=document.getElementById('snack');
-  el.textContent=msg;
-  el.style.background=isError?'#E24B4A':'#1A1208';
-  el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),2500);
+  el.textContent=msg; el.style.background=err?'#E24B4A':'#1A1208';
+  el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),2500);
 }
 
 /* ============================================================
    ログイン
 ============================================================ */
-document.getElementById('loginBtn').addEventListener('click', async()=>{
-  const email    = document.getElementById('emailInput').value.trim();
-  const password = document.getElementById('passwordInput').value;
-  const err      = document.getElementById('loginErr');
-  if(!email||!password){ err.textContent='メールアドレスとパスワードを入力してください'; return; }
+document.getElementById('loginBtn').addEventListener('click',async()=>{
+  const email=document.getElementById('emailInput').value.trim();
+  const password=document.getElementById('passwordInput').value;
+  const err=document.getElementById('loginErr');
+  if(!email||!password){err.textContent='メールアドレスとパスワードを入力してください';return;}
   err.textContent='ログイン中…';
-  const user = await signInTeacher(email, password);
-  if(!user){ err.textContent='メールアドレスまたはパスワードが違います'; return; }
+  const user=await signInTeacher(email,password);
+  if(!user){err.textContent='メールアドレスまたはパスワードが違います';return;}
   document.getElementById('teacherEmail').textContent=user.email;
   document.getElementById('loginPage').style.display='none';
   document.getElementById('adminPage').style.display='block';
   await loadProblems();
 });
-
 document.getElementById('passwordInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginBtn').click();});
-
-document.getElementById('logoutBtn').addEventListener('click', async()=>{
+document.getElementById('logoutBtn').addEventListener('click',async()=>{
   await signOutUser();
   document.getElementById('adminPage').style.display='none';
   document.getElementById('loginPage').style.display='block';
@@ -341,59 +494,54 @@ document.getElementById('logoutBtn').addEventListener('click', async()=>{
 });
 
 /* ============================================================
-   問題の読み込み・表示
+   ナビゲーション
+============================================================ */
+document.querySelectorAll('.nav-item[data-page]').forEach(el=>{
+  el.addEventListener('click',()=>{
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    el.classList.add('active');
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('page-'+el.dataset.page).classList.add('active');
+  });
+});
+
+/* ============================================================
+   問題一覧
 ============================================================ */
 async function loadProblems(){
   document.getElementById('problemList').innerHTML='<div class="loading"><div class="spinner"></div><div>よみこみ中…</div></div>';
-  allProblems = await getAllProblems();
+  allProblems=await getAllProblems();
   renderTable();
 }
 
 function getFiltered(){
-  const grade     = document.getElementById('filterGrade').value;
-  const unit      = document.getElementById('filterUnit').value;
-  const stage     = document.getElementById('filterStage').value;
-  const published = document.getElementById('filterPublished').value;
+  const unit=document.getElementById('filterUnit').value;
+  const stage=document.getElementById('filterStage').value;
   return allProblems.filter(p=>{
-    if(grade     && p.gradeId      !== grade)            return false;
-    if(unit      && p.unitId       !== unit)             return false;
-    if(stage     && String(p.stageId) !== stage)         return false;
-    if(published && String(p.isPublished) !== published) return false;
+    if(unit&&p.unitId!==unit)return false;
+    if(stage&&String(p.stageId)!==stage)return false;
     return true;
   });
 }
 
 function renderTable(){
-  const list = getFiltered();
-  const el   = document.getElementById('problemList');
+  const list=getFiltered();
+  const el=document.getElementById('problemList');
   if(list.length===0){
-    el.innerHTML=`<div class="table-wrap"><div class="empty-state"><div class="empty-icon">📭</div><div>問題がありません</div><div style="font-size:12px;color:var(--muted);margin-top:4px">「＋ 問題を追加」ボタンで追加してください</div></div></div>`;
+    el.innerHTML=`<div class="table-wrap"><div class="empty">問題がありません。「＋ 問題を追加」または「一括インポート」で追加してください。</div></div>`;
     return;
   }
-  el.innerHTML=`
-    <div class="table-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>問題文</th>
-            <th>単元 / ステージ</th>
-            <th>答え</th>
-            <th>公開</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody id="tbody"></tbody>
-      </table>
-    </div>`;
+  el.innerHTML=`<div class="table-wrap"><table>
+    <thead><tr><th>問題文</th><th>単元 / ステージ</th><th>答え</th><th>公開</th><th>操作</th></tr></thead>
+    <tbody id="tbody"></tbody></table></div>`;
   const tbody=document.getElementById('tbody');
   list.forEach(p=>{
     const tr=document.createElement('tr');
     tr.innerHTML=`
-      <td><div class="q-text">${p.question||'（問題文なし）'}</div><div class="q-meta">ヒント：${p.hint||'—'}</div></td>
-      <td>
-        <span class="badge badge-unit">${UNIT_NAMES[p.unitId]||p.unitId}</span><br>
-        <span class="badge badge-stage" style="margin-top:4px">${STAGE_ICONS[p.stageId]||''} ${STAGE_NAMES[p.stageId]||p.stageId}</span>
-      </td>
+      <td><div style="font-weight:600;margin-bottom:3px">${p.question||'（問題文なし）'}</div>
+          <div style="font-size:11px;color:var(--muted)">ヒント：${p.hint||'—'}</div></td>
+      <td><span class="badge badge-unit">${UNIT_NAMES[p.unitId]||p.unitId}</span><br>
+          <span class="badge badge-stage" style="margin-top:4px">${STAGE_ICONS[p.stageId]||''} ${STAGE_NAMES[p.stageId]||p.stageId}</span></td>
       <td><strong>${p.answer}</strong></td>
       <td><span class="badge ${p.isPublished?'badge-pub':'badge-draft'}">${p.isPublished?'公開中':'非公開'}</span></td>
       <td style="white-space:nowrap">
@@ -402,55 +550,42 @@ function renderTable(){
       </td>`;
     tbody.appendChild(tr);
   });
-
-  /* 編集・削除ボタン */
-  tbody.querySelectorAll('.btn-edit').forEach(btn=>{
-    btn.addEventListener('click',()=>openModal(btn.dataset.id));
-  });
-  tbody.querySelectorAll('.btn-del').forEach(btn=>{
-    btn.addEventListener('click',()=>handleDelete(btn.dataset.id));
-  });
+  tbody.querySelectorAll('.btn-edit').forEach(b=>b.addEventListener('click',()=>openModal(b.dataset.id)));
+  tbody.querySelectorAll('.btn-del' ).forEach(b=>b.addEventListener('click',()=>handleDelete(b.dataset.id)));
 }
 
-/* フィルター変更 */
-['filterGrade','filterUnit','filterStage','filterPublished'].forEach(id=>{
+['filterUnit','filterStage'].forEach(id=>{
   document.getElementById(id).addEventListener('change',renderTable);
 });
 
 /* ============================================================
-   モーダル：追加・編集
+   問題モーダル（追加・編集）
 ============================================================ */
 document.getElementById('addBtn').addEventListener('click',()=>openModal(null));
 document.getElementById('cancelBtn').addEventListener('click',closeModal);
 document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
-
-/* 筆算フィールドの表示切替 */
 document.getElementById('f_displayType').addEventListener('change',function(){
   document.getElementById('calcFields').style.display=this.value==='calc'?'block':'none';
 });
 
 function openModal(id){
   editingId=id;
-  const modal=document.getElementById('modal');
   document.getElementById('modalTitle').textContent=id?'問題を編集':'問題を追加';
   if(id){
-    /* 編集：既存データを埋める */
-    const p=allProblems.find(p=>p.id===id);
-    if(!p)return;
-    document.getElementById('f_unitId').value      = p.unitId    ||'add';
-    document.getElementById('f_stageId').value     = p.stageId   ||1;
-    document.getElementById('f_question').value    = p.question  ||'';
-    document.getElementById('f_answer').value      = p.answer    ||'';
-    document.getElementById('f_displayType').value = p.displayType||'text';
-    document.getElementById('f_displayLeft').value = p.displayLeft||'';
-    document.getElementById('f_displayOp').value   = p.displayOp ||'+';
-    document.getElementById('f_displayRight').value= p.displayRight||'';
-    document.getElementById('f_hint').value        = p.hint       ||'';
-    document.getElementById('f_explanation').value = p.explanation||'';
+    const p=allProblems.find(p=>p.id===id); if(!p)return;
+    document.getElementById('f_unitId').value      =p.unitId    ||'add';
+    document.getElementById('f_stageId').value     =p.stageId   ||1;
+    document.getElementById('f_question').value    =p.question  ||'';
+    document.getElementById('f_answer').value      =p.answer    ||'';
+    document.getElementById('f_displayType').value =p.displayType||'text';
+    document.getElementById('f_displayLeft').value =p.displayLeft||'';
+    document.getElementById('f_displayOp').value   =p.displayOp ||'+';
+    document.getElementById('f_displayRight').value=p.displayRight||'';
+    document.getElementById('f_hint').value        =p.hint      ||'';
+    document.getElementById('f_explanation').value =p.explanation||'';
     document.getElementById('f_isPublished').checked=p.isPublished!==false;
     document.getElementById('calcFields').style.display=p.displayType==='calc'?'block':'none';
   } else {
-    /* 新規：フォームリセット */
     ['f_question','f_answer','f_displayLeft','f_displayRight','f_hint','f_explanation'].forEach(id=>document.getElementById(id).value='');
     document.getElementById('f_unitId').value='add';
     document.getElementById('f_stageId').value='1';
@@ -459,83 +594,230 @@ function openModal(id){
     document.getElementById('f_isPublished').checked=true;
     document.getElementById('calcFields').style.display='none';
   }
-  modal.classList.add('active');
+  document.getElementById('modal').classList.add('active');
 }
+function closeModal(){ document.getElementById('modal').classList.remove('active'); editingId=null; }
 
-function closeModal(){
-  document.getElementById('modal').classList.remove('active');
-  editingId=null;
-}
-
-/* 保存 */
-document.getElementById('saveBtn').addEventListener('click', async()=>{
-  const question    = document.getElementById('f_question').value.trim();
-  const answer      = parseInt(document.getElementById('f_answer').value);
-  const displayType = document.getElementById('f_displayType').value;
-
-  /* バリデーション */
-  if(!question){ showSnack('問題文を入力してください',true); return; }
-  if(isNaN(answer)){ showSnack('答えを数字で入力してください',true); return; }
-  if(displayType==='calc'){
-    if(!document.getElementById('f_displayLeft').value ||
-       !document.getElementById('f_displayRight').value){
-      showSnack('筆算の左右の数を入力してください',true); return;
-    }
-  }
-
-  const data = {
+document.getElementById('saveBtn').addEventListener('click',async()=>{
+  const question=document.getElementById('f_question').value.trim();
+  const answer=parseInt(document.getElementById('f_answer').value);
+  const displayType=document.getElementById('f_displayType').value;
+  if(!question){snack('問題文を入力してください',true);return;}
+  if(isNaN(answer)){snack('答えを数字で入力してください',true);return;}
+  if(displayType==='calc'&&(!document.getElementById('f_displayLeft').value||!document.getElementById('f_displayRight').value)){snack('筆算の数を入力してください',true);return;}
+  const data={
     unitId:      document.getElementById('f_unitId').value,
     gradeId:     'g2',
     stageId:     parseInt(document.getElementById('f_stageId').value),
-    question,
-    answer,
-    displayType,
-    displayLeft:  displayType==='calc' ? parseInt(document.getElementById('f_displayLeft').value)  : null,
-    displayOp:    displayType==='calc' ? document.getElementById('f_displayOp').value              : null,
-    displayRight: displayType==='calc' ? parseInt(document.getElementById('f_displayRight').value) : null,
-    hint:         document.getElementById('f_hint').value.trim(),
-    explanation:  document.getElementById('f_explanation').value.trim(),
-    isPublished:  document.getElementById('f_isPublished').checked,
+    question, answer, displayType,
+    displayLeft: displayType==='calc'?parseInt(document.getElementById('f_displayLeft').value):null,
+    displayOp:   displayType==='calc'?document.getElementById('f_displayOp').value:null,
+    displayRight:displayType==='calc'?parseInt(document.getElementById('f_displayRight').value):null,
+    hint:        document.getElementById('f_hint').value.trim(),
+    explanation: document.getElementById('f_explanation').value.trim(),
+    isPublished: document.getElementById('f_isPublished').checked,
   };
-
   document.getElementById('saveBtn').textContent='保存中…';
   document.getElementById('saveBtn').disabled=true;
-
-  let ok=false;
-  if(editingId){
-    ok = await updateProblem(editingId, data);
-  } else {
-    const id = await addProblem(data);
-    ok = !!id;
-  }
-
+  const ok=editingId?await updateProblem(editingId,data):!!(await addProblem(data));
   document.getElementById('saveBtn').textContent='保存する';
   document.getElementById('saveBtn').disabled=false;
+  if(ok){snack(editingId?'問題を更新しました':'問題を追加しました');closeModal();await loadProblems();}
+  else snack('エラーが発生しました',true);
+});
 
-  if(ok){
-    showSnack(editingId?'問題を更新しました':'問題を追加しました');
-    closeModal();
-    await loadProblems();
-  } else {
-    showSnack('エラーが発生しました',true);
-  }
+async function handleDelete(id){
+  const p=allProblems.find(p=>p.id===id); if(!p)return;
+  if(!confirm(`「${p.question}」を削除しますか？`))return;
+  const ok=await deleteProblem(id);
+  if(ok){snack('削除しました');await loadProblems();}
+  else snack('削除に失敗しました',true);
+}
+
+/* ============================================================
+   テンプレートCSVダウンロード
+============================================================ */
+document.getElementById('downloadTemplateBtn').addEventListener('click',()=>{
+  const headers=['単元ID','ステージ','問題文','答え','ヒント','解説','表示タイプ','筆算（左）','演算子','筆算（右）','公開'];
+  const examples=[
+    ['add','1','23 ＋ 47 は いくつですか？','70','一の位から計算しよう','3＋7＝10、くり上がりに注意！','calc','23','+','47','true'],
+    ['add','1','15 ＋ 28 は いくつですか？','43','一の位から計算してみよう','5＋8＝13、くり上がりに注意！','calc','15','+','28','true'],
+    ['sub','1','53 ー 27 は いくつですか？','26','一の位から引いてみよう','3から7は引けないのでくり下げ！','calc','53','−','27','true'],
+    ['mul','1','3 × 4 は いくつですか？','12','3のだんを順番にとなえよう','3×4＝12だよ！','text','','','','true'],
+    ['num','1','百のくらいが 3、十のくらいが 5、一のくらいが 7 の数は？','357','百・十・一のくらいに分けて考えよう','3×100＋5×10＋7＝357！','text','','','','true'],
+    ['len','2','3cm と 5cm をあわせると なんcm？','8','cmどうしをたしてみよう','3＋5＝8cm！','text','','','','true'],
+    ['time','1','9じ から 2じかん たつと なんじ？','11','じかんをたしてみよう','9＋2＝11じ！','text','','','','true'],
+    ['shape','1','三角形の辺はなんぼんありますか？','3','辺を指でかぞえてみよう','三角形の辺は3本だよ！','text','','','','true'],
+  ];
+  const csv=[headers,...examples].map(r=>r.map(c=>`"${c}"`).join(',')).join('\r\n');
+  const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='mondai_template.csv';
+  a.click();
+  snack('テンプレートをダウンロードしました');
 });
 
 /* ============================================================
-   削除
+   ファイルアップロード（ドロップ＆クリック）
 ============================================================ */
-async function handleDelete(id){
-  const p = allProblems.find(p=>p.id===id);
-  if(!p) return;
-  if(!confirm(`「${p.question}」を削除しますか？`)) return;
-  const ok = await deleteProblem(id);
-  if(ok){
-    showSnack('削除しました');
-    await loadProblems();
+const dropZone=document.getElementById('dropZone');
+const fileInput=document.getElementById('fileInput');
+
+dropZone.addEventListener('click',()=>fileInput.click());
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('drag-over');});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop',e=>{
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  const file=e.dataTransfer.files[0]; if(file) handleFile(file);
+});
+fileInput.addEventListener('change',()=>{
+  const file=fileInput.files[0]; if(file) handleFile(file);
+});
+
+function handleFile(file){
+  const ext=file.name.split('.').pop().toLowerCase();
+  document.getElementById('dropFilename').textContent='📄 '+file.name;
+  if(ext==='csv'){
+    const reader=new FileReader();
+    reader.onload=e=>parseCSV(e.target.result);
+    reader.readAsText(file,'UTF-8');
+  } else if(ext==='xlsx'||ext==='xls'){
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const wb=XLSX.read(e.target.result,{type:'array'});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const csv=XLSX.utils.sheet_to_csv(ws);
+      parseCSV(csv);
+    };
+    reader.readAsArrayBuffer(file);
   } else {
-    showSnack('削除に失敗しました',true);
+    snack('CSV または Excel ファイルを選択してください',true);
   }
 }
+
+/* ============================================================
+   CSVパースとバリデーション
+============================================================ */
+function parseCSV(csvText){
+  const result=Papa.parse(csvText,{header:true,skipEmptyLines:true,trimHeaders:true});
+  if(result.errors.length>0 && result.data.length===0){
+    snack('ファイルの読み込みに失敗しました',true); return;
+  }
+  /* 列名を正規化 */
+  const normalized=result.data.map(row=>{
+    const nr={};
+    Object.entries(row).forEach(([k,v])=>{
+      const mapped=COL_MAP[k.toLowerCase().trim()]||COL_MAP[k.trim()]||k;
+      nr[mapped]=v?.toString().trim();
+    });
+    return nr;
+  });
+  parsedRows=normalized.map((row,i)=>validateRow(row,i+2));
+  renderPreview();
+}
+
+function validateRow(row,lineNum){
+  const errors=[];
+  const unitId=(row.unitId||'').toLowerCase();
+  const stageId=parseInt(row.stageId);
+  const answer=parseInt(row.answer);
+  const displayType=(row.displayType||'text').toLowerCase();
+
+  if(!VALID_UNITS.includes(unitId)) errors.push(`単元ID「${row.unitId||''}」が無効`);
+  if(![1,2,3].includes(stageId))    errors.push(`ステージは1・2・3のいずれかを指定`);
+  if(!row.question)                  errors.push('問題文が空です');
+  if(isNaN(answer))                  errors.push(`答え「${row.answer}」は数字を入力`);
+  if(displayType==='calc'){
+    if(!row.displayLeft||isNaN(parseInt(row.displayLeft)))  errors.push('筆算（左）が無効');
+    if(!row.displayRight||isNaN(parseInt(row.displayRight)))errors.push('筆算（右）が無効');
+  }
+  const isPublished=String(row.isPublished||'true').toLowerCase()!=='false';
+  return {
+    lineNum, row, errors,
+    data:{
+      unitId, gradeId:'g2', stageId, question:row.question,
+      answer, hint:row.hint||'', explanation:row.explanation||'',
+      displayType:displayType==='calc'?'calc':'text',
+      displayLeft: displayType==='calc'?parseInt(row.displayLeft):null,
+      displayOp:   displayType==='calc'?(row.displayOp||'+'):null,
+      displayRight:displayType==='calc'?parseInt(row.displayRight):null,
+      isPublished,
+    },
+  };
+}
+
+/* ============================================================
+   プレビュー表示
+============================================================ */
+function renderPreview(){
+  const step=document.getElementById('previewStep');
+  step.style.display='block';
+  const okCount=parsedRows.filter(r=>r.errors.length===0).length;
+  const errCount=parsedRows.length-okCount;
+  document.getElementById('previewSummary').innerHTML=`
+    <span class="preview-count ok">✅ 有効：${okCount}件</span>
+    ${errCount>0?`<span class="preview-count err">❌ エラー：${errCount}件</span>`:''}
+    <span style="font-size:12px;color:var(--muted)">合計${parsedRows.length}件</span>`;
+  document.getElementById('importRunBtn').disabled=okCount===0;
+  document.getElementById('importRunBtn').textContent=`✅ ${okCount}件をインポート`;
+  const tbody=document.getElementById('previewBody');
+  tbody.innerHTML=parsedRows.map(r=>`
+    <tr class="${r.errors.length?'row-err':''}">
+      <td style="color:var(--muted)">${r.lineNum}</td>
+      <td>${UNIT_NAMES[r.data.unitId]||r.data.unitId||'—'}</td>
+      <td>${r.data.stageId||'—'}</td>
+      <td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.row.question||'—'}</td>
+      <td>${r.row.answer||'—'}</td>
+      <td><span class="badge badge-stage">${r.data.displayType}</span></td>
+      <td><span class="badge ${r.data.isPublished?'badge-pub':'badge-draft'}">${r.data.isPublished?'公開':'非公開'}</span></td>
+      <td>${r.errors.length===0
+        ?'<span class="badge badge-ok">✅ OK</span>'
+        :`<span class="badge badge-err">❌ エラー</span><div class="err-msg">${r.errors.join('<br>')}</div>`}
+      </td>
+    </tr>`).join('');
+  step.scrollIntoView({behavior:'smooth'});
+}
+
+/* ============================================================
+   インポート実行
+============================================================ */
+document.getElementById('importRunBtn').addEventListener('click',async()=>{
+  const validRows=parsedRows.filter(r=>r.errors.length===0);
+  if(validRows.length===0)return;
+  document.getElementById('importRunBtn').disabled=true;
+  document.getElementById('importCancelBtn').style.display='none';
+  const pw=document.getElementById('progressWrap');
+  const pf=document.getElementById('progressFill');
+  const pl=document.getElementById('progressLabel');
+  pw.style.display='block';
+  let done=0;
+  for(const r of validRows){
+    await addProblem(r.data);
+    done++;
+    const pct=Math.round(done/validRows.length*100);
+    pf.style.width=pct+'%';
+    pl.textContent=`インポート中… ${done}/${validRows.length}件`;
+  }
+  pl.textContent=`✅ ${done}件のインポートが完了しました！`;
+  snack(`${done}件をインポートしました`);
+  await loadProblems();
+  setTimeout(()=>{
+    document.getElementById('previewStep').style.display='none';
+    document.getElementById('dropFilename').textContent='';
+    fileInput.value='';
+    parsedRows=[];
+    pw.style.display='none';
+    document.getElementById('importCancelBtn').style.display='';
+    document.getElementById('importRunBtn').disabled=false;
+  },3000);
+});
+
+document.getElementById('importCancelBtn').addEventListener('click',()=>{
+  document.getElementById('previewStep').style.display='none';
+  document.getElementById('dropFilename').textContent='';
+  fileInput.value=''; parsedRows=[];
+});
 </script>
 </body>
 </html>
