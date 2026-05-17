@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>えなまなびのもり｜保護者ページ</title>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --amber:#EF9F27;--amber-d:#C97E10;--amber-l:#FAEEDA;--amber-ll:#FFF8EC;
+      --green:#2D7A4F;--green-l:#E1F5EE;
+      --red:#E24B4A;--red-l:#FCEBEB;
+      --blue:#2563EB;--blue-l:#EFF6FF;
+      --bg:#FFFBF4;--card:#FFFFFF;--border:#E8E0D0;
+      --text:#1A1208;--muted:#8A7A60;--shadow:0 2px 12px rgba(0,0,0,.07);
+    }
+    body{font-family:'Hiragino Maru Gothic ProN','M PLUS Rounded 1c',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+    .wrap{max-width:520px;margin:0 auto;padding:1.5rem 1rem 5rem;}
+    .screen{display:none;}.screen.active{display:block;}
+
+    /* ローディング */
+    .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:var(--muted);}
+    .spinner{width:32px;height:32px;border:3px solid var(--amber-l);border-top-color:var(--amber);border-radius:50%;animation:spin .8s linear infinite;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* 共通 */
+    .btn-p{width:100%;padding:13px;font-size:16px;font-weight:700;background:var(--amber);color:#3D2000;border:none;border-radius:14px;cursor:pointer;font-family:inherit;box-shadow:0 4px 0 var(--amber-d);transition:transform .1s,opacity .15s;}
+    .btn-p:hover{opacity:.9;} .btn-p:active{transform:translateY(2px);box-shadow:0 2px 0 var(--amber-d);} .btn-p:disabled{opacity:.4;cursor:default;box-shadow:none;}
+    .btn-s{width:100%;padding:11px;font-size:14px;font-weight:500;background:#F0EDE8;color:#555;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-family:inherit;margin-top:8px;}
+    .btn-s:hover{background:#E8E4DE;}
+    .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1rem;box-shadow:var(--shadow);}
+    .badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700;}
+    .badge-green{background:var(--green-l);color:var(--green);}
+    .badge-amber{background:var(--amber-l);color:var(--amber-d);}
+    .badge-blue{background:var(--blue-l);color:var(--blue);}
+    .badge-gray{background:#F0EDE8;color:var(--muted);}
+
+    /* ============================================================
+       検索画面
+    ============================================================ */
+    .search-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:2.5rem 2rem;margin:2rem auto;text-align:center;max-width:360px;box-shadow:var(--shadow);}
+    .logo{font-size:52px;margin-bottom:8px;animation:float 3s ease-in-out infinite;}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+    .page-title{font-size:22px;font-weight:700;margin-bottom:4px;}
+    .page-sub{font-size:13px;color:var(--muted);margin-bottom:1.75rem;}
+    .search-input{width:100%;padding:13px;font-size:18px;border:2.5px solid #FAC775;border-radius:14px;text-align:center;background:var(--bg);outline:none;margin-bottom:1rem;font-family:inherit;font-weight:500;}
+    .search-input:focus{border-color:var(--amber);}
+    .search-status{font-size:12px;color:var(--muted);margin-top:8px;min-height:16px;}
+    .search-note{font-size:11px;color:var(--muted);margin-top:1rem;line-height:1.6;background:var(--amber-ll);border-radius:10px;padding:10px 12px;}
+
+    /* 候補リスト（同名が複数いるとき） */
+    .candidate-list{display:flex;flex-direction:column;gap:8px;margin-top:1rem;}
+    .candidate-item{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:border-color .15s;}
+    .candidate-item:hover{border-color:var(--amber);}
+    .candidate-avatar{width:36px;height:36px;border-radius:50%;background:var(--amber-l);border:2px solid var(--amber);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+    .candidate-name{font-size:15px;font-weight:700;}
+    .candidate-meta{font-size:11px;color:var(--muted);}
+
+    /* ============================================================
+       ダッシュボード画面
+    ============================================================ */
+    .dash-header{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;}
+    .dash-avatar{width:52px;height:52px;border-radius:50%;background:var(--amber-l);border:2.5px solid var(--amber);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
+    .dash-name{font-size:20px;font-weight:700;}
+    .dash-sub{font-size:12px;color:var(--muted);}
+    .back-btn{margin-left:auto;padding:7px 14px;font-size:13px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--muted);cursor:pointer;}
+    .back-btn:hover{background:var(--bg);}
+
+    /* サマリー */
+    .summary-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1rem;}
+    .sum-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center;box-shadow:var(--shadow);}
+    .sum-label{font-size:11px;color:var(--muted);margin-bottom:5px;}
+    .sum-value{font-size:26px;font-weight:700;}
+    .sum-unit{font-size:11px;color:var(--muted);margin-top:2px;}
+
+    /* 円形ゲージ */
+    .gauge-wrap{display:flex;flex-direction:column;align-items:center;padding:1rem 0;}
+    .gauge-label-below{font-size:12px;color:var(--muted);margin-top:4px;}
+
+    /* 単元カード */
+    .unit-section-title{font-size:14px;font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:6px;}
+    .unit-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem;}
+    .unit-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:12px;box-shadow:var(--shadow);}
+    .unit-card.cleared{border-color:var(--green);background:#F4FBF7;}
+    .uc-icon{font-size:24px;margin-bottom:4px;}
+    .uc-name{font-size:12px;font-weight:700;margin-bottom:4px;line-height:1.3;}
+    .uc-stars{font-size:14px;margin-bottom:4px;}
+    .uc-score{font-size:11px;color:var(--muted);}
+
+    /* 学習履歴 */
+    .history-title{font-size:14px;font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:6px;}
+    .history-item{display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid #F0EDE8;}
+    .history-item:last-child{border-bottom:none;}
+    .history-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px;}
+    .history-body{flex:1;}
+    .history-name{font-size:13px;font-weight:700;margin-bottom:2px;}
+    .history-meta{font-size:11px;color:var(--muted);margin-bottom:4px;}
+    .history-advice{font-size:12px;color:var(--muted);font-style:italic;line-height:1.5;}
+    .history-score{font-size:14px;font-weight:700;flex-shrink:0;}
+
+    /* スコアバー */
+    .score-bar-wrap{display:flex;align-items:center;gap:8px;}
+    .score-bar{flex:1;height:7px;background:#EEE;border-radius:4px;overflow:hidden;}
+    .score-bar-fill{height:100%;border-radius:4px;}
+    .score-num{font-size:12px;font-weight:700;width:32px;text-align:right;flex-shrink:0;}
+
+    /* フッター */
+    .site-footer{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(255,251,244,.92);backdrop-filter:blur(6px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:12px;padding:6px 16px;}
+    .footer-version{font-size:11px;font-weight:700;background:var(--amber-l);color:var(--amber-d);padding:2px 8px;border-radius:10px;}
+    .footer-license{font-size:11px;color:var(--muted);}
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 検索画面 -->
+  <div id="S_search" class="screen active">
+    <div class="search-card">
+      <div class="logo">🌳</div>
+      <div class="page-title">えなまなびのもり</div>
+      <div class="page-sub">保護者ページ</div>
+      <input id="searchInput" class="search-input" type="text"
+             placeholder="お子さんのなまえ" maxlength="10"/>
+      <button id="searchBtn" class="btn-p" disabled>けんさく 🔍</button>
+      <div class="search-status" id="searchStatus"></div>
+      <div class="search-note">
+        ※ お子さんがアプリで入力したニックネームを入力してください。<br>
+        ※ 本格運用時には保護者登録機能を追加予定です。
+      </div>
+    </div>
+  </div>
+
+  <!-- 候補選択画面（同名が複数いるとき） -->
+  <div id="S_candidates" class="screen">
+    <div style="text-align:center;margin-bottom:1rem;">
+      <div style="font-size:16px;font-weight:700;margin-bottom:4px">同じなまえが見つかりました</div>
+      <div style="font-size:13px;color:var(--muted)">お子さんを選んでください</div>
+    </div>
+    <div class="candidate-list" id="candidateList"></div>
+    <button class="btn-s" id="backToSearch">もどる</button>
+  </div>
+
+  <!-- ダッシュボード画面 -->
+  <div id="S_dashboard" class="screen">
+    <div class="dash-header">
+      <div class="dash-avatar">🐻</div>
+      <div>
+        <div class="dash-name" id="dashName"></div>
+        <div class="dash-sub" id="dashSub"></div>
+      </div>
+      <button class="back-btn" id="backBtn">← もどる</button>
+    </div>
+
+    <!-- サマリー -->
+    <div class="summary-row" id="summaryRow">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+
+    <!-- 理解度スコアゲージ -->
+    <div class="card">
+      <div style="font-size:13px;font-weight:700;margin-bottom:.5rem;text-align:center">📊 平均理解度スコア</div>
+      <div class="gauge-wrap" id="gaugeWrap">
+        <div class="loading" style="height:120px"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <!-- 単元別進捗 -->
+    <div class="unit-section-title">📚 単元べつのようす</div>
+    <div class="unit-grid" id="unitGrid">
+      <div class="loading"><div class="spinner"></div></div>
+    </div>
+
+    <!-- 最近の学習履歴 -->
+    <div class="card">
+      <div class="history-title">📖 さいきんのがくしゅう</div>
+      <div id="historyList">
+        <div class="loading"><div class="spinner"></div></div>
+      </div>
+    </div>
+
+    <button class="btn-s" id="backBtn2">← さがしなおす</button>
+  </div>
+
+</div><!-- /.wrap -->
+
+<!-- フッター -->
+<footer class="site-footer">
+  <span class="footer-version">v1.0.0</span>
+  <span class="footer-license">© 2025 @ena-gifu.com All rights reserved.</span>
+</footer>
+
+<script type="module">
+import { signInUser, getUserByName, getUserSessions } from "../firebase.js";
+
+/* ============================================================
+   定数
+============================================================ */
+const UNITS = [
+  {id:'add',  icon:'➕', name:'たし算の筆算'},
+  {id:'sub',  icon:'➖', name:'ひき算の筆算'},
+  {id:'num',  icon:'🔢', name:'1000までの数'},
+  {id:'len',  icon:'📏', name:'長さ'},
+  {id:'vol',  icon:'🫙', name:'かさ'},
+  {id:'time', icon:'⏰', name:'時こくと時間'},
+  {id:'mul',  icon:'✖️', name:'かけ算（九九）'},
+  {id:'shape',icon:'🔷', name:'三角形と四角形'},
+];
+
+/* ============================================================
+   ユーティリティ
+============================================================ */
+function scoreColor(s){
+  if(s>=80)return'var(--green)';
+  if(s>=60)return'var(--blue)';
+  if(s>=40)return'var(--amber)';
+  return'var(--red)';
+}
+function scoreLabel(s){
+  if(s>=80)return'かんぺき！';
+  if(s>=60)return'よくできました';
+  if(s>=40)return'がんばっているよ';
+  return'もう少し！';
+}
+function formatDate(ts){
+  if(!ts)return'—';
+  const d=ts.toDate?ts.toDate():new Date(ts);
+  return d.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+function totalCleared(progress){
+  let n=0;
+  Object.values(progress||{}).forEach(u=>{
+    Object.values(u).forEach(s=>{if(s.cleared)n++;});
+  });
+  return n;
+}
+function avgScore(sessions){
+  const scores=sessions.map(s=>s.understandingScore).filter(s=>s!=null);
+  if(!scores.length)return null;
+  return Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
+}
+function buildGaugeSVG(score){
+  const circ=2*Math.PI*46;
+  const offset=circ-(score/100)*circ;
+  const color=scoreColor(score);
+  return`<svg width="130" height="130" viewBox="0 0 130 130">
+    <circle cx="65" cy="65" r="46" fill="none" stroke="#EEE" stroke-width="10"/>
+    <circle cx="65" cy="65" r="46" fill="none" stroke="${color}" stroke-width="10"
+      stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"
+      stroke-linecap="round" transform="rotate(-90 65 65)"
+      style="transition:stroke-dashoffset .8s ease"/>
+    <text x="65" y="58" text-anchor="middle" font-size="28" font-weight="bold"
+      fill="${color}" font-family="inherit">${score}</text>
+    <text x="65" y="74" text-anchor="middle" font-size="11" fill="#8A7A60"
+      font-family="inherit">てん</text>
+  </svg>`;
+}
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+/* ============================================================
+   匿名サインイン（Firestoreを読むために必要）
+============================================================ */
+await signInUser();
+
+/* ============================================================
+   検索
+============================================================ */
+document.getElementById('searchInput').addEventListener('input',function(){
+  document.getElementById('searchBtn').disabled=!this.value.trim();
+});
+document.getElementById('searchInput').addEventListener('keydown',e=>{
+  if(e.key==='Enter')document.getElementById('searchBtn').click();
+});
+
+document.getElementById('searchBtn').addEventListener('click', async()=>{
+  const name=document.getElementById('searchInput').value.trim();
+  if(!name)return;
+  document.getElementById('searchBtn').disabled=true;
+  document.getElementById('searchStatus').textContent='けんさく中…';
+
+  const users=await getUserByName(name);
+
+  if(users.length===0){
+    document.getElementById('searchStatus').textContent='見つかりませんでした。なまえを確認してください。';
+    document.getElementById('searchBtn').disabled=false;
+    return;
+  }
+  if(users.length===1){
+    document.getElementById('searchStatus').textContent='';
+    document.getElementById('searchBtn').disabled=false;
+    await showDashboard(users[0]);
+    return;
+  }
+  /* 複数候補 */
+  document.getElementById('searchStatus').textContent='';
+  document.getElementById('searchBtn').disabled=false;
+  showCandidates(users);
+});
+
+/* ============================================================
+   候補選択
+============================================================ */
+function showCandidates(users){
+  const list=document.getElementById('candidateList');
+  list.innerHTML=users.map((u,i)=>{
+    const days=u.updatedAt?(Math.floor((Date.now()-(u.updatedAt.toDate?u.updatedAt.toDate():new Date(u.updatedAt)).getTime())/86400000)):999;
+    const lastStr=days===0?'今日':days===1?'昨日':days<7?`${days}日前`:'1週間以上前';
+    return`<div class="candidate-item" data-idx="${i}">
+      <div class="candidate-avatar">🐻</div>
+      <div>
+        <div class="candidate-name">${u.name}</div>
+        <div class="candidate-meta">さいごの学習：${lastStr}</div>
+      </div>
+    </div>`;
+  }).join('');
+  list.querySelectorAll('.candidate-item').forEach(el=>{
+    el.addEventListener('click',async()=>{
+      await showDashboard(users[parseInt(el.dataset.idx)]);
+    });
+  });
+  show('S_candidates');
+}
+document.getElementById('backToSearch').addEventListener('click',()=>show('S_search'));
+
+/* ============================================================
+   ダッシュボード表示
+============================================================ */
+async function showDashboard(user){
+  show('S_dashboard');
+  document.getElementById('dashName').textContent=user.name+'さん';
+  document.getElementById('dashSub').textContent='2年生';
+  document.getElementById('summaryRow').innerHTML='<div class="loading"><div class="spinner"></div></div>';
+  document.getElementById('gaugeWrap').innerHTML='<div class="loading" style="height:120px"><div class="spinner"></div></div>';
+  document.getElementById('unitGrid').innerHTML='<div class="loading"><div class="spinner"></div></div>';
+  document.getElementById('historyList').innerHTML='<div class="loading" style="height:80px"><div class="spinner"></div></div>';
+
+  const sessions=await getUserSessions(user.uid, 30);
+  const cleared=totalCleared(user.progress);
+  const avg=avgScore(sessions);
+  const lastStr=user.updatedAt?(()=>{
+    const d=user.updatedAt.toDate?user.updatedAt.toDate():new Date(user.updatedAt);
+    return d.toLocaleDateString('ja-JP',{month:'numeric',day:'numeric'})+'に学習';
+  })():'まだ学習していません';
+  document.getElementById('dashSub').textContent=lastStr;
+
+  /* サマリー */
+  document.getElementById('summaryRow').innerHTML=`
+    <div class="sum-card">
+      <div class="sum-label">ステージクリア数</div>
+      <div class="sum-value" style="color:var(--green)">${cleared}</div>
+      <div class="sum-unit">/ 24</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">学習回数</div>
+      <div class="sum-value" style="color:var(--blue)">${sessions.length}</div>
+      <div class="sum-unit">回</div>
+    </div>
+    <div class="sum-card">
+      <div class="sum-label">平均理解度</div>
+      <div class="sum-value" style="color:${scoreColor(avg||0)}">${avg??'—'}</div>
+      <div class="sum-unit">${avg?'点':''}</div>
+    </div>`;
+
+  /* 理解度ゲージ */
+  if(avg!=null){
+    document.getElementById('gaugeWrap').innerHTML=`
+      ${buildGaugeSVG(avg)}
+      <div class="gauge-label-below" style="color:${scoreColor(avg)};font-weight:700">${scoreLabel(avg)}</div>`;
+  } else {
+    document.getElementById('gaugeWrap').innerHTML='<div style="color:var(--muted);font-size:13px;padding:1rem">まだデータがありません</div>';
+  }
+
+  /* 単元別進捗 */
+  document.getElementById('unitGrid').innerHTML=UNITS.map(u=>{
+    const p=(user.progress||{})[u.id]||{};
+    const clearedStages=[1,2,3].filter(s=>(p[`s${s}`]||{}).cleared);
+    const bestUs=Math.max(...[1,2,3].map(s=>(p[`s${s}`]||{}).bestUnderstandingScore||0));
+    const stars='⭐'.repeat(clearedStages.length)+'☆'.repeat(3-clearedStages.length);
+    const isCleared=clearedStages.length>0;
+    return`<div class="unit-card ${isCleared?'cleared':''}">
+      <div class="uc-icon">${u.icon}</div>
+      <div class="uc-name">${u.name}</div>
+      <div class="uc-stars">${stars}</div>
+      <div class="uc-score">${bestUs>0?`さいこう ${bestUs}点`:'まだです'}</div>
+    </div>`;
+  }).join('');
+
+  /* 学習履歴 */
+  if(sessions.length===0){
+    document.getElementById('historyList').innerHTML='<div style="color:var(--muted);font-size:13px;padding:.5rem 0">まだ学習記録がありません</div>';
+  } else {
+    document.getElementById('historyList').innerHTML=sessions.slice(0,10).map(s=>{
+      const score=s.understandingScore||0;
+      return`<div class="history-item">
+        <div class="history-dot" style="background:${s.cleared?'var(--green)':'var(--amber)'}"></div>
+        <div class="history-body">
+          <div class="history-name">${s.unitName||s.unitId}　ステージ${s.stageId}「${s.stageName||''}」</div>
+          <div class="history-meta">
+            ${formatDate(s.createdAt)}　
+            <span class="badge ${s.cleared?'badge-green':'badge-gray'}">${s.cleared?'✅ クリア':'未クリア'}</span>　
+            ヒント${s.hintCount||0}回
+          </div>
+          ${s.advice?`<div class="history-advice">🦉「${s.advice}」</div>`:''}
+        </div>
+        <div class="history-score" style="color:${scoreColor(score)}">${score}点</div>
+      </div>`;
+    }).join('');
+  }
+}
+
+/* ============================================================
+   もどるボタン
+============================================================ */
+document.getElementById('backBtn').addEventListener('click',()=>show('S_search'));
+document.getElementById('backBtn2').addEventListener('click',()=>show('S_search'));
+</script>
+</body>
+</html>

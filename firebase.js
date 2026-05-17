@@ -1,6 +1,9 @@
 /* ============================================================
-   firebase.js — Phase2対応版 ver2
-   追加機能: saveSession（理解度スコア・アドバイスを保存）
+   firebase.js — ダッシュボード対応版
+   追加機能:
+     getAllUsers()        先生用：全ユーザー一覧
+     getUserSessions()   先生・保護者用：セッション履歴
+     getUserByName()     保護者用：ニックネームで検索
 ============================================================ */
 
 import { initializeApp }
@@ -40,10 +43,7 @@ export async function signInUser() {
   try {
     const result = await signInAnonymously(auth);
     return result.user;
-  } catch (e) {
-    console.error("signInUser:", e);
-    return null;
-  }
+  } catch (e) { console.error("signInUser:", e); return null; }
 }
 
 /* ============================================================
@@ -53,10 +53,7 @@ export async function signInTeacher(email, password) {
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
     return result.user;
-  } catch (e) {
-    console.error("signInTeacher:", e);
-    return null;
-  }
+  } catch (e) { console.error("signInTeacher:", e); return null; }
 }
 
 export async function signOutUser() {
@@ -64,7 +61,7 @@ export async function signOutUser() {
 }
 
 /* ============================================================
-   ユーザー管理
+   ユーザー管理（子ども）
 ============================================================ */
 export async function createUserIfNew(uid, name) {
   try {
@@ -97,22 +94,7 @@ export async function saveProgress(uid, name, progress) {
 }
 
 /* ============================================================
-   セッション保存（フェーズ2）
-   ステージ終了ごとに理解度スコアと学習結果を保存する
-
-   Firestoreのデータ構造:
-   users/{uid}/sessions/{自動ID}
-     unitId:            "add"
-     unitName:          "たし算の筆算"
-     stageId:           1
-     stageName:         "きほん"
-     score:             4        ← 正解数
-     understandingScore: 78      ← 理解度スコア(0〜100)
-     hintCount:         1        ← ヒント使用回数
-     avgTimeSec:        8.5      ← 平均解答時間(秒)
-     cleared:           true
-     advice:            "よくできました！..."
-     createdAt:         timestamp
+   セッション保存（子ども用）
 ============================================================ */
 export async function saveSession(uid, sessionData) {
   try {
@@ -124,10 +106,21 @@ export async function saveSession(uid, sessionData) {
 }
 
 /* ============================================================
-   セッション履歴を取得（直近10件）
-   管理者ダッシュボード・保護者画面で使う予定
+   全ユーザー取得（先生用ダッシュボード）
+   戻り値: [ { uid, name, gradeId, progress, updatedAt, ... } ]
 ============================================================ */
-export async function getRecentSessions(uid, count = 10) {
+export async function getAllUsers() {
+  try {
+    const snap = await getDocs(collection(db, "users"));
+    return snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+  } catch (e) { console.error("getAllUsers:", e); return []; }
+}
+
+/* ============================================================
+   セッション履歴取得（先生・保護者用）
+   uid を指定して最新 count 件を返す
+============================================================ */
+export async function getUserSessions(uid, count = 20) {
   try {
     const q = query(
       collection(db, "users", uid, "sessions"),
@@ -136,7 +129,23 @@ export async function getRecentSessions(uid, count = 10) {
     );
     const snap = await getDocs(q);
     return snap.docs.map(d => ({ id: d.id, ...d.data() }));
-  } catch (e) { console.error("getRecentSessions:", e); return []; }
+  } catch (e) { console.error("getUserSessions:", e); return []; }
+}
+
+/* ============================================================
+   ニックネームでユーザーを検索（保護者用）
+   同じ名前が複数いる場合は全員返す
+   TODO: 本格運用時は保護者と子どもの紐付けテーブルに変更
+============================================================ */
+export async function getUserByName(name) {
+  try {
+    const q = query(
+      collection(db, "users"),
+      where("name", "==", name)
+    );
+    const snap = await getDocs(q);
+    return snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+  } catch (e) { console.error("getUserByName:", e); return []; }
 }
 
 /* ============================================================
@@ -154,10 +163,7 @@ export async function getProblems(unitId, stageId) {
     const list = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     if (list.length < 5) return [];
     return shuffleArray(list).slice(0, 5);
-  } catch (e) {
-    console.error("getProblems:", e);
-    return [];
-  }
+  } catch (e) { console.error("getProblems:", e); return []; }
 }
 
 function shuffleArray(arr) {
@@ -170,7 +176,7 @@ function shuffleArray(arr) {
 }
 
 /* ============================================================
-   問題の管理（先生用）
+   問題管理（先生用）
 ============================================================ */
 export async function getAllProblems() {
   try {
