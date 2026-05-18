@@ -1,9 +1,6 @@
 /* ============================================================
-   firebase.js — ダッシュボード対応版
-   追加機能:
-     getAllUsers()        先生用：全ユーザー一覧
-     getUserSessions()   先生・保護者用：セッション履歴
-     getUserByName()     保護者用：ニックネームで検索
+   firebase.js — 多科目対応版
+   subjectId（math / japanese / science）に対応
 ============================================================ */
 
 import { initializeApp }
@@ -61,7 +58,7 @@ export async function signOutUser() {
 }
 
 /* ============================================================
-   ユーザー管理（子ども）
+   ユーザー管理
 ============================================================ */
 export async function createUserIfNew(uid, name) {
   try {
@@ -94,7 +91,7 @@ export async function saveProgress(uid, name, progress) {
 }
 
 /* ============================================================
-   セッション保存（子ども用）
+   セッション保存
 ============================================================ */
 export async function saveSession(uid, sessionData) {
   try {
@@ -105,21 +102,6 @@ export async function saveSession(uid, sessionData) {
   } catch (e) { console.error("saveSession:", e); }
 }
 
-/* ============================================================
-   全ユーザー取得（先生用ダッシュボード）
-   戻り値: [ { uid, name, gradeId, progress, updatedAt, ... } ]
-============================================================ */
-export async function getAllUsers() {
-  try {
-    const snap = await getDocs(collection(db, "users"));
-    return snap.docs.map(d => ({ uid: d.id, ...d.data() }));
-  } catch (e) { console.error("getAllUsers:", e); return []; }
-}
-
-/* ============================================================
-   セッション履歴取得（先生・保護者用）
-   uid を指定して最新 count 件を返す
-============================================================ */
 export async function getUserSessions(uid, count = 20) {
   try {
     const q = query(
@@ -133,16 +115,18 @@ export async function getUserSessions(uid, count = 20) {
 }
 
 /* ============================================================
-   ニックネームでユーザーを検索（保護者用）
-   同じ名前が複数いる場合は全員返す
-   TODO: 本格運用時は保護者と子どもの紐付けテーブルに変更
+   全ユーザー取得（先生用）
 ============================================================ */
+export async function getAllUsers() {
+  try {
+    const snap = await getDocs(collection(db, "users"));
+    return snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+  } catch (e) { console.error("getAllUsers:", e); return []; }
+}
+
 export async function getUserByName(name) {
   try {
-    const q = query(
-      collection(db, "users"),
-      where("name", "==", name)
-    );
+    const q = query(collection(db, "users"), where("name", "==", name));
     const snap = await getDocs(q);
     return snap.docs.map(d => ({ uid: d.id, ...d.data() }));
   } catch (e) { console.error("getUserByName:", e); return []; }
@@ -150,6 +134,28 @@ export async function getUserByName(name) {
 
 /* ============================================================
    問題の取得（子ども用）
+   unitId でフィルタ（unitId は科目をまたいで一意）
+   5問未満の場合は空配列 → JS生成にフォールバック
+
+   Firestoreの問題データ構造（多科目対応版）:
+   problems/{自動ID}
+     subjectId:    "math" / "japanese" / "science"
+     unitId:       "add" / "kanji2" など
+     gradeId:      "g2"
+     stageId:      1 / 2 / 3
+     questionType: "number"（数字入力）/ "choice"（選択肢）
+     question:     "問題文"
+     answer:       70（numberの場合）/ 1（choiceの場合はインデックス0〜3）
+     choices:      null / ["あ）東京","い）大阪","う）名古屋","え）京都"]
+     hint:         "ヒント"
+     explanation:  "解説"
+     displayType:  "text" / "calc"
+     displayLeft:  23（calcのとき）
+     displayOp:    "+"（calcのとき）
+     displayRight: 47（calcのとき）
+     isPublished:  true
+     createdAt:    timestamp
+     updatedAt:    timestamp
 ============================================================ */
 export async function getProblems(unitId, stageId) {
   try {

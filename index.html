@@ -9,17 +9,19 @@
     :root {
       --amber:#EF9F27; --amber-d:#C97E10; --amber-l:#FAEEDA; --amber-ll:#FFF8EC;
       --green:#2D7A4F; --green-l:#E1F5EE;
-      --red:#E24B4A; --red-l:#FCEBEB;
-      --blue:#2563EB; --blue-l:#EFF6FF;
+      --red:#E24B4A;   --red-l:#FCEBEB;
+      --blue:#2563EB;  --blue-l:#EFF6FF;
       --bg:#FFFBF4; --card:#FFFFFF; --border:#E8E0D0;
       --text:#1A1208; --muted:#8A7A60;
       --shadow:0 2px 12px rgba(0,0,0,.07);
+      /* 科目カラー */
+      --math-color:#EF9F27;    --math-bg:#FAEEDA;
+      --japanese-color:#2D7A4F; --japanese-bg:#E1F5EE;
+      --science-color:#2563EB;  --science-bg:#EFF6FF;
     }
     body { font-family:'Hiragino Maru Gothic ProN','M PLUS Rounded 1c',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; }
     .app { max-width:480px; margin:0 auto; padding:1rem 1rem 5rem; }
     .screen { display:none; } .screen.active { display:block; }
-
-    /* ローディング */
     .loading { display:flex; flex-direction:column; align-items:center; justify-content:center; height:60vh; gap:16px; color:var(--muted); }
     .spinner { width:36px; height:36px; border:3px solid var(--amber-l); border-top-color:var(--amber); border-radius:50%; animation:spin .8s linear infinite; }
     @keyframes spin { to{transform:rotate(360deg)} }
@@ -37,18 +39,43 @@
     @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
     .app-title{font-size:26px;font-weight:700;margin-bottom:4px} .app-sub{font-size:13px;color:var(--muted);margin-bottom:1.75rem}
     .name-input { width:100%; padding:13px; font-size:20px; border:2.5px solid #FAC775; border-radius:14px; text-align:center; background:var(--bg); outline:none; margin-bottom:1.25rem; font-family:inherit; font-weight:500; }
-    .name-input:focus{border-color:var(--amber)}
-    .login-status{font-size:12px;color:var(--muted);margin-top:8px;min-height:16px}
+    .name-input:focus{border-color:var(--amber)} .login-status{font-size:12px;color:var(--muted);margin-top:8px;min-height:16px}
 
     /* ホーム */
-    .home-hdr{display:flex;align-items:center;gap:10px;padding:.5rem 0 1.25rem}
+    .home-hdr{display:flex;align-items:center;gap:10px;padding:.5rem 0 1rem}
     .avatar{width:44px;height:44px;border-radius:50%;background:var(--amber-l);border:2.5px solid var(--amber);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
     .hw{font-size:15px;font-weight:700} .hs{font-size:12px;color:var(--muted)}
     .lo-btn{margin-left:auto;padding:6px 12px;font-size:12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);cursor:pointer}
+
+    /* 科目タブ */
+    .subject-tabs { display:flex; gap:8px; margin-bottom:1.25rem; }
+    .subject-tab {
+      flex:1; padding:10px 8px; font-size:13px; font-weight:700;
+      border:2px solid var(--border); border-radius:12px;
+      background:var(--card); color:var(--muted);
+      cursor:pointer; font-family:inherit; transition:all .15s;
+      display:flex; flex-direction:column; align-items:center; gap:3px;
+    }
+    .subject-tab .tab-icon{font-size:20px}
+    .subject-tab.active[data-subject="math"]     { border-color:var(--math-color);    background:var(--math-bg);     color:var(--amber-d); }
+    .subject-tab.active[data-subject="japanese"] { border-color:var(--japanese-color); background:var(--japanese-bg); color:var(--green); }
+    .subject-tab.active[data-subject="science"]  { border-color:var(--science-color);  background:var(--science-bg);  color:var(--blue); }
+    .subject-tab:hover{border-color:var(--border);opacity:.85}
+
+    /* 単元グリッド */
     .ugrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
     .ucard{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:14px 12px;cursor:pointer;transition:transform .12s,box-shadow .12s;box-shadow:var(--shadow)}
     .ucard:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,.1)}
     .ui{font-size:28px;margin-bottom:5px} .un{font-size:13px;font-weight:700;line-height:1.3;margin-bottom:3px} .uc{font-size:11px;color:var(--muted);margin-bottom:7px} .ustars span{font-size:14px}
+
+    /* 準備中バナー */
+    .coming-soon {
+      background:var(--card); border:1.5px dashed var(--border);
+      border-radius:16px; padding:2rem; text-align:center; color:var(--muted);
+    }
+    .coming-soon .cs-icon{font-size:40px;margin-bottom:8px}
+    .coming-soon .cs-title{font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text)}
+    .coming-soon .cs-sub{font-size:13px;line-height:1.6}
 
     /* 単元 */
     .unit-hdr{text-align:center;padding:.75rem 0 1.25rem} .ubig{font-size:54px;margin-bottom:4px} .utit{font-size:21px;font-weight:700;margin-bottom:4px} .udsc{font-size:13px;color:var(--muted);margin-bottom:.75rem}
@@ -85,54 +112,43 @@
     .ckbtn:active{transform:translateY(2px);box-shadow:none} .ckbtn:disabled{opacity:.4;cursor:default;box-shadow:none}
     .fb{padding:11px 13px;border-radius:12px;margin-top:10px;font-size:14px;line-height:1.5}
     .fb.ok{background:var(--green-l);color:#085041} .fb.ng{background:var(--red-l);color:#501313} .fb.hint{background:var(--amber-ll);color:#6B3800}
+
+    /* 数字パッド */
     .numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
     .nb{padding:14px;font-size:20px;font-weight:700;background:#F0EDE8;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-family:'Courier New',monospace;box-shadow:0 3px 0 #D5CFC6;transition:transform .08s}
     .nb:active{transform:translateY(2px);box-shadow:none} .nb.del{color:var(--red);font-size:13px;font-family:inherit} .nb.ok{background:var(--amber);color:#3D2000;border-color:var(--amber);box-shadow:0 3px 0 var(--amber-d)}
 
-    /* ============================================================
-       理解度スコアパネル（フェーズ2）
-    ============================================================ */
-    .score-panel {
-      background:var(--card); border:1px solid var(--border);
-      border-radius:20px; padding:1.25rem;
-      margin-bottom:1rem; box-shadow:var(--shadow);
+    /* 選択肢ボタン（国語・理科） */
+    .choices-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+    .choice-btn{
+      padding:14px 12px;font-size:14px;font-weight:500;text-align:left;
+      background:#F0EDE8;border:2px solid var(--border);border-radius:12px;
+      cursor:pointer;font-family:inherit;line-height:1.4;transition:all .15s;
     }
-    .score-panel-title {
-      font-size:13px; font-weight:700; color:var(--muted);
-      text-align:center; margin-bottom:1rem;
-    }
+    .choice-btn:hover{border-color:var(--amber);background:var(--amber-ll)}
+    .choice-btn.selected{border-color:var(--amber);background:var(--amber-l)}
+    .choice-btn.correct{border-color:var(--green);background:var(--green-l);color:#085041}
+    .choice-btn.wrong{border-color:var(--red);background:var(--red-l);color:#501313}
+    .choice-btn.show-correct{border-color:var(--green);background:var(--green-l)}
+    .choice-btn:disabled{cursor:default}
 
-    /* 円形ゲージ */
-    .gauge-wrap {
-      display:flex; flex-direction:column;
-      align-items:center; margin-bottom:1rem;
-    }
-    .gauge-svg { display:block; }
-    .gauge-label {
-      font-size:12px; color:var(--muted); margin-top:4px; text-align:center;
-    }
+    /* 理解度スコアパネル */
+    .score-panel{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:1.25rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+    .score-panel-title{font-size:13px;font-weight:700;color:var(--muted);text-align:center;margin-bottom:1rem}
+    .gauge-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:1rem}
+    .gauge-label{font-size:12px;color:var(--muted);margin-top:4px;text-align:center}
+    .score-breakdown{display:flex;flex-direction:column;gap:8px}
+    .sb-row{display:flex;align-items:center;gap:8px}
+    .sb-label{font-size:12px;color:var(--muted);width:80px;flex-shrink:0}
+    .sb-bar-wrap{flex:1;background:#EEE;border-radius:4px;height:8px;overflow:hidden}
+    .sb-bar-fill{height:100%;border-radius:4px;transition:width .6s ease}
+    .sb-val{font-size:12px;font-weight:700;width:36px;text-align:right;flex-shrink:0}
 
-    /* スコア内訳バー */
-    .score-breakdown { display:flex; flex-direction:column; gap:8px; }
-    .sb-row { display:flex; align-items:center; gap:8px; }
-    .sb-label { font-size:12px; color:var(--muted); width:80px; flex-shrink:0; }
-    .sb-bar-wrap { flex:1; background:#EEE; border-radius:4px; height:8px; overflow:hidden; }
-    .sb-bar-fill { height:100%; border-radius:4px; transition:width .6s ease; }
-    .sb-val { font-size:12px; font-weight:700; width:36px; text-align:right; flex-shrink:0; }
+    /* アドバイス */
+    .advice-box{display:flex;gap:10px;align-items:flex-start;padding:13px 15px;background:#F5F1EB;border-radius:16px;margin-bottom:1rem}
+    .advice-icon{font-size:28px;flex-shrink:0} .advice-label{font-size:11px;font-weight:700;color:var(--muted);margin-bottom:4px} .advice-text{font-size:14px;line-height:1.7}
 
-    /* フクロウ先生のアドバイス */
-    .advice-box {
-      display:flex; gap:10px; align-items:flex-start;
-      padding:13px 15px; background:#F5F1EB;
-      border-radius:16px; margin-bottom:1rem;
-    }
-    .advice-icon { font-size:28px; flex-shrink:0; }
-    .advice-body {}
-    .advice-label { font-size:11px; font-weight:700; color:var(--muted); margin-bottom:4px; }
-    .advice-text { font-size:14px; line-height:1.7; color:var(--text); }
-    .advice-loading { font-size:13px; color:var(--muted); display:flex; align-items:center; gap:6px; }
-
-    /* 結果画面 */
+    /* 結果 */
     .res-wrap{max-width:400px;margin:1rem auto}
     .ricon{font-size:64px;margin-bottom:8px;text-align:center} .rtit{font-size:22px;font-weight:700;margin-bottom:4px;text-align:center} .rsub{font-size:14px;color:var(--muted);margin-bottom:1.25rem;text-align:center}
 
@@ -152,11 +168,9 @@
     @keyframes fw-burst{0%{transform:translate(0,0) scale(1);opacity:1}100%{transform:translate(var(--dx),var(--dy)) scale(0);opacity:0}}
 
     /* フッター */
-    .site-footer{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(255,251,244,.92);backdrop-filter:blur(6px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:12px;padding:6px 16px;}
-    .footer-version{font-size:11px;font-weight:700;background:var(--amber-l);color:var(--amber-d);padding:2px 8px;border-radius:10px;}
-    .footer-license{font-size:11px;color:var(--muted);}
-    .footer-license a{color:var(--amber-d);text-decoration:none;font-weight:500;}
-    .footer-license a:hover{text-decoration:underline;}
+    .site-footer{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(255,251,244,.92);backdrop-filter:blur(6px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:12px;padding:6px 16px}
+    .footer-version{font-size:11px;font-weight:700;background:var(--amber-l);color:var(--amber-d);padding:2px 8px;border-radius:10px}
+    .footer-license{font-size:11px;color:var(--muted)}
   </style>
 </head>
 <body>
@@ -167,7 +181,7 @@
     <div class="login-card">
       <div class="logo">🌳</div>
       <div class="app-title">えなまなびのもり</div>
-      <div class="app-sub">2年生の算数を、いっしょに学ぼう！</div>
+      <div class="app-sub">いっしょに学ぼう！</div>
       <input id="nameInput" class="name-input" type="text" placeholder="なまえを入れてね" maxlength="10"/>
       <button id="startBtn" class="btn-p" disabled>もりへ入る 🌟</button>
       <div class="login-status" id="loginStatus"></div>
@@ -177,15 +191,31 @@
   <div id="S_home" class="screen">
     <div class="home-hdr">
       <div class="avatar">🐻</div>
-      <div><div class="hw" id="welcomeName"></div><div class="hs">どの単元にする？</div></div>
+      <div><div class="hw" id="welcomeName"></div><div class="hs">どの科目にする？</div></div>
       <button class="lo-btn" id="loBtn">ログアウト</button>
     </div>
-    <div class="ugrid" id="unitGrid"></div>
+    <!-- 科目タブ -->
+    <div class="subject-tabs" id="subjectTabs">
+      <button class="subject-tab active" data-subject="math">
+        <span class="tab-icon">🔢</span>算数
+      </button>
+      <button class="subject-tab" data-subject="japanese">
+        <span class="tab-icon">📝</span>国語
+      </button>
+      <button class="subject-tab" data-subject="science">
+        <span class="tab-icon">🔬</span>理科
+      </button>
+    </div>
+    <div id="unitGrid"></div>
   </div>
 
   <div id="S_unit" class="screen">
     <button class="back-btn" id="backHome">← もどる</button>
-    <div class="unit-hdr"><div class="ubig" id="uIcon"></div><div class="utit" id="uTitle"></div><div class="udsc" id="uDesc"></div></div>
+    <div class="unit-hdr">
+      <div class="ubig" id="uIcon"></div>
+      <div class="utit" id="uTitle"></div>
+      <div class="udsc" id="uDesc"></div>
+    </div>
     <div class="stages-list" id="stagesList"></div>
   </div>
 
@@ -200,15 +230,12 @@
     <div id="quizBody"></div>
   </div>
 
-  <!-- 結果画面（不合格） -->
   <div id="S_result" class="screen">
     <div class="res-wrap">
       <div class="ricon" id="rIcon"></div>
       <div class="rtit"  id="rTitle"></div>
       <div class="rsub"  id="rSub"></div>
-      <!-- 理解度スコアパネル -->
       <div id="resultScorePanel"></div>
-      <!-- アドバイス -->
       <div id="resultAdvice"></div>
       <button class="btn-p" id="retryBtn">もう一度チャレンジ！ 🔁</button>
       <button class="btn-s" id="homeBtn">ホームにもどる 🏠</button>
@@ -216,11 +243,15 @@
   </div>
 </div>
 
-<!-- クリア演出オーバーレイ -->
 <div id="celebrateOverlay" class="celebrate-overlay">
   <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
   <div class="cel-card" id="celCard"></div>
 </div>
+
+<footer class="site-footer">
+  <span class="footer-version">v1.1.0</span>
+  <span class="footer-license">© 2025 @ena-gifu.com All rights reserved.</span>
+</footer>
 
 <script type="module">
 import {
@@ -229,48 +260,87 @@ import {
 } from "./firebase.js";
 
 /* ============================================================
-   定数
+   科目・単元定義
 ============================================================ */
-const UNITS = [
-  {id:'add',  icon:'➕',name:'たし算の筆算',  ch:'だい1しょう',desc:'くり上がりのあるたし算'},
-  {id:'sub',  icon:'➖',name:'ひき算の筆算',  ch:'だい2しょう',desc:'くり下がりのあるひき算'},
-  {id:'num',  icon:'🔢',name:'1000までの数', ch:'だい3しょう',desc:'大きい数のしくみ'},
-  {id:'len',  icon:'📏',name:'長さ',          ch:'だい4しょう',desc:'cmとmmをつかおう'},
-  {id:'vol',  icon:'🫙',name:'かさ',          ch:'だい5しょう',desc:'L・dLのたんい'},
-  {id:'time', icon:'⏰',name:'時こくと時間',  ch:'だい6しょう',desc:'時間のけいさん'},
-  {id:'mul',  icon:'✖️',name:'かけ算（九九）',ch:'だい7しょう',desc:'九九をマスター！'},
-  {id:'shape',icon:'🔷',name:'三角形と四角形',ch:'だい8しょう',desc:'図形のとくちょう'},
+const SUBJECTS = [
+  { id:'math',     icon:'🔢', name:'算数', color:'var(--amber)' },
+  { id:'japanese', icon:'📝', name:'国語', color:'var(--green)' },
+  { id:'science',  icon:'🔬', name:'理科', color:'var(--blue)'  },
 ];
+
+const ALL_UNITS = {
+  math: [
+    {id:'add',  icon:'➕',name:'たし算の筆算',  ch:'だい1しょう',desc:'くり上がりのあるたし算'},
+    {id:'sub',  icon:'➖',name:'ひき算の筆算',  ch:'だい2しょう',desc:'くり下がりのあるひき算'},
+    {id:'num',  icon:'🔢',name:'1000までの数', ch:'だい3しょう',desc:'大きい数のしくみ'},
+    {id:'len',  icon:'📏',name:'長さ',          ch:'だい4しょう',desc:'cmとmmをつかおう'},
+    {id:'vol',  icon:'🫙',name:'かさ',          ch:'だい5しょう',desc:'L・dLのたんい'},
+    {id:'time', icon:'⏰',name:'時こくと時間',  ch:'だい6しょう',desc:'時間のけいさん'},
+    {id:'mul',  icon:'✖️',name:'かけ算（九九）',ch:'だい7しょう',desc:'九九をマスター！'},
+    {id:'shape',icon:'🔷',name:'三角形と四角形',ch:'だい8しょう',desc:'図形のとくちょう'},
+  ],
+  japanese: [
+    {id:'kanji2',  icon:'🔤',name:'かん字',    ch:'だい1しょう',desc:'2年生のかん字をおぼえよう'},
+    {id:'reading2',icon:'📖',name:'よむこと',  ch:'だい2しょう',desc:'文しょうをよんで答えよう'},
+    {id:'kotoba2', icon:'💬',name:'ことば',    ch:'だい3しょう',desc:'ことばのいみをおぼえよう'},
+    {id:'bunpo2',  icon:'✍️',name:'文のしくみ',ch:'だい4しょう',desc:'文のきまりをおぼえよう'},
+  ],
+  science: [
+    {id:'shizen3', icon:'🌱',name:'しぜんのかんさつ',ch:'だい1しょう',desc:'しぜんをよくかんさつしよう'},
+    {id:'konchu3', icon:'🐛',name:'こん虫',          ch:'だい2しょう',desc:'こん虫のからだとせいかつ'},
+    {id:'kage3',   icon:'☀️',name:'日光とかげ',      ch:'だい3しょう',desc:'日光とかげのかんけい'},
+    {id:'jishaku3',icon:'🧲',name:'じしゃく',        ch:'だい4しょう',desc:'じしゃくのふしぎをしろう'},
+  ],
+};
+
+/* 科目をまたいで全単元をフラットに取得 */
+function findUnit(unitId) {
+  for(const units of Object.values(ALL_UNITS)){
+    const u=units.find(u=>u.id===unitId);
+    if(u) return u;
+  }
+  return null;
+}
+
 const STAGES = [
   {id:1,name:'きほん',    icon:'🌱',desc:'やさしい問題 5問',    clearScore:3,stars:'⭐'},
   {id:2,name:'れんしゅう',icon:'🌿',desc:'すこし難しい問題 5問', clearScore:4,stars:'⭐⭐'},
   {id:3,name:'チャレンジ',icon:'🌟',desc:'おうよう問題 5問',    clearScore:5,stars:'⭐⭐⭐'},
 ];
+
 const TUTORS = {
-  add:['一の位から計算してみよう。くり上がりに気をつけてね！','10以上になったら十の位に1くり上げるよ！'],
-  sub:['一の位から引いてみよう。引けないときはくり下げ！','上の数が小さいときは十の位から10かりてくるよ。'],
-  num:['百・十・一のくらいに分けて考えよう！','100が10こで1000になるよ。'],
+  add:['一の位から計算してみよう！くり上がりに気をつけてね','10以上になったら十の位に1くり上げるよ！'],
+  sub:['一の位から引いてみよう！引けないときはくり下げ','上の数が小さいときは十の位から10かりてくるよ'],
+  num:['百・十・一のくらいに分けて考えよう！'],
   len:['1cmは10mmだよ！'],vol:['1Lは10dLだよ！'],
-  time:['60分で1時間！時こくと時間のちがいに注目しよう。'],
-  mul:['かけ算は同じ数を何回もたすことだよ。','九九のリズムで覚えよう♪'],
+  time:['60分で1時間！時こくと時間のちがいに注目しよう'],
+  mul:['かけ算は同じ数を何回もたすことだよ。九九のリズムで覚えよう♪'],
   shape:['辺の数と角の数を数えてみよう！'],
+  kanji2:['かん字の形をよく見てかいてみよう！'],
+  reading2:['文しょうをゆっくり読んで考えよう！'],
+  kotoba2:['ことばのいみをおぼえよう！'],
+  bunpo2:['文のはじめと終わりに気をつけよう！'],
+  shizen3:['じっくりかんさつすることが大切だよ！'],
+  konchu3:['こん虫のからだをよく見てみよう！'],
+  kage3:['日光とかげのかんけいを考えてみよう！'],
+  jishaku3:['じしゃくがくっつくものとくっつかないものをかんがえよう！'],
 };
 const HINTS = {
-  add:'一の位から計算してみよう。くり上がりはあるかな？',
-  sub:'一の位から引いてみよう。引けないときはくり下げを使ってね。',
-  num:'百・十・一のくらいに分けて考えてみよう。',
-  len:'1cmは何mm？それを思い出してみて。',
-  vol:'1Lは何dL？まずそれを思い出してみよう。',
-  time:'60分で1時間だよ。何分たすと1時間になるかな？',
-  mul:'そのだんを順番にとなえてみよう。',
-  shape:'辺の数と角の数を指で数えてみよう。',
+  add:'一の位から計算してみよう',sub:'一の位から引いてみよう',
+  num:'百・十・一のくらいに分けて考えよう',len:'1cmは何mm？',
+  vol:'1Lは何dL？',time:'60分で1時間だよ',
+  mul:'そのだんを順番にとなえてみよう',shape:'辺の数と角の数を指で数えよう',
+  kanji2:'かん字の形をよく見てみよう',reading2:'文しょうをもう一度読んでみよう',
+  kotoba2:'ことばのいみを思い出してみよう',bunpo2:'文のきまりを思い出してみよう',
+  shizen3:'かんさつしたことを思い出してみよう',konchu3:'こん虫のからだを思い出してみよう',
+  kage3:'日光がどこから来るか考えよう',jishaku3:'どんなものがくっつくか考えよう',
 };
 
 /* ============================================================
-   問題生成（JS フォールバック）
+   算数JS問題生成（フォールバック）
 ============================================================ */
 function rnd(a,b){return Math.floor(Math.random()*(b-a+1))+a;}
-function makeProblemJS(uid,sid){
+function makeMathProblem(uid,sid){
   let q,ans,display=null,expl='';
   switch(uid){
     case 'add':{const a=sid===1?rnd(11,39):sid===2?rnd(20,69):rnd(40,98);const b=sid===1?rnd(11,39):sid===2?rnd(20,69):rnd(20,58);ans=a+b;display={left:a,op:'+',right:b};q=`${a} ＋ ${b} は いくつですか？`;expl=`${a}＋${b}＝${ans}！`;}break;
@@ -283,149 +353,90 @@ function makeProblemJS(uid,sid){
     case 'shape':{const ss=[{n:'三角形',v:3},{n:'四角形',v:4},{n:'長方形',v:4}];const s=ss[rnd(0,ss.length-1)];if(sid===1){ans=s.v;q=`${s.n} の 辺は なんぼん？`;expl=`${ans}本！`;}else if(sid===2){ans=s.v;q=`${s.n} の 角は なんこ？`;expl=`${ans}つ！`;}else{const a=rnd(2,5),b=rnd(2,4);ans=(a+b)*2;q=`たて${a}cm・よこ${b}cm の長方形のまわりの長さは？`;expl=`${ans}cm！`;}}break;
     default:{const a=rnd(10,50),b=rnd(1,20);ans=a+b;q=`${a}＋${b}は？`;expl=`${ans}！`;}
   }
-  return {q,ans,display,expl,hint:HINTS[uid]||'よく考えてみよう！'};
+  return {q,ans,display,expl,hint:HINTS[uid]||'よく考えてみよう！',questionType:'number'};
 }
+
+/* Firestoreの問題データをアプリ形式に変換 */
 function convertFSProblem(p){
   return {
     q:p.question, ans:p.answer, hint:p.hint, expl:p.explanation,
-    display:p.displayType==='calc'?{left:p.displayLeft,op:p.displayOp,right:p.displayRight}:null,
+    questionType: p.questionType||'number',
+    choices:      p.choices||null,
+    display: p.displayType==='calc'?{left:p.displayLeft,op:p.displayOp,right:p.displayRight}:null,
   };
 }
 
 /* ============================================================
-   フェーズ2：理解度スコアの計算
-   ・正答率スコア   : 正解数/5 × 50点
-   ・ヒントなし正解 : ヒントなし正解数/5 × 20点
-   ・解答速度      : 平均10秒以下→20点、30秒以上→0点
-   ・クリアボーナス : クリアしたら+10点
+   フェーズ2：理解度スコア計算
 ============================================================ */
-function calcUnderstandingScore(results, cleared) {
-  const n = results.length;
-  if (n === 0) return 0;
+function calcUnderstandingScore(results,cleared){
+  const n=results.length; if(!n)return 0;
+  const correct   =results.filter(r=>r.correct).length;
+  const noHint    =results.filter(r=>r.correct&&r.hintsUsed===0).length;
+  const avgTime   =results.reduce((a,r)=>a+r.timeSec,0)/n;
+  const acc       =Math.round((correct/n)*50);
+  const nh        =Math.round((noHint/n)*20);
+  const speed     =Math.max(0,Math.min(20,Math.round((1-Math.max(0,avgTime-10)/20)*20)));
+  const bonus     =cleared?10:0;
+  return Math.min(100,acc+nh+speed+bonus);
+}
+function scoreColor(s){if(s>=80)return'var(--green)';if(s>=60)return'var(--blue)';if(s>=40)return'var(--amber)';return'var(--red)';}
+function scoreLevel(s){if(s>=90)return'かんぺき！';if(s>=70)return'よくできました';if(s>=50)return'がんばっているよ';return'もう少し！';}
 
-  const correctCount   = results.filter(r => r.correct).length;
-  const noHintCorrect  = results.filter(r => r.correct && r.hintsUsed === 0).length;
-  const avgTime        = results.reduce((a, r) => a + r.timeSec, 0) / n;
-
-  const accuracyScore  = Math.round((correctCount  / n) * 50);
-  const noHintScore    = Math.round((noHintCorrect / n) * 20);
-  const speedScore     = Math.max(0, Math.min(20, Math.round((1 - Math.max(0, avgTime - 10) / 20) * 20)));
-  const clearBonus     = cleared ? 10 : 0;
-
-  return Math.min(100, accuracyScore + noHintScore + speedScore + clearBonus);
+function generateAdvice(unitName,stageNum,results,score,cleared){
+  const correct=results.filter(r=>r.correct).length;
+  const hintUsed=results.filter(r=>r.hintsUsed>0).length;
+  if(score>=90)return`${unitName}はかんぺきだよ！すごいスピードで正かいできたね。このちょうしでつぎもがんばろう！`;
+  if(score>=70&&cleared){
+    if(hintUsed===0)return`${correct}もん全部ヒントなしでせいかい！すばらしいね。つぎのステージもちょうせんしよう！`;
+    return`よくできました！ヒントなしでできるようになるともっとすごいよ！`;
+  }
+  if(score>=50)return`${correct}もんせいかいできたよ！あと少しでクリアだ。まちがえたところをもう一度かくにんしてみよう！`;
+  if(correct>=2)return`${correct}もんせいかいできたね。もう一度ゆっくりかんがえながらやってみよう！`;
+  return`むずかしかったね。${unitName}のポイントをもう一度読んでからちょうせんしてみよう！`;
 }
 
-/* ============================================================
-   フェーズ2：スコアレベルの判定
-============================================================ */
-function scoreLevel(score) {
-  if (score >= 90) return { label:'かんぺき！',    color:'#2D7A4F', bg:var_('--green-l') };
-  if (score >= 70) return { label:'よくできました',  color:'#2563EB', bg:'#EFF6FF' };
-  if (score >= 50) return { label:'がんばっているよ', color:'#EF9F27', bg:'#FAEEDA' };
-  return             { label:'もう少し！',        color:'#E24B4A', bg:'#FCEBEB' };
-}
-function var_(name){ return getComputedStyle(document.documentElement).getPropertyValue(name).trim(); }
-
-/* ============================================================
-   フェーズ2：アドバイス生成（スマートルール方式）
-   TODO: Firebase Cloud Functions + Claude API に切り替え可能
-============================================================ */
-function generateAdvice(unitName, stageNum, results, score, cleared) {
-  const correct   = results.filter(r => r.correct).length;
-  const hintUsed  = results.filter(r => r.hintsUsed > 0).length;
-  const avgTime   = (results.reduce((a,r) => a + r.timeSec, 0) / results.length).toFixed(1);
-
-  if (score >= 90) {
-    return `${unitName}はかんぺきだよ！はやく正かいできてすごいね。このちょうしでつぎのステージもがんばろう！`;
-  }
-  if (score >= 70 && cleared) {
-    if (hintUsed === 0) return `${correct}もん全部ヒントなしでせいかい！すばらしいね。つぎのステージにもちょうせんしてみよう！`;
-    return `よくできました！${unitName}の力がついてきたね。ヒントなしでできるようになるともっとすごいよ！`;
-  }
-  if (score >= 50) {
-    return `${correct}もんせいかいできたよ！あと少しでクリアだ。まちがえたところをもう一度かくにんしてみよう！`;
-  }
-  if (correct >= 2) {
-    return `${correct}もんせいかいできたね。むずかしかったかな？もう一度ゆっくりかんがえながらやってみよう！`;
-  }
-  return `むずかしかったね。${unitName}のポイントをもう一度読んでからちょうせんしてみよう！きっとできるよ！`;
+function buildScorePanelHTML(score,results,cleared){
+  const circ=2*Math.PI*46;
+  const offset=circ-(score/100)*circ;
+  const color=scoreColor(score);
+  const correct=results.filter(r=>r.correct).length;
+  const noHint=results.filter(r=>r.correct&&r.hintsUsed===0).length;
+  const avgTime=(results.reduce((a,r)=>a+r.timeSec,0)/results.length).toFixed(1);
+  const accPct=Math.round((correct/results.length)*100);
+  const speedPct=Math.max(0,Math.min(100,Math.round((1-Math.max(0,parseFloat(avgTime)-10)/20)*100)));
+  const nhPct=Math.round((noHint/results.length)*100);
+  return`<div class="score-panel">
+    <div class="score-panel-title">📊 理解度スコア</div>
+    <div class="gauge-wrap">
+      <svg width="130" height="130" viewBox="0 0 130 130">
+        <circle cx="65" cy="65" r="46" fill="none" stroke="#EEE" stroke-width="10"/>
+        <circle cx="65" cy="65" r="46" fill="none" stroke="${color}" stroke-width="10"
+          stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${offset.toFixed(1)}"
+          stroke-linecap="round" transform="rotate(-90 65 65)" style="transition:stroke-dashoffset .8s ease"/>
+        <text x="65" y="58" text-anchor="middle" font-size="28" font-weight="bold" fill="${color}" font-family="inherit">${score}</text>
+        <text x="65" y="74" text-anchor="middle" font-size="11" fill="#8A7A60" font-family="inherit">てん</text>
+      </svg>
+      <div class="gauge-label" style="color:${color};font-weight:700">${scoreLevel(score)}</div>
+    </div>
+    <div class="score-breakdown">
+      <div class="sb-row"><div class="sb-label">せいかい率</div><div class="sb-bar-wrap"><div class="sb-bar-fill" style="width:${accPct}%;background:var(--green)"></div></div><div class="sb-val" style="color:var(--green)">${correct}/5</div></div>
+      <div class="sb-row"><div class="sb-label">ヒントなし</div><div class="sb-bar-wrap"><div class="sb-bar-fill" style="width:${nhPct}%;background:var(--blue)"></div></div><div class="sb-val" style="color:var(--blue)">${noHint}/5</div></div>
+      <div class="sb-row"><div class="sb-label">かいとう速度</div><div class="sb-bar-wrap"><div class="sb-bar-fill" style="width:${speedPct}%;background:var(--amber)"></div></div><div class="sb-val" style="color:var(--amber)">${avgTime}秒</div></div>
+    </div>
+  </div>`;
 }
 
-/* ============================================================
-   フェーズ2：理解度スコアパネルのHTML生成
-============================================================ */
-function buildScorePanelHTML(score, results, cleared) {
-  const lv     = scoreLevel(score);
-  const circ   = 2 * Math.PI * 46; // 半径46の円周
-  const offset = circ - (score / 100) * circ;
-  const correct   = results.filter(r => r.correct).length;
-  const noHint    = results.filter(r => r.correct && r.hintsUsed === 0).length;
-  const avgTime   = (results.reduce((a,r) => a + r.timeSec, 0) / results.length).toFixed(1);
-  const accuracyPct = Math.round((correct / results.length) * 100);
-  const speedPct    = Math.max(0, Math.min(100, Math.round((1 - Math.max(0, parseFloat(avgTime) - 10) / 20) * 100)));
-  const noHintPct   = Math.round((noHint / results.length) * 100);
-
-  return `
-    <div class="score-panel">
-      <div class="score-panel-title">📊 理解度スコア</div>
-      <div class="gauge-wrap">
-        <svg class="gauge-svg" width="130" height="130" viewBox="0 0 130 130">
-          <circle cx="65" cy="65" r="46" fill="none" stroke="#EEE" stroke-width="10"/>
-          <circle cx="65" cy="65" r="46" fill="none"
-            stroke="${lv.color}" stroke-width="10"
-            stroke-dasharray="${circ.toFixed(1)}"
-            stroke-dashoffset="${offset.toFixed(1)}"
-            stroke-linecap="round"
-            transform="rotate(-90 65 65)"
-            style="transition:stroke-dashoffset .8s ease"/>
-          <text x="65" y="58" text-anchor="middle" font-size="28" font-weight="bold" fill="${lv.color}" font-family="inherit">${score}</text>
-          <text x="65" y="74" text-anchor="middle" font-size="11" fill="#8A7A60" font-family="inherit">てん</text>
-        </svg>
-        <div class="gauge-label" style="color:${lv.color};font-weight:700">${lv.label}</div>
-      </div>
-      <div class="score-breakdown">
-        <div class="sb-row">
-          <div class="sb-label">せいかい率</div>
-          <div class="sb-bar-wrap"><div class="sb-bar-fill" style="width:${accuracyPct}%;background:#2D7A4F"></div></div>
-          <div class="sb-val" style="color:#2D7A4F">${correct}/5</div>
-        </div>
-        <div class="sb-row">
-          <div class="sb-label">ヒントなし</div>
-          <div class="sb-bar-wrap"><div class="sb-bar-fill" style="width:${noHintPct}%;background:#2563EB"></div></div>
-          <div class="sb-val" style="color:#2563EB">${noHint}/5</div>
-        </div>
-        <div class="sb-row">
-          <div class="sb-label">かいとう速度</div>
-          <div class="sb-bar-wrap"><div class="sb-bar-fill" style="width:${speedPct}%;background:#EF9F27"></div></div>
-          <div class="sb-val" style="color:#EF9F27">${avgTime}秒</div>
-        </div>
-      </div>
-    </div>`;
-}
-
-/* ============================================================
-   フェーズ2：アドバイスボックスのHTML生成
-============================================================ */
-function buildAdviceHTML(advice) {
-  return `
-    <div class="advice-box">
-      <div class="advice-icon">🦉</div>
-      <div class="advice-body">
-        <div class="advice-label">フクロウ先生からのひとこと</div>
-        <div class="advice-text">${advice}</div>
-      </div>
-    </div>`;
+function buildAdviceHTML(advice){
+  return`<div class="advice-box"><div class="advice-icon">🦉</div><div><div class="advice-label">フクロウ先生からのひとこと</div><div class="advice-text">${advice}</div></div></div>`;
 }
 
 /* ============================================================
    アプリ状態
 ============================================================ */
-let currentUid='', userName='', unit=null, stageNum=0, progress={};
-let problems=[], pidx=0, score=0, attempts=0;
-let totalHints=0, totalTime=0, qStartTime=0;
-let qHintCount=0;                          // フェーズ2：問題ごとのヒント数
-let questionResults=[];                    // フェーズ2：問題ごとの結果
-let timerInterval=null;
+let currentUid='',userName='',unit=null,currentSubject='math',stageNum=0,progress={};
+let problems=[],pidx=0,score=0,attempts=0,qHintCount=0,totalHints=0,totalTime=0,qStartTime=0;
+let questionResults=[],timerInterval=null;
 const TIMER_SEC=30;
 
 function stageState(uid,sid){return ((progress[uid]||{})[`s${sid}`])||{cleared:false,bestScore:0,bestUnderstandingScore:0};}
@@ -434,22 +445,70 @@ async function saveProg(){if(currentUid)await saveProgress(currentUid,userName,p
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
 /* ============================================================
-   画面描画
+   ホーム画面
 ============================================================ */
 function renderHome(){
-  document.getElementById('unitGrid').innerHTML=UNITS.map(u=>{
+  const units=ALL_UNITS[currentSubject]||[];
+
+  /* 準備中（国語・理科） */
+  if(currentSubject!=='math'){
+    document.getElementById('unitGrid').innerHTML=`
+      <div class="coming-soon" style="grid-column:1/-1">
+        <div class="cs-icon">${currentSubject==='japanese'?'📝':'🔬'}</div>
+        <div class="cs-title">${currentSubject==='japanese'?'国語':'理科'}の問題を準備中です</div>
+        <div class="cs-sub">
+          先生が問題を追加すると、ここに単元が表示されます。<br>
+          管理画面から問題を登録してください。<br><br>
+          ${currentSubject==='science'?'※ 理科は3年生から学ぶ科目です。':''}
+        </div>
+      </div>`;
+
+    /* 単元カードも表示（クリック時にFirestoreを確認） */
+    const grid=document.createElement('div');
+    grid.className='ugrid';grid.style.marginTop='1rem';
+    units.forEach(u=>{
+      const s=unitStars(u.id);
+      const div=document.createElement('div');
+      div.className='ucard';div.dataset.uid=u.id;
+      div.innerHTML=`<div class="ui">${u.icon}</div><div class="un">${u.name}</div><div class="uc">${u.ch}</div><div class="ustars">${[0,1,2].map(i=>`<span>${i<s?'⭐':'☆'}</span>`).join('')}</div>`;
+      div.addEventListener('click',()=>openUnit(u.id));
+      grid.appendChild(div);
+    });
+    document.getElementById('unitGrid').appendChild(grid);
+    return;
+  }
+
+  /* 算数は通常表示 */
+  const grid=document.createElement('div');
+  grid.className='ugrid';
+  units.forEach(u=>{
     const s=unitStars(u.id);
-    return`<div class="ucard" data-uid="${u.id}">
-      <div class="ui">${u.icon}</div><div class="un">${u.name}</div>
-      <div class="uc">${u.ch}</div>
-      <div class="ustars">${[0,1,2].map(i=>`<span>${i<s?'⭐':'☆'}</span>`).join('')}</div>
-    </div>`;
-  }).join('');
-  document.querySelectorAll('.ucard').forEach(c=>c.addEventListener('click',()=>openUnit(c.dataset.uid)));
+    const div=document.createElement('div');
+    div.className='ucard';div.dataset.uid=u.id;
+    div.innerHTML=`<div class="ui">${u.icon}</div><div class="un">${u.name}</div><div class="uc">${u.ch}</div><div class="ustars">${[0,1,2].map(i=>`<span>${i<s?'⭐':'☆'}</span>`).join('')}</div>`;
+    div.addEventListener('click',()=>openUnit(u.id));
+    grid.appendChild(div);
+  });
+  document.getElementById('unitGrid').innerHTML='';
+  document.getElementById('unitGrid').appendChild(grid);
 }
 
+/* 科目タブ */
+document.getElementById('subjectTabs').addEventListener('click',e=>{
+  const tab=e.target.closest('.subject-tab');
+  if(!tab)return;
+  document.querySelectorAll('.subject-tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');
+  currentSubject=tab.dataset.subject;
+  renderHome();
+});
+
+/* ============================================================
+   単元・ステージ
+============================================================ */
 function openUnit(uid){
-  unit=UNITS.find(u=>u.id===uid);
+  unit=findUnit(uid);
+  if(!unit)return;
   document.getElementById('uIcon').textContent=unit.icon;
   document.getElementById('uTitle').textContent=unit.name;
   document.getElementById('uDesc').textContent=unit.desc;
@@ -465,14 +524,7 @@ function renderStages(){
     let cls='stage-card'; if(!unlocked)cls+=' locked'; if(cleared)cls+=' cleared';
     const badge=!unlocked?`<div class="stage-badge lock">🔒 ロック</div>`:cleared?`<div class="stage-badge clear">✅ クリア</div>`:`<div class="stage-badge play">▶ プレイ</div>`;
     const usLabel=cleared&&bestUs>0?`<span style="font-size:11px;color:var(--muted)"> 理解度:${bestUs}点</span>`:'';
-    return`<div class="${cls}" data-sid="${st.id}">
-      <div class="stage-num">${cleared?'✅':st.icon}</div>
-      <div class="stage-info">
-        <div class="stage-name">ステージ${st.id}「${st.name}」</div>
-        <div class="stage-desc">${st.desc}　クリア条件：${st.clearScore}/5問</div>
-        <div class="stage-stars">${cleared?st.stars:'☆'.repeat(st.id)}${usLabel}</div>
-      </div>${badge}
-    </div>`;
+    return`<div class="${cls}" data-sid="${st.id}"><div class="stage-num">${cleared?'✅':st.icon}</div><div class="stage-info"><div class="stage-name">ステージ${st.id}「${st.name}」</div><div class="stage-desc">${st.desc}　クリア条件：${st.clearScore}/5問</div><div class="stage-stars">${cleared?st.stars:'☆'.repeat(st.id)}${usLabel}</div></div>${badge}</div>`;
   }).join('');
   document.querySelectorAll('.stage-card:not(.locked)').forEach(c=>c.addEventListener('click',()=>startStage(parseInt(c.dataset.sid))));
 }
@@ -482,7 +534,7 @@ function renderStages(){
 ============================================================ */
 async function startStage(sid){
   stageNum=sid; score=0; pidx=0; attempts=0;
-  totalHints=0; totalTime=0; questionResults=[];
+  qHintCount=0; totalHints=0; totalTime=0; questionResults=[];
   document.getElementById('quizTitle').textContent=`${unit.icon} ${unit.name}`;
   document.getElementById('quizSub').textContent=`ステージ${sid}「${STAGES[sid-1].name}」`;
   document.getElementById('scoreTxt').textContent='0';
@@ -494,15 +546,27 @@ async function startStage(sid){
   if(fsProblems.length>=5){
     problems=fsProblems.map(convertFSProblem);
     document.getElementById('sourceBadge').textContent='📚 先生が用意した問題';
-  } else {
-    problems=Array.from({length:5},()=>makeProblemJS(unit.id,sid));
+  } else if(currentSubject==='math'){
+    /* 算数のみJS自動生成 */
+    problems=Array.from({length:5},()=>makeMathProblem(unit.id,sid));
     document.getElementById('sourceBadge').textContent='🤖 じどうせいせい問題';
+  } else {
+    /* 国語・理科は問題が足りない場合は案内 */
+    document.getElementById('quizBody').innerHTML=`
+      <div class="coming-soon">
+        <div class="cs-icon">📭</div>
+        <div class="cs-title">もんだいがまだありません</div>
+        <div class="cs-sub">先生が問題を追加するまで少し待ってね。<br>管理画面から問題を登録できます。</div>
+      </div>
+      <button class="btn-s" id="backToUnit" style="margin-top:1rem">← もどる</button>`;
+    document.getElementById('backToUnit').addEventListener('click',()=>show('S_unit'));
+    return;
   }
   renderProblem();
 }
 
 /* ============================================================
-   問題描画
+   問題描画（数字入力 / 選択肢 両対応）
 ============================================================ */
 function renderProblem(){
   if(pidx>=5){endStage();return;}
@@ -512,23 +576,40 @@ function renderProblem(){
   const msg=pidx===0?tlist[rnd(0,tlist.length-1)]:`${pidx+1}もん目！いけるよ！`;
   const dots=Array.from({length:5},(_,i)=>{let c='pdot';if(i<pidx)c+=' done';else if(i===pidx)c+=' now';return`<div class="${c}"></div>`;}).join('');
   const calc=p.display?`<div class="calcbox"><div class="crow"><span>${p.display.left}</span></div><div class="crow"><span class="cop">${p.display.op}</span><span>${p.display.right}</span></div><hr class="cdiv"><div class="crow cans" id="cAns">？</div></div>`:'';
+
+  const isChoice = p.questionType==='choice' && Array.isArray(p.choices);
+
+  /* 入力エリア：選択肢 or 数字入力 */
+  const inputHTML = isChoice
+    ? `<div class="choices-grid" id="choicesGrid">${p.choices.map((c,i)=>`<button class="choice-btn" data-idx="${i}">${c}</button>`).join('')}</div>`
+    : `<div class="ans-row"><div class="albl">こたえ：</div><input id="aInp" class="ainp" type="number" placeholder="？" min="0" max="9999"/><button id="ckBtn" class="ckbtn">かくにん</button></div>`;
+
   document.getElementById('quizBody').innerHTML=`
     <div class="tutor-box"><div class="tico">🦉</div><div class="ttxt" id="tutMsg">${msg}</div></div>
     <div class="pcard">
       <div class="pnum">${pidx+1}もんめ / 5もん</div>
       <div class="pdots">${dots}</div>
       <div class="ptxt">${p.q}</div>${calc}
-      <div class="ans-row"><div class="albl">こたえ：</div><input id="aInp" class="ainp" type="number" placeholder="？" min="0" max="9999"/><button id="ckBtn" class="ckbtn">かくにん</button></div>
+      ${inputHTML}
       <div id="fb"></div>
     </div>
-    <div class="numpad" id="numpad"></div>`;
-  const pad=document.getElementById('numpad');
-  [7,8,9,4,5,6,1,2,3].forEach(n=>{const b=document.createElement('button');b.className='nb';b.textContent=n;b.addEventListener('click',()=>numInput(n));pad.appendChild(b);});
-  const del=document.createElement('button');del.className='nb del';del.textContent='けす';del.addEventListener('click',numDel);pad.appendChild(del);
-  const z=document.createElement('button');z.className='nb';z.textContent='0';z.addEventListener('click',()=>numInput(0));pad.appendChild(z);
-  const ok=document.createElement('button');ok.className='nb ok';ok.textContent='OK';ok.addEventListener('click',checkAnswer);pad.appendChild(ok);
-  document.getElementById('ckBtn').addEventListener('click',checkAnswer);
-  document.getElementById('aInp').addEventListener('keydown',e=>{if(e.key==='Enter')checkAnswer();});
+    ${isChoice?'':'<div class="numpad" id="numpad"></div>'}`;
+
+  if(isChoice){
+    /* 選択肢クリック */
+    document.querySelectorAll('.choice-btn').forEach(btn=>{
+      btn.addEventListener('click',()=>checkChoiceAnswer(parseInt(btn.dataset.idx)));
+    });
+  } else {
+    /* 数字パッド */
+    const pad=document.getElementById('numpad');
+    [7,8,9,4,5,6,1,2,3].forEach(n=>{const b=document.createElement('button');b.className='nb';b.textContent=n;b.addEventListener('click',()=>numInput(n));pad.appendChild(b);});
+    const del=document.createElement('button');del.className='nb del';del.textContent='けす';del.addEventListener('click',numDel);pad.appendChild(del);
+    const z=document.createElement('button');z.className='nb';z.textContent='0';z.addEventListener('click',()=>numInput(0));pad.appendChild(z);
+    const ok=document.createElement('button');ok.className='nb ok';ok.textContent='OK';ok.addEventListener('click',checkNumberAnswer);pad.appendChild(ok);
+    document.getElementById('ckBtn').addEventListener('click',checkNumberAnswer);
+    document.getElementById('aInp').addEventListener('keydown',e=>{if(e.key==='Enter')checkNumberAnswer();});
+  }
 }
 
 function startTimer(){
@@ -547,124 +628,110 @@ function numInput(n){const i=document.getElementById('aInp');if(!i)return;i.valu
 function numDel(){const i=document.getElementById('aInp');if(!i)return;i.value=i.value.slice(0,-1);const c=document.getElementById('cAns');if(c)c.textContent=i.value||'？';}
 
 /* ============================================================
-   答え確認（フェーズ2：問題結果を記録）
+   答え確認：数字入力
 ============================================================ */
-function checkAnswer(){
+function checkNumberAnswer(){
   const i=document.getElementById('aInp');if(!i||i.value==='')return;
   const v=parseInt(i.value),p=problems[pidx],ok=v===p.ans;
   attempts++;
   i.className='ainp '+(ok?'ok':'ng');
   const fb=document.getElementById('fb'),ca=document.getElementById('cAns');
   if(ok){
-    stopTimer();
-    if(ca)ca.textContent=p.ans;
-    score++;
-    document.getElementById('scoreTxt').textContent=score;
+    stopTimer();if(ca)ca.textContent=p.ans;
+    score++;document.getElementById('scoreTxt').textContent=score;
     fb.className='fb ok';fb.textContent='⭕ せいかい！ '+p.expl;
     document.getElementById('ckBtn').disabled=true;
-    /* フェーズ2：正解を記録 */
-    questionResults.push({
-      correct: true,
-      hintsUsed: qHintCount,
-      timeSec: (Date.now()-qStartTime)/1000,
-    });
+    questionResults.push({correct:true,hintsUsed:qHintCount,timeSec:(Date.now()-qStartTime)/1000});
     setTimeout(()=>{attempts=0;pidx++;renderProblem();},1700);
   } else if(attempts===1){
-    qHintCount++;    // フェーズ2：ヒント使用を記録
-    totalHints++;
+    qHintCount++;totalHints++;
     fb.className='fb hint';fb.textContent='❓ もう少し！ ヒント：'+p.hint;
     document.getElementById('tutMsg').textContent='もう一かいかんがえてみよう！';
   } else {
-    stopTimer();
-    if(ca)ca.textContent=p.ans;
+    stopTimer();if(ca)ca.textContent=p.ans;
     fb.className='fb ng';fb.innerHTML=`✕ こたえは <b>${p.ans}</b> だよ。${p.expl}`;
     document.getElementById('ckBtn').disabled=true;
-    /* フェーズ2：不正解を記録 */
-    questionResults.push({
-      correct: false,
-      hintsUsed: qHintCount,
-      timeSec: (Date.now()-qStartTime)/1000,
-    });
+    questionResults.push({correct:false,hintsUsed:qHintCount,timeSec:(Date.now()-qStartTime)/1000});
     setTimeout(()=>{attempts=0;pidx++;renderProblem();},2200);
   }
 }
 
 /* ============================================================
-   ステージ終了（フェーズ2：スコア計算・アドバイス・保存）
+   答え確認：選択肢
 ============================================================ */
-async function endStage(){
-  clearInterval(timerInterval);
-  const st       = STAGES[stageNum-1];
-  const cleared  = score >= st.clearScore;
-  const us       = calcUnderstandingScore(questionResults, cleared);
-  const avgTime  = (totalTime / 5).toFixed(1);
-  const advice   = generateAdvice(unit.name, stageNum, questionResults, us, cleared);
-
-  /* 進捗を更新 */
-  if(!progress[unit.id]) progress[unit.id]={};
-  const key=`s${stageNum}`;
-  if(!progress[unit.id][key]) progress[unit.id][key]={cleared:false,bestScore:0,bestUnderstandingScore:0};
-  if(score > progress[unit.id][key].bestScore) progress[unit.id][key].bestScore=score;
-  if(us    > (progress[unit.id][key].bestUnderstandingScore||0)) progress[unit.id][key].bestUnderstandingScore=us;
-  if(cleared) progress[unit.id][key].cleared=true;
-
-  /* Firestoreに保存 */
-  await saveProg();
-  if(currentUid){
-    await saveSession(currentUid, {
-      unitId:             unit.id,
-      unitName:           unit.name,
-      stageId:            stageNum,
-      stageName:          st.name,
-      score,
-      understandingScore: us,
-      hintCount:          totalHints,
-      avgTimeSec:         parseFloat(avgTime),
-      cleared,
-      advice,
-    });
+function checkChoiceAnswer(selectedIdx){
+  const p=problems[pidx];
+  const ok=selectedIdx===p.ans;
+  stopTimer();
+  /* 全ボタンを無効化 */
+  document.querySelectorAll('.choice-btn').forEach((btn,i)=>{
+    btn.disabled=true;
+    if(i===p.ans)btn.classList.add('correct');
+    else if(i===selectedIdx&&!ok)btn.classList.add('wrong');
+  });
+  const fb=document.getElementById('fb');
+  if(ok){
+    score++;document.getElementById('scoreTxt').textContent=score;
+    fb.className='fb ok';fb.textContent='⭕ せいかい！ '+p.expl;
+    questionResults.push({correct:true,hintsUsed:0,timeSec:(Date.now()-qStartTime)/1000});
+    setTimeout(()=>{pidx++;renderProblem();},1800);
+  } else {
+    fb.className='fb ng';fb.innerHTML=`✕ こたえは <b>${p.choices[p.ans]}</b> だよ。${p.expl}`;
+    questionResults.push({correct:false,hintsUsed:0,timeSec:(Date.now()-qStartTime)/1000});
+    setTimeout(()=>{pidx++;renderProblem();},2400);
   }
-
-  cleared ? showCelebration(stageNum, st, us, questionResults, advice)
-          : showResult(st, score, us, questionResults, advice);
 }
 
 /* ============================================================
-   クリア演出（フェーズ2：スコアパネル＋アドバイスを追加）
+   ステージ終了
+============================================================ */
+async function endStage(){
+  clearInterval(timerInterval);
+  const st=STAGES[stageNum-1];
+  const cleared=score>=st.clearScore;
+  const us=calcUnderstandingScore(questionResults,cleared);
+  const advice=generateAdvice(unit.name,stageNum,questionResults,us,cleared);
+  const avg=(totalTime/5).toFixed(1);
+
+  if(!progress[unit.id])progress[unit.id]={};
+  const key=`s${stageNum}`;
+  if(!progress[unit.id][key])progress[unit.id][key]={cleared:false,bestScore:0,bestUnderstandingScore:0};
+  if(score>progress[unit.id][key].bestScore)progress[unit.id][key].bestScore=score;
+  if(us>(progress[unit.id][key].bestUnderstandingScore||0))progress[unit.id][key].bestUnderstandingScore=us;
+  if(cleared)progress[unit.id][key].cleared=true;
+
+  await saveProg();
+  if(currentUid){
+    await saveSession(currentUid,{
+      unitId:unit.id,unitName:unit.name,subjectId:currentSubject,
+      stageId:stageNum,stageName:st.name,score,
+      understandingScore:us,hintCount:totalHints,
+      avgTimeSec:parseFloat(avg),cleared,advice,
+    });
+  }
+  cleared?showCelebration(stageNum,st,us,questionResults,advice):showResult(st,score,us,questionResults,advice);
+}
+
+/* ============================================================
+   クリア演出
 ============================================================ */
 const COLORS=['#EF9F27','#2D7A4F','#E24B4A','#4A90D9','#9B59B6','#F1C40F'];
 let confettiAnim=null;
-
-function showCelebration(sid, st, us, results, advice){
-  const ov=document.getElementById('celebrateOverlay');
-  const card=document.getElementById('celCard');
-
-  let topHTML='';
-  if(sid===1)      topHTML=`<div class="cel-icon">🎊</div><div class="cel-title">ステージ1 クリア！</div><div class="cel-sub">よくできました！すごいよ！</div><div class="cel-stars">${st.stars}</div><div class="cel-badge">✨ ${unit.name} きほんマスター！</div>`;
-  else if(sid===2) topHTML=`<div class="cel-icon">🎆</div><div class="cel-title">ステージ2 クリア！！</div><div class="cel-sub">すばらしい！</div><div class="cel-stars">${st.stars}</div><div class="cel-badge">🌿 ${unit.name} れんしゅう名人！</div>`;
-  else             topHTML=`<div class="trophy-glow">🏆</div><div class="cel-title">全ステージ制覇！！！</div><div class="cel-sub">かんぺきだ！きみはほんものだ！</div><div class="title-badge">👑 ${unit.name} チャレンジ王者</div><div class="cel-stars" style="font-size:36px;letter-spacing:4px">⭐⭐⭐</div>`;
-
-  card.innerHTML=`
-    ${topHTML}
-    ${buildScorePanelHTML(us, results, true)}
-    ${buildAdviceHTML(advice)}
-    <button class="btn-p" id="celBtn">${sid<3?'つぎのステージへ ➡':'もりに帰る 🌳'}</button>`;
-
+function showCelebration(sid,st,us,results,advice){
+  const ov=document.getElementById('celebrateOverlay'),card=document.getElementById('celCard');
+  let top='';
+  if(sid===1)top=`<div class="cel-icon">🎊</div><div class="cel-title">ステージ1 クリア！</div><div class="cel-sub">よくできました！</div><div class="cel-stars">${st.stars}</div><div class="cel-badge">✨ ${unit.name} きほんマスター！</div>`;
+  else if(sid===2)top=`<div class="cel-icon">🎆</div><div class="cel-title">ステージ2 クリア！！</div><div class="cel-sub">すばらしい！</div><div class="cel-stars">${st.stars}</div><div class="cel-badge">🌿 れんしゅう名人！</div>`;
+  else top=`<div class="trophy-glow">🏆</div><div class="cel-title">全ステージ制覇！！！</div><div class="cel-sub">かんぺきだ！</div><div class="title-badge">👑 ${unit.name} チャレンジ王者</div><div class="cel-stars" style="font-size:36px;letter-spacing:4px">⭐⭐⭐</div>`;
+  card.innerHTML=`${top}${buildScorePanelHTML(us,results,true)}${buildAdviceHTML(advice)}<button class="btn-p" id="celBtn">${sid<3?'つぎのステージへ ➡':'もりに帰る 🌳'}</button>`;
   ov.classList.add('active');
-  if(sid===1||sid===3) startConfetti();
-  if(sid===2||sid===3) launchFireworks();
-
-  document.getElementById('celBtn').addEventListener('click',()=>{
-    stopConfetti();
-    ov.classList.remove('active');
-    renderHome(); renderStages(); show('S_unit');
-  });
+  if(sid===1||sid===3)startConfetti();
+  if(sid===2||sid===3)launchFireworks();
+  document.getElementById('celBtn').addEventListener('click',()=>{stopConfetti();ov.classList.remove('active');renderHome();renderStages();show('S_unit');});
 }
-
 function startConfetti(){
-  const canvas=document.getElementById('confettiCanvas');
-  const ctx=canvas.getContext('2d');
-  canvas.width=window.innerWidth; canvas.height=window.innerHeight;
+  const canvas=document.getElementById('confettiCanvas'),ctx=canvas.getContext('2d');
+  canvas.width=window.innerWidth;canvas.height=window.innerHeight;
   const ps=Array.from({length:130},()=>({x:Math.random()*canvas.width,y:-10,r:rnd(4,9),d:Math.random()*120,color:COLORS[rnd(0,COLORS.length-1)],tilt:rnd(-10,10),speed:Math.random()*2+1.5}));
   function draw(){ctx.clearRect(0,0,canvas.width,canvas.height);ps.forEach(p=>{ctx.beginPath();ctx.lineWidth=p.r;ctx.strokeStyle=p.color;ctx.moveTo(p.x+p.tilt+p.r/3,p.y);ctx.lineTo(p.x+p.tilt,p.y+p.tilt+p.r/5);ctx.stroke();p.y+=p.speed;p.x+=Math.sin(p.d+=.04)*1.5;p.tilt=Math.sin(p.d)*12;if(p.y>canvas.height+20){p.y=-10;p.x=Math.random()*canvas.width;}});confettiAnim=requestAnimationFrame(draw);}
   draw();
@@ -675,19 +742,15 @@ function launchFireworks(){
   for(let i=0;i<5;i++){setTimeout(()=>{const fx=rnd(15,85),fy=rnd(10,50),color=COLORS[rnd(0,COLORS.length-1)];for(let j=0;j<18;j++){const el=document.createElement('div');el.className='firework';const angle=(j/18)*360,dist=rnd(60,120);el.style.cssText=`left:${fx}vw;top:${fy}vh;background:${color};--dx:${Math.cos(angle*Math.PI/180)*dist}px;--dy:${Math.sin(angle*Math.PI/180)*dist}px;animation:fw-burst .9s ease-out ${j*.02}s forwards;`;ov.appendChild(el);setTimeout(()=>el.remove(),1400);}},i*280);}
 }
 
-/* ============================================================
-   結果画面（不合格）（フェーズ2：スコアパネル＋アドバイスを追加）
-============================================================ */
-function showResult(st, sc, us, results, advice){
+function showResult(st,sc,us,results,advice){
   let icon,title,sub;
-  if(sc>=st.clearScore-1){icon='😊';title='あと少し！';sub=`クリアまであと${st.clearScore-sc}問！もう一度チャレンジしよう！`;}
-  else if(sc>=2){icon='💪';title='ファイト！';sub='もう一度やってみよう！きっとできる！';}
-  else{icon='📖';title='もう少しべんきょうしよう！';sub='まえのステージをもう一度やってみてね。';}
-
+  if(sc>=st.clearScore-1){icon='😊';title='あと少し！';sub=`クリアまであと${st.clearScore-sc}問！`;}
+  else if(sc>=2){icon='💪';title='ファイト！';sub='もう一度やってみよう！';}
+  else{icon='📖';title='もう少しべんきょうしよう！';sub='もう一度チャレンジしてね。';}
   document.getElementById('rIcon').textContent=icon;
   document.getElementById('rTitle').textContent=title;
   document.getElementById('rSub').textContent=sub;
-  document.getElementById('resultScorePanel').innerHTML=buildScorePanelHTML(us, results, false);
+  document.getElementById('resultScorePanel').innerHTML=buildScorePanelHTML(us,results,false);
   document.getElementById('resultAdvice').innerHTML=buildAdviceHTML(advice);
   show('S_result');
 }
@@ -702,12 +765,12 @@ document.getElementById('startBtn').addEventListener('click',async()=>{
   document.getElementById('startBtn').disabled=true;
   document.getElementById('loginStatus').textContent='つないでいます…';
   const user=await signInUser();
-  if(!user){document.getElementById('loginStatus').textContent='エラーが発生しました。もう一度試してね。';document.getElementById('startBtn').disabled=false;return;}
-  currentUid=user.uid; userName=name;
+  if(!user){document.getElementById('loginStatus').textContent='エラーが発生しました';document.getElementById('startBtn').disabled=false;return;}
+  currentUid=user.uid;userName=name;
   await createUserIfNew(currentUid,userName);
   progress=await loadProgress(currentUid);
   document.getElementById('welcomeName').textContent=name+'さん、こんにちは！';
-  renderHome(); show('S_home');
+  renderHome();show('S_home');
 });
 document.getElementById('loBtn').addEventListener('click',()=>{currentUid='';userName='';progress={};document.getElementById('nameInput').value='';document.getElementById('startBtn').disabled=true;document.getElementById('loginStatus').textContent='';show('S_login');});
 document.getElementById('backHome').addEventListener('click',()=>{renderHome();show('S_home');});
@@ -715,11 +778,5 @@ document.getElementById('retryBtn').addEventListener('click',()=>startStage(stag
 document.getElementById('homeBtn').addEventListener('click',()=>{renderHome();show('S_home');});
 show('S_login');
 </script>
-<!-- フッター -->
-<footer class="site-footer">
-  <span class="footer-version">v1.0.0</span>
-  <span class="footer-license">© 2025 <a href="mailto:admin@ena-gifu.com">@ena-gifu.com</a> All rights reserved.</span>
-</footer>
-
 </body>
 </html>
