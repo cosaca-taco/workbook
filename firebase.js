@@ -1,6 +1,8 @@
 /* ============================================================
-   firebase.js — 多科目対応版
-   subjectId（math / japanese / science）に対応
+   firebase.js — 動画URL管理対応版
+   追加機能:
+     getUnitVideos()   単元ごとの動画URLを取得
+     saveUnitVideos()  動画URLを保存
 ============================================================ */
 
 import { initializeApp }
@@ -133,29 +135,62 @@ export async function getUserByName(name) {
 }
 
 /* ============================================================
-   問題の取得（子ども用）
-   unitId でフィルタ（unitId は科目をまたいで一意）
-   5問未満の場合は空配列 → JS生成にフォールバック
+   動画URL管理
+   Firestoreのデータ構造:
+   unitVideos/{unitId}
+     unitId:  "add"
+     s1: "https://www.youtube.com/watch?v=xxxxx"  ← ステージ1の動画
+     s2: "https://www.youtube.com/watch?v=yyyyy"  ← ステージ2の動画
+     s3: "https://www.youtube.com/watch?v=zzzzz"  ← ステージ3の動画
+     updatedAt: timestamp
+============================================================ */
 
-   Firestoreの問題データ構造（多科目対応版）:
-   problems/{自動ID}
-     subjectId:    "math" / "japanese" / "science"
-     unitId:       "add" / "kanji2" など
-     gradeId:      "g2"
-     stageId:      1 / 2 / 3
-     questionType: "number"（数字入力）/ "choice"（選択肢）
-     question:     "問題文"
-     answer:       70（numberの場合）/ 1（choiceの場合はインデックス0〜3）
-     choices:      null / ["あ）東京","い）大阪","う）名古屋","え）京都"]
-     hint:         "ヒント"
-     explanation:  "解説"
-     displayType:  "text" / "calc"
-     displayLeft:  23（calcのとき）
-     displayOp:    "+"（calcのとき）
-     displayRight: 47（calcのとき）
-     isPublished:  true
-     createdAt:    timestamp
-     updatedAt:    timestamp
+/* 全単元の動画URLを一括取得 */
+export async function getAllUnitVideos() {
+  try {
+    const snap = await getDocs(collection(db, "unitVideos"));
+    const result = {};
+    snap.docs.forEach(d => { result[d.id] = d.data(); });
+    return result;
+  } catch (e) { console.error("getAllUnitVideos:", e); return {}; }
+}
+
+/* 特定単元の動画URLを取得 */
+export async function getUnitVideos(unitId) {
+  try {
+    const snap = await getDoc(doc(db, "unitVideos", unitId));
+    return snap.exists() ? snap.data() : {};
+  } catch (e) { console.error("getUnitVideos:", e); return {}; }
+}
+
+/* 動画URLを保存（先生用） */
+export async function saveUnitVideos(unitId, urls) {
+  try {
+    await setDoc(
+      doc(db, "unitVideos", unitId),
+      { unitId, ...urls, updatedAt: serverTimestamp() },
+      { merge: true }
+    );
+    return true;
+  } catch (e) { console.error("saveUnitVideos:", e); return false; }
+}
+
+/* YouTubeのURLから埋め込みURLに変換するユーティリティ */
+export function toYouTubeEmbedUrl(url) {
+  if (!url) return null;
+  // 通常URL: https://www.youtube.com/watch?v=VIDEOID
+  const m1 = url.match(/[?&]v=([^&]+)/);
+  if (m1) return `https://www.youtube.com/embed/${m1[1]}`;
+  // 短縮URL: https://youtu.be/VIDEOID
+  const m2 = url.match(/youtu\.be\/([^?&]+)/);
+  if (m2) return `https://www.youtube.com/embed/${m2[1]}`;
+  // すでに埋め込みURL
+  if (url.includes('/embed/')) return url;
+  return null;
+}
+
+/* ============================================================
+   問題の取得（子ども用）
 ============================================================ */
 export async function getProblems(unitId, stageId) {
   try {

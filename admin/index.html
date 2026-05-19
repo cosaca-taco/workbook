@@ -32,7 +32,7 @@
     .main{padding:1.5rem;overflow-y:auto}
     .page{display:none}.page.active{display:block}
     .page-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:1.5rem}
-    .page-title{font-size:20px;font-weight:700} .page-sub{font-size:13px;color:var(--muted);margin-top:3px}
+    .page-title{font-size:20px;font-weight:700}.page-sub{font-size:13px;color:var(--muted);margin-top:3px}
     .header-right{margin-left:auto;display:flex;align-items:center;gap:8px;flex-shrink:0}
 
     /* ボタン */
@@ -52,7 +52,7 @@
     table{width:100%;border-collapse:collapse}
     th{background:#F5F1EB;padding:10px 14px;text-align:left;font-size:12px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);white-space:nowrap}
     td{padding:11px 14px;border-bottom:1px solid #F0EDE8;vertical-align:top}
-    tr:last-child td{border-bottom:none} tr:hover td{background:#FAFAF8}
+    tr:last-child td{border-bottom:none}tr:hover td{background:#FAFAF8}
     .empty{text-align:center;padding:2.5rem;color:var(--muted)}
 
     /* バッジ */
@@ -65,6 +65,8 @@
     .badge-stage{background:#F0EDE8;color:var(--muted)}
     .badge-ok{background:var(--green-l);color:var(--green)}
     .badge-err{background:var(--red-l);color:var(--red)}
+    .badge-video{background:#FFF0F0;color:#901010}
+    .badge-novideo{background:#F0EDE8;color:var(--muted)}
 
     /* モーダル */
     .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
@@ -87,35 +89,63 @@
     .toggle-slider:before{content:'';position:absolute;width:18px;height:18px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
     .toggle input:checked+.toggle-slider{background:var(--green)}
     .toggle input:checked+.toggle-slider:before{transform:translateX(20px)}
-
-    /* 選択肢フォーム */
     .choices-form{display:flex;flex-direction:column;gap:8px}
     .choice-input-row{display:flex;align-items:center;gap:8px}
     .choice-prefix{width:28px;height:28px;border-radius:50%;background:var(--amber-l);color:var(--amber-d);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;flex-shrink:0}
     .correct-radio{display:flex;align-items:center;gap:4px;font-size:12px;color:var(--muted);flex-shrink:0;cursor:pointer}
 
+    /* ============================================================
+       動画管理ページ
+    ============================================================ */
+    .video-unit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .video-unit-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.1rem;box-shadow:var(--shadow)}
+    .vuc-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+    .vuc-icon{font-size:22px}
+    .vuc-name{font-size:14px;font-weight:700}
+    .vuc-subject{font-size:11px;color:var(--muted)}
+    .vuc-stages{display:flex;flex-direction:column;gap:6px}
+    .vuc-stage-row{display:flex;align-items:center;gap:8px}
+    .vuc-stage-label{font-size:12px;font-weight:700;color:var(--muted);width:80px;flex-shrink:0}
+    .vuc-stage-status{flex:1}
+    .vuc-edit-btn{padding:4px 10px;font-size:11px;font-weight:600;background:var(--amber-l);color:var(--amber-d);border:none;border-radius:6px;cursor:pointer;white-space:nowrap}
+    .vuc-edit-btn:hover{background:var(--amber-l);opacity:.8}
+
+    /* 動画URLモーダル */
+    .video-url-input{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:10px;font-size:13px;background:#fff;outline:none;font-family:monospace;margin-bottom:6px}
+    .video-url-input:focus{border-color:var(--amber)}
+    .video-preview{width:100%;aspect-ratio:16/9;border-radius:10px;border:none;margin-top:8px;background:#000;display:none}
+    .video-preview.active{display:block}
+    .url-hint{font-size:11px;color:var(--muted);margin-bottom:4px;line-height:1.6}
+    .url-hint code{background:#F0EDE8;padding:1px 4px;border-radius:4px}
+    .stage-section{margin-bottom:1.25rem;padding-bottom:1.25rem;border-bottom:1px solid #F0EDE8}
+    .stage-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+    .stage-section-title{font-size:14px;font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:6px}
+    .btn-preview-video{padding:6px 12px;font-size:12px;font-weight:600;background:var(--red-l);color:#901010;border:none;border-radius:8px;cursor:pointer;margin-top:4px}
+    .btn-preview-video:hover{opacity:.85}
+    .btn-clear-url{padding:6px 12px;font-size:12px;font-weight:600;background:#F0EDE8;color:var(--muted);border:none;border-radius:8px;cursor:pointer;margin-top:4px;margin-left:6px}
+
     /* インポート */
     .import-step{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.5rem;margin-bottom:1rem;box-shadow:var(--shadow)}
     .import-step-header{display:flex;align-items:center;gap:10px;margin-bottom:1rem}
     .step-num{width:28px;height:28px;border-radius:50%;background:var(--amber);color:#3D2000;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-    .step-title{font-size:15px;font-weight:700} .step-sub{font-size:12px;color:var(--muted);margin-top:2px}
+    .step-title{font-size:15px;font-weight:700}.step-sub{font-size:12px;color:var(--muted);margin-top:2px}
     .template-info{background:#F5F1EB;border-radius:10px;padding:12px 14px;margin-bottom:1rem;font-size:12px;line-height:1.8;color:var(--muted)}
-    .template-info b{color:var(--text)} .template-info code{background:#E8E0D0;padding:1px 4px;border-radius:4px;font-size:11px}
+    .template-info b{color:var(--text)}.template-info code{background:#E8E0D0;padding:1px 4px;border-radius:4px;font-size:11px}
     .unit-ref{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:8px}
     .unit-ref-item{background:#fff;border:1px solid var(--border);border-radius:8px;padding:6px 8px;font-size:11px;text-align:center}
-    .unit-ref-id{font-weight:700;color:var(--amber-d);font-family:monospace} .unit-ref-name{color:var(--muted);margin-top:2px}
+    .unit-ref-id{font-weight:700;color:var(--amber-d);font-family:monospace}.unit-ref-name{color:var(--muted);margin-top:2px}
     .drop-zone{border:2.5px dashed var(--border);border-radius:14px;padding:2rem;text-align:center;cursor:pointer;transition:border-color .2s,background .2s}
-    .drop-zone:hover,.drop-zone.drag-over{border-color:var(--amber);background:var(--amber-ll)}
-    .drop-icon{font-size:40px;margin-bottom:8px} .drop-label{font-size:14px;font-weight:700;margin-bottom:4px} .drop-sub{font-size:12px;color:var(--muted)} .drop-filename{font-size:13px;color:var(--green);font-weight:700;margin-top:8px}
+    .drop-zone:hover,.drop-zone.drag-over{border-color:var(--amber);background:#FFF8EC}
+    .drop-icon{font-size:40px;margin-bottom:8px}.drop-label{font-size:14px;font-weight:700;margin-bottom:4px}.drop-sub{font-size:12px;color:var(--muted)}.drop-filename{font-size:13px;color:var(--green);font-weight:700;margin-top:8px}
     .drop-input{display:none}
     .preview-summary{display:flex;gap:10px;margin-bottom:1rem;flex-wrap:wrap}
     .preview-count{padding:6px 14px;border-radius:20px;font-size:13px;font-weight:700}
-    .preview-count.ok{background:var(--green-l);color:var(--green)} .preview-count.err{background:var(--red-l);color:var(--red)}
+    .preview-count.ok{background:var(--green-l);color:var(--green)}.preview-count.err{background:var(--red-l);color:var(--red)}
     .preview-table-wrap{overflow-x:auto;max-height:320px;overflow-y:auto;border:1px solid var(--border);border-radius:12px}
     .preview-table{width:100%;border-collapse:collapse;min-width:600px}
     .preview-table th{background:#F5F1EB;padding:8px 12px;text-align:left;font-size:11px;font-weight:700;color:var(--muted);border-bottom:1px solid var(--border);position:sticky;top:0}
     .preview-table td{padding:8px 12px;border-bottom:1px solid #F5F1EB;font-size:12px;vertical-align:top}
-    .preview-table tr.row-err td{background:#FFF5F5} .err-msg{color:var(--red);font-size:11px;margin-top:2px}
+    .preview-table tr.row-err td{background:#FFF5F5}.err-msg{color:var(--red);font-size:11px;margin-top:2px}
     .progress-wrap{margin-top:1rem}
     .progress-bar{height:10px;background:#EEE;border-radius:5px;overflow:hidden;margin-bottom:6px}
     .progress-fill{height:100%;background:var(--green);border-radius:5px;transition:width .3s}
@@ -124,7 +154,7 @@
     /* ログイン */
     .login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh}
     .login-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:2.5rem 2rem;width:100%;max-width:360px;text-align:center;box-shadow:var(--shadow)}
-    .login-logo{font-size:44px;margin-bottom:8px} .login-title{font-size:20px;font-weight:700;margin-bottom:4px} .login-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
+    .login-logo{font-size:44px;margin-bottom:8px}.login-title{font-size:20px;font-weight:700;margin-bottom:4px}.login-sub{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
     .login-input{width:100%;padding:11px;font-size:15px;border:1.5px solid var(--border);border-radius:10px;margin-bottom:10px;outline:none;font-family:inherit}
     .login-input:focus{border-color:var(--amber)}
     .login-btn{width:100%;padding:13px;font-size:15px;font-weight:700;background:var(--amber);color:#3D2000;border:none;border-radius:12px;cursor:pointer;box-shadow:0 3px 0 var(--amber-d)}
@@ -162,6 +192,7 @@
       <div class="sidebar-section">問題管理</div>
       <div class="nav-item active" data-page="problems"><span class="nav-icon">✏️</span>問題一覧</div>
       <div class="nav-item" data-page="import"><span class="nav-icon">📥</span>一括インポート</div>
+      <div class="nav-item" data-page="videos"><span class="nav-icon">🎬</span>動画URL管理</div>
       <div class="sidebar-section">ダッシュボード</div>
       <a class="nav-item" href="./dashboard.html"><span class="nav-icon">📊</span>クラス概要</a>
       <div style="margin-top:auto">
@@ -177,19 +208,19 @@
         <div class="page-header">
           <div><div class="page-title">✏️ 問題一覧</div><div class="page-sub">科目・単元・ステージで絞り込めます</div></div>
           <div class="header-right">
-            <select id="filterSubject" class="form-select" style="width:120px">
+            <select id="filterSubject" class="form-select" style="width:110px">
               <option value="">すべての科目</option>
               <option value="math">🔢 算数</option>
               <option value="japanese">📝 国語</option>
               <option value="science">🔬 理科</option>
             </select>
-            <select id="filterUnit" class="form-select" style="width:160px">
+            <select id="filterUnit" class="form-select" style="width:155px">
               <option value="">すべての単元</option>
               <optgroup label="🔢 算数">
-                <option value="add">たし算の筆算</option><option value="sub">ひき算の筆算</option>
+                <option value="add">たし算</option><option value="sub">ひき算</option>
                 <option value="num">1000までの数</option><option value="len">長さ</option>
                 <option value="vol">かさ</option><option value="time">時こくと時間</option>
-                <option value="mul">かけ算（九九）</option><option value="shape">三角形と四角形</option>
+                <option value="mul">かけ算</option><option value="shape">図形</option>
               </optgroup>
               <optgroup label="📝 国語">
                 <option value="kanji2">かん字</option><option value="reading2">よむこと</option>
@@ -200,7 +231,7 @@
                 <option value="kage3">日光とかげ</option><option value="jishaku3">じしゃく</option>
               </optgroup>
             </select>
-            <select id="filterStage" class="form-select" style="width:130px">
+            <select id="filterStage" class="form-select" style="width:110px">
               <option value="">すべてのST</option>
               <option value="1">🌱 ST1</option><option value="2">🌿 ST2</option><option value="3">🌟 ST3</option>
             </select>
@@ -210,12 +241,24 @@
         <div id="problemList"><div class="loading"><div class="spinner"></div><div>よみこみ中…</div></div></div>
       </div>
 
+      <!-- 動画URL管理 -->
+      <div id="page-videos" class="page">
+        <div class="page-header">
+          <div>
+            <div class="page-title">🎬 動画URL管理</div>
+            <div class="page-sub">各ステージの説明動画（YouTube）を登録できます</div>
+          </div>
+        </div>
+        <div class="video-unit-grid" id="videoUnitGrid">
+          <div class="loading"><div class="spinner"></div><div>よみこみ中…</div></div>
+        </div>
+      </div>
+
       <!-- 一括インポート -->
       <div id="page-import" class="page">
         <div class="page-header">
           <div><div class="page-title">📥 一括インポート</div><div class="page-sub">スプレッドシートから問題をまとめて登録できます</div></div>
         </div>
-
         <div class="import-step">
           <div class="import-step-header">
             <div class="step-num">1</div>
@@ -224,10 +267,9 @@
           </div>
           <div class="template-info">
             <b>列の説明：</b><br>
-            <b>科目ID</b>：<code>math</code>（算数）/<code>japanese</code>（国語）/<code>science</code>（理科）<br>
-            <b>単元ID</b>：下の表を参照　<b>ステージ</b>：1・2・3　<b>問題タイプ</b>：<code>number</code>（数字入力）/<code>choice</code>（選択肢）<br>
-            <b>答え</b>：numberは数字、choiceは正解の選択肢番号（0〜3）<br>
-            <b>選択肢A〜D</b>：choiceのときのみ記入（例：あ）東京）
+            <b>科目ID</b>：<code>math</code>/<code>japanese</code>/<code>science</code>　<b>単元ID</b>：下の表を参照　<b>ステージ</b>：1〜3<br>
+            <b>問題タイプ</b>：<code>number</code>（数字入力）/<code>choice</code>（選択肢）　<b>答え</b>：numberは数字、choiceは0〜3<br>
+            <b>選択肢A〜D</b>：choiceのときのみ記入
             <div class="unit-ref">
               <div class="unit-ref-item"><div class="unit-ref-id">add</div><div class="unit-ref-name">たし算</div></div>
               <div class="unit-ref-item"><div class="unit-ref-id">sub</div><div class="unit-ref-name">ひき算</div></div>
@@ -248,7 +290,6 @@
             </div>
           </div>
         </div>
-
         <div class="import-step">
           <div class="import-step-header">
             <div class="step-num">2</div>
@@ -262,11 +303,10 @@
             <input type="file" id="fileInput" class="drop-input" accept=".csv,.xlsx,.xls"/>
           </div>
         </div>
-
         <div class="import-step" id="previewStep" style="display:none">
           <div class="import-step-header">
             <div class="step-num">3</div>
-            <div><div class="step-title">確認してインポート</div><div class="step-sub">赤い行はエラーです。修正して再アップロードしてください</div></div>
+            <div><div class="step-title">確認してインポート</div><div class="step-sub">赤い行はエラーです</div></div>
           </div>
           <div class="preview-summary" id="previewSummary"></div>
           <div class="preview-table-wrap">
@@ -295,8 +335,6 @@
 <div id="modal" class="modal-overlay">
   <div class="modal">
     <div class="modal-title" id="modalTitle">問題を追加</div>
-
-    <!-- 科目・単元・ステージ -->
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">科目</label>
@@ -309,40 +347,35 @@
       <div class="form-group">
         <label class="form-label">ステージ</label>
         <select id="f_stageId" class="form-select">
-          <option value="1">🌱 ステージ1「きほん」</option>
-          <option value="2">🌿 ステージ2「れんしゅう」</option>
-          <option value="3">🌟 ステージ3「チャレンジ」</option>
+          <option value="1">🌱 ステージ1</option>
+          <option value="2">🌿 ステージ2</option>
+          <option value="3">🌟 ステージ3</option>
         </select>
       </div>
     </div>
-
     <div class="form-group">
       <label class="form-label">単元</label>
       <select id="f_unitId" class="form-select">
-        <optgroup label="🔢 算数" id="og_math">
+        <optgroup label="🔢 算数">
           <option value="add">たし算の筆算</option><option value="sub">ひき算の筆算</option>
           <option value="num">1000までの数</option><option value="len">長さ</option>
           <option value="vol">かさ</option><option value="time">時こくと時間</option>
           <option value="mul">かけ算（九九）</option><option value="shape">三角形と四角形</option>
         </optgroup>
-        <optgroup label="📝 国語" id="og_japanese">
+        <optgroup label="📝 国語">
           <option value="kanji2">かん字</option><option value="reading2">よむこと</option>
           <option value="kotoba2">ことば</option><option value="bunpo2">文のしくみ</option>
         </optgroup>
-        <optgroup label="🔬 理科" id="og_science">
+        <optgroup label="🔬 理科">
           <option value="shizen3">しぜんのかんさつ</option><option value="konchu3">こん虫</option>
           <option value="kage3">日光とかげ</option><option value="jishaku3">じしゃく</option>
         </optgroup>
       </select>
     </div>
-
-    <!-- 問題文 -->
     <div class="form-group">
       <label class="form-label">問題文</label>
       <textarea id="f_question" class="form-textarea" placeholder="例: 23 ＋ 47 は いくつですか？"></textarea>
     </div>
-
-    <!-- 問題タイプ -->
     <div class="form-row">
       <div class="form-group">
         <label class="form-label">問題タイプ</label>
@@ -356,63 +389,36 @@
         <input id="f_answer" class="form-input" type="number" placeholder="例: 70"/>
       </div>
     </div>
-
-    <!-- 筆算フィールド（numberかつcalcのとき） -->
     <div class="form-group">
       <label class="form-label">表示タイプ</label>
       <select id="f_displayType" class="form-select">
         <option value="text">テキストのみ</option>
-        <option value="calc">筆算形式で表示（算数のとき）</option>
+        <option value="calc">筆算形式（算数のとき）</option>
       </select>
     </div>
     <div class="field-box" id="calcFields" style="display:none">
       <div class="field-box-label">筆算の設定</div>
       <div class="form-row3">
-        <div class="form-group" style="margin:0"><label class="form-label">左の数</label><input id="f_displayLeft" class="form-input" type="number" placeholder="例: 23"/></div>
+        <div class="form-group" style="margin:0"><label class="form-label">左の数</label><input id="f_displayLeft" class="form-input" type="number"/></div>
         <div class="form-group" style="margin:0"><label class="form-label">演算子</label><select id="f_displayOp" class="form-select"><option value="+">＋</option><option value="−">－</option></select></div>
-        <div class="form-group" style="margin:0"><label class="form-label">右の数</label><input id="f_displayRight" class="form-input" type="number" placeholder="例: 47"/></div>
+        <div class="form-group" style="margin:0"><label class="form-label">右の数</label><input id="f_displayRight" class="form-input" type="number"/></div>
       </div>
     </div>
-
-    <!-- 選択肢フィールド（choiceのとき） -->
     <div class="field-box" id="choiceFields" style="display:none">
-      <div class="field-box-label">選択肢の設定（正解にチェックを入れてください）</div>
+      <div class="field-box-label">選択肢（正解にチェック）</div>
       <div class="choices-form">
-        <div class="choice-input-row">
-          <div class="choice-prefix">あ</div>
-          <input id="c0" class="form-input" placeholder="選択肢1" style="flex:1"/>
-          <label class="correct-radio"><input type="radio" name="correct" value="0" id="r0"/> 正解</label>
-        </div>
-        <div class="choice-input-row">
-          <div class="choice-prefix">い</div>
-          <input id="c1" class="form-input" placeholder="選択肢2" style="flex:1"/>
-          <label class="correct-radio"><input type="radio" name="correct" value="1" id="r1"/> 正解</label>
-        </div>
-        <div class="choice-input-row">
-          <div class="choice-prefix">う</div>
-          <input id="c2" class="form-input" placeholder="選択肢3" style="flex:1"/>
-          <label class="correct-radio"><input type="radio" name="correct" value="2" id="r2"/> 正解</label>
-        </div>
-        <div class="choice-input-row">
-          <div class="choice-prefix">え</div>
-          <input id="c3" class="form-input" placeholder="選択肢4" style="flex:1"/>
-          <label class="correct-radio"><input type="radio" name="correct" value="3" id="r3"/> 正解</label>
-        </div>
+        <div class="choice-input-row"><div class="choice-prefix">あ</div><input id="c0" class="form-input" placeholder="選択肢1" style="flex:1"/><label class="correct-radio"><input type="radio" name="correct" value="0"/> 正解</label></div>
+        <div class="choice-input-row"><div class="choice-prefix">い</div><input id="c1" class="form-input" placeholder="選択肢2" style="flex:1"/><label class="correct-radio"><input type="radio" name="correct" value="1"/> 正解</label></div>
+        <div class="choice-input-row"><div class="choice-prefix">う</div><input id="c2" class="form-input" placeholder="選択肢3" style="flex:1"/><label class="correct-radio"><input type="radio" name="correct" value="2"/> 正解</label></div>
+        <div class="choice-input-row"><div class="choice-prefix">え</div><input id="c3" class="form-input" placeholder="選択肢4" style="flex:1"/><label class="correct-radio"><input type="radio" name="correct" value="3"/> 正解</label></div>
       </div>
     </div>
-
-    <div class="form-group">
-      <label class="form-label">ヒント</label>
-      <input id="f_hint" class="form-input" type="text" placeholder="例: 一の位から計算しよう"/>
-    </div>
-    <div class="form-group">
-      <label class="form-label">解説</label>
-      <input id="f_explanation" class="form-input" type="text" placeholder="例: 3＋7＝10、くり上がりに注意！"/>
-    </div>
+    <div class="form-group"><label class="form-label">ヒント</label><input id="f_hint" class="form-input" type="text"/></div>
+    <div class="form-group"><label class="form-label">解説</label><input id="f_explanation" class="form-input" type="text"/></div>
     <div class="form-group">
       <div class="toggle-row">
         <label class="toggle"><input type="checkbox" id="f_isPublished" checked/><span class="toggle-slider"></span></label>
-        <span style="font-size:13px">公開する（子どもの画面に表示される）</span>
+        <span style="font-size:13px">公開する</span>
       </div>
     </div>
     <button class="btn btn-save" id="saveBtn">保存する</button>
@@ -420,47 +426,54 @@
   </div>
 </div>
 
+<!-- 動画URL編集モーダル -->
+<div id="videoModal" class="modal-overlay">
+  <div class="modal">
+    <div class="modal-title" id="videoModalTitle">動画URLを設定</div>
+    <div id="videoModalContent"></div>
+    <button class="btn btn-save" id="videoSaveBtn">保存する</button>
+    <button class="btn btn-cancel" id="videoCancelBtn">キャンセル</button>
+  </div>
+</div>
+
 <div class="snack" id="snack"></div>
 
 <script type="module">
-import { auth, signInTeacher, signOutUser, getAllProblems, addProblem, updateProblem, deleteProblem } from "../firebase.js";
+import {
+  auth, signInTeacher, signOutUser,
+  getAllProblems, addProblem, updateProblem, deleteProblem,
+  getAllUnitVideos, saveUnitVideos, toYouTubeEmbedUrl
+} from "../firebase.js";
 
 /* ============================================================
    定数
 ============================================================ */
-const SUBJECT_NAMES = { math:'算数', japanese:'国語', science:'理科' };
-const SUBJECT_BADGE = { math:'badge-math', japanese:'badge-japanese', science:'badge-science' };
-const UNIT_NAMES = {
+const SUBJECT_NAMES={math:'算数',japanese:'国語',science:'理科'};
+const SUBJECT_BADGE={math:'badge-math',japanese:'badge-japanese',science:'badge-science'};
+const UNIT_NAMES={
   add:'たし算の筆算',sub:'ひき算の筆算',num:'1000までの数',len:'長さ',
   vol:'かさ',time:'時こくと時間',mul:'かけ算（九九）',shape:'三角形と四角形',
   kanji2:'かん字',reading2:'よむこと',kotoba2:'ことば',bunpo2:'文のしくみ',
   shizen3:'しぜんのかんさつ',konchu3:'こん虫',kage3:'日光とかげ',jishaku3:'じしゃく',
 };
-const VALID_UNITS = Object.keys(UNIT_NAMES);
-const VALID_SUBJECTS = ['math','japanese','science'];
-
-/* CSVマッピング */
-const COL_MAP = {
-  '科目id':'subjectId','科目':'subjectId','subjectid':'subjectId',
-  '単元id':'unitId','単元':'unitId','unitid':'unitId',
-  'ステージ':'stageId','stageid':'stageId',
-  '問題文':'question','question':'question',
-  '問題タイプ':'questionType','questiontype':'questionType',
-  '答え':'answer','answer':'answer',
-  '選択肢a':'choiceA','choicea':'choiceA',
-  '選択肢b':'choiceB','choiceb':'choiceB',
-  '選択肢c':'choiceC','choicec':'choiceC',
-  '選択肢d':'choiceD','choiced':'choiceD',
-  'ヒント':'hint','hint':'hint',
-  '解説':'explanation','explanation':'explanation',
-  '表示タイプ':'displayType','displaytype':'displayType',
-  '筆算（左）':'displayLeft','displayleft':'displayLeft',
-  '演算子':'displayOp','displayop':'displayOp',
-  '筆算（右）':'displayRight','displayright':'displayRight',
-  '公開':'isPublished','ispublished':'isPublished',
+const UNIT_ICONS={
+  add:'➕',sub:'➖',num:'🔢',len:'📏',vol:'🫙',time:'⏰',mul:'✖️',shape:'🔷',
+  kanji2:'🔤',reading2:'📖',kotoba2:'💬',bunpo2:'✍️',
+  shizen3:'🌱',konchu3:'🐛',kage3:'☀️',jishaku3:'🧲',
 };
+const UNIT_SUBJECT={
+  add:'math',sub:'math',num:'math',len:'math',vol:'math',time:'math',mul:'math',shape:'math',
+  kanji2:'japanese',reading2:'japanese',kotoba2:'japanese',bunpo2:'japanese',
+  shizen3:'science',konchu3:'science',kage3:'science',jishaku3:'science',
+};
+const ALL_UNIT_IDS=Object.keys(UNIT_NAMES);
+const STAGE_ICONS={1:'🌱',2:'🌿',3:'🌟'};
+const STAGE_NAMES={1:'きほん',2:'れんしゅう',3:'チャレンジ'};
+const VALID_UNITS=ALL_UNIT_IDS;
+const VALID_SUBJECTS=['math','japanese','science'];
+const COL_MAP={'科目id':'subjectId','科目':'subjectId','subjectid':'subjectId','単元id':'unitId','単元':'unitId','unitid':'unitId','ステージ':'stageId','stageid':'stageId','問題文':'question','question':'question','問題タイプ':'questionType','questiontype':'questionType','答え':'answer','answer':'answer','選択肢a':'choiceA','choicea':'choiceA','選択肢b':'choiceB','choiceb':'choiceB','選択肢c':'choiceC','choicec':'choiceC','選択肢d':'choiceD','choiced':'choiceD','ヒント':'hint','hint':'hint','解説':'explanation','explanation':'explanation','表示タイプ':'displayType','displaytype':'displayType','筆算（左）':'displayLeft','displayleft':'displayLeft','演算子':'displayOp','displayop':'displayOp','筆算（右）':'displayRight','displayright':'displayRight','公開':'isPublished','ispublished':'isPublished'};
 
-let allProblems=[], editingId=null, parsedRows=[];
+let allProblems=[],editingId=null,parsedRows=[],allVideos={},editingVideoUnitId=null;
 
 function snack(msg,err=false){const el=document.getElementById('snack');el.textContent=msg;el.style.background=err?'#E24B4A':'#1A1208';el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2500);}
 
@@ -478,16 +491,14 @@ document.getElementById('loginBtn').addEventListener('click',async()=>{
   document.getElementById('teacherEmail').textContent=user.email;
   document.getElementById('loginPage').style.display='none';
   document.getElementById('adminPage').style.display='block';
-  await loadProblems();
+  await Promise.all([loadProblems(), loadVideos()]);
 });
 document.getElementById('passwordInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('loginBtn').click();});
 document.getElementById('logoutBtn').addEventListener('click',async()=>{
   await signOutUser();
   document.getElementById('adminPage').style.display='none';
   document.getElementById('loginPage').style.display='block';
-  document.getElementById('emailInput').value='';
-  document.getElementById('passwordInput').value='';
-  document.getElementById('loginErr').textContent='';
+  document.getElementById('emailInput').value='';document.getElementById('passwordInput').value='';document.getElementById('loginErr').textContent='';
 });
 
 /* ============================================================
@@ -507,68 +518,47 @@ document.querySelectorAll('.nav-item[data-page]').forEach(el=>{
 ============================================================ */
 async function loadProblems(){
   document.getElementById('problemList').innerHTML='<div class="loading"><div class="spinner"></div><div>よみこみ中…</div></div>';
-  allProblems=await getAllProblems();
-  renderTable();
+  allProblems=await getAllProblems();renderTable();
 }
-
 function getFiltered(){
-  const subject=document.getElementById('filterSubject').value;
-  const unit=document.getElementById('filterUnit').value;
-  const stage=document.getElementById('filterStage').value;
+  const s=document.getElementById('filterSubject').value;
+  const u=document.getElementById('filterUnit').value;
+  const st=document.getElementById('filterStage').value;
   return allProblems.filter(p=>{
-    if(subject&&p.subjectId!==subject)return false;
-    if(unit&&p.unitId!==unit)return false;
-    if(stage&&String(p.stageId)!==stage)return false;
+    if(s&&p.subjectId!==s)return false;
+    if(u&&p.unitId!==u)return false;
+    if(st&&String(p.stageId)!==st)return false;
     return true;
   });
 }
-
 function renderTable(){
   const list=getFiltered();
-  if(list.length===0){
-    document.getElementById('problemList').innerHTML='<div class="table-wrap"><div class="empty">問題がありません。「＋ 問題を追加」または「一括インポート」で追加してください。</div></div>';
-    return;
-  }
-  document.getElementById('problemList').innerHTML=`<div class="table-wrap"><table>
-    <thead><tr><th>科目</th><th>問題文</th><th>タイプ</th><th>単元/ST</th><th>答え</th><th>公開</th><th>操作</th></tr></thead>
-    <tbody id="tbody"></tbody></table></div>`;
+  if(!list.length){document.getElementById('problemList').innerHTML='<div class="table-wrap"><div class="empty">問題がありません。「＋ 問題を追加」または「一括インポート」で追加してください。</div></div>';return;}
+  document.getElementById('problemList').innerHTML=`<div class="table-wrap"><table><thead><tr><th>科目</th><th>問題文</th><th>タイプ</th><th>単元/ST</th><th>答え</th><th>公開</th><th>操作</th></tr></thead><tbody id="tbody"></tbody></table></div>`;
   const tbody=document.getElementById('tbody');
   list.forEach(p=>{
     const tr=document.createElement('tr');
     const isChoice=p.questionType==='choice';
-    const ansLabel=isChoice&&p.choices?`選択肢${p.answer}番`:`${p.answer}`;
-    tr.innerHTML=`
-      <td><span class="badge ${SUBJECT_BADGE[p.subjectId]||'badge-stage'}">${SUBJECT_NAMES[p.subjectId]||p.subjectId}</span></td>
-      <td><div style="font-weight:600;margin-bottom:3px;max-width:200px">${p.question||'—'}</div>
-          ${isChoice&&p.choices?`<div style="font-size:11px;color:var(--muted)">${p.choices.slice(0,2).join(' / ')}…</div>`:''}
-          <div style="font-size:11px;color:var(--muted)">ヒント：${p.hint||'—'}</div></td>
+    tr.innerHTML=`<td><span class="badge ${SUBJECT_BADGE[p.subjectId]||'badge-stage'}">${SUBJECT_NAMES[p.subjectId]||p.subjectId}</span></td>
+      <td><div style="font-weight:600;max-width:200px">${p.question||'—'}</div>${isChoice&&p.choices?`<div style="font-size:11px;color:var(--muted)">${p.choices.slice(0,2).join(' / ')}…</div>`:''}<div style="font-size:11px;color:var(--muted)">ヒント：${p.hint||'—'}</div></td>
       <td><span class="badge badge-stage">${isChoice?'選択肢':'数字'}</span></td>
-      <td><div style="font-size:12px">${UNIT_NAMES[p.unitId]||p.unitId}</div>
-          <div style="font-size:11px;color:var(--muted)">ST${p.stageId}</div></td>
-      <td><strong>${ansLabel}</strong></td>
+      <td><div style="font-size:12px">${UNIT_NAMES[p.unitId]||p.unitId}</div><div style="font-size:11px;color:var(--muted)">ST${p.stageId}</div></td>
+      <td><strong>${isChoice&&p.choices?`${p.choices[p.answer]||p.answer}`:p.answer}</strong></td>
       <td><span class="badge ${p.isPublished?'badge-pub':'badge-draft'}">${p.isPublished?'公開中':'非公開'}</span></td>
-      <td style="white-space:nowrap">
-        <button class="btn btn-edit" data-id="${p.id}">編集</button>
-        <button class="btn btn-del"  data-id="${p.id}" style="margin-left:6px">削除</button>
-      </td>`;
+      <td style="white-space:nowrap"><button class="btn btn-edit" data-id="${p.id}">編集</button><button class="btn btn-del" data-id="${p.id}" style="margin-left:6px">削除</button></td>`;
     tbody.appendChild(tr);
   });
   tbody.querySelectorAll('.btn-edit').forEach(b=>b.addEventListener('click',()=>openModal(b.dataset.id)));
-  tbody.querySelectorAll('.btn-del' ).forEach(b=>b.addEventListener('click',()=>handleDelete(b.dataset.id)));
+  tbody.querySelectorAll('.btn-del').forEach(b=>b.addEventListener('click',()=>handleDelete(b.dataset.id)));
 }
-
-['filterSubject','filterUnit','filterStage'].forEach(id=>{
-  document.getElementById(id).addEventListener('change',renderTable);
-});
+['filterSubject','filterUnit','filterStage'].forEach(id=>{document.getElementById(id).addEventListener('change',renderTable);});
 
 /* ============================================================
-   モーダル
+   問題モーダル
 ============================================================ */
 document.getElementById('addBtn').addEventListener('click',()=>openModal(null));
 document.getElementById('cancelBtn').addEventListener('click',closeModal);
 document.getElementById('modal').addEventListener('click',e=>{if(e.target===document.getElementById('modal'))closeModal();});
-
-/* 問題タイプ切替 */
 document.getElementById('f_questionType').addEventListener('change',function(){
   const isChoice=this.value==='choice';
   document.getElementById('choiceFields').style.display=isChoice?'block':'none';
@@ -576,48 +566,19 @@ document.getElementById('f_questionType').addEventListener('change',function(){
   document.getElementById('f_displayType').closest('.form-group').style.display=isChoice?'none':'block';
   document.getElementById('calcFields').style.display='none';
 });
-document.getElementById('f_displayType').addEventListener('change',function(){
-  document.getElementById('calcFields').style.display=this.value==='calc'?'block':'none';
-});
+document.getElementById('f_displayType').addEventListener('change',function(){document.getElementById('calcFields').style.display=this.value==='calc'?'block':'none';});
 
 function openModal(id){
-  editingId=id;
-  document.getElementById('modalTitle').textContent=id?'問題を編集':'問題を追加';
+  editingId=id;document.getElementById('modalTitle').textContent=id?'問題を編集':'問題を追加';
   if(id){
     const p=allProblems.find(p=>p.id===id);if(!p)return;
-    document.getElementById('f_subjectId').value     =p.subjectId    ||'math';
-    document.getElementById('f_unitId').value        =p.unitId       ||'add';
-    document.getElementById('f_stageId').value       =p.stageId      ||1;
-    document.getElementById('f_question').value      =p.question     ||'';
-    document.getElementById('f_questionType').value  =p.questionType ||'number';
-    document.getElementById('f_answer').value        =p.answer       ||'';
-    document.getElementById('f_displayType').value   =p.displayType  ||'text';
-    document.getElementById('f_displayLeft').value   =p.displayLeft  ||'';
-    document.getElementById('f_displayOp').value     =p.displayOp    ||'+';
-    document.getElementById('f_displayRight').value  =p.displayRight ||'';
-    document.getElementById('f_hint').value          =p.hint         ||'';
-    document.getElementById('f_explanation').value   =p.explanation  ||'';
-    document.getElementById('f_isPublished').checked =p.isPublished!==false;
-    if(p.questionType==='choice'&&p.choices){
-      p.choices.forEach((c,i)=>{document.getElementById(`c${i}`).value=c;});
-      const r=document.getElementById(`r${p.answer}`);if(r)r.checked=true;
-    }
-    const isChoice=p.questionType==='choice';
-    document.getElementById('choiceFields').style.display=isChoice?'block':'none';
-    document.getElementById('answerGroup').style.display=isChoice?'none':'block';
-    document.getElementById('calcFields').style.display=p.displayType==='calc'?'block':'none';
+    document.getElementById('f_subjectId').value=p.subjectId||'math';document.getElementById('f_unitId').value=p.unitId||'add';document.getElementById('f_stageId').value=p.stageId||1;document.getElementById('f_question').value=p.question||'';document.getElementById('f_questionType').value=p.questionType||'number';document.getElementById('f_answer').value=p.answer||'';document.getElementById('f_displayType').value=p.displayType||'text';document.getElementById('f_displayLeft').value=p.displayLeft||'';document.getElementById('f_displayOp').value=p.displayOp||'+';document.getElementById('f_displayRight').value=p.displayRight||'';document.getElementById('f_hint').value=p.hint||'';document.getElementById('f_explanation').value=p.explanation||'';document.getElementById('f_isPublished').checked=p.isPublished!==false;
+    if(p.questionType==='choice'&&p.choices){p.choices.forEach((c,i)=>{document.getElementById(`c${i}`).value=c;});const r=document.getElementById(`r${p.answer}`);if(r)r.checked=true;}
+    const isChoice=p.questionType==='choice';document.getElementById('choiceFields').style.display=isChoice?'block':'none';document.getElementById('answerGroup').style.display=isChoice?'none':'block';document.getElementById('calcFields').style.display=p.displayType==='calc'?'block':'none';
   } else {
     ['f_question','f_answer','f_displayLeft','f_displayRight','f_hint','f_explanation','c0','c1','c2','c3'].forEach(i=>document.getElementById(i).value='');
     document.querySelectorAll('input[name="correct"]').forEach(r=>r.checked=false);
-    document.getElementById('f_subjectId').value='math';
-    document.getElementById('f_unitId').value='add';
-    document.getElementById('f_stageId').value='1';
-    document.getElementById('f_questionType').value='number';
-    document.getElementById('f_displayType').value='text';
-    document.getElementById('f_isPublished').checked=true;
-    document.getElementById('choiceFields').style.display='none';
-    document.getElementById('answerGroup').style.display='block';
-    document.getElementById('calcFields').style.display='none';
+    document.getElementById('f_subjectId').value='math';document.getElementById('f_unitId').value='add';document.getElementById('f_stageId').value='1';document.getElementById('f_questionType').value='number';document.getElementById('f_displayType').value='text';document.getElementById('f_isPublished').checked=true;document.getElementById('choiceFields').style.display='none';document.getElementById('answerGroup').style.display='block';document.getElementById('calcFields').style.display='none';
   }
   document.getElementById('modal').classList.add('active');
 }
@@ -628,7 +589,6 @@ document.getElementById('saveBtn').addEventListener('click',async()=>{
   const questionType=document.getElementById('f_questionType').value;
   const displayType=document.getElementById('f_displayType').value;
   if(!question){snack('問題文を入力してください',true);return;}
-
   let answer,choices=null;
   if(questionType==='choice'){
     choices=[0,1,2,3].map(i=>document.getElementById(`c${i}`).value.trim());
@@ -639,40 +599,144 @@ document.getElementById('saveBtn').addEventListener('click',async()=>{
   } else {
     answer=parseInt(document.getElementById('f_answer').value);
     if(isNaN(answer)){snack('答えを数字で入力してください',true);return;}
-    if(displayType==='calc'&&(!document.getElementById('f_displayLeft').value||!document.getElementById('f_displayRight').value)){snack('筆算の数を入力してください',true);return;}
   }
-
-  const data={
-    subjectId:   document.getElementById('f_subjectId').value,
-    unitId:      document.getElementById('f_unitId').value,
-    gradeId:     'g2',
-    stageId:     parseInt(document.getElementById('f_stageId').value),
-    questionType,question,answer,choices,
-    displayType: questionType==='choice'?'text':displayType,
-    displayLeft: displayType==='calc'?parseInt(document.getElementById('f_displayLeft').value):null,
-    displayOp:   displayType==='calc'?document.getElementById('f_displayOp').value:null,
-    displayRight:displayType==='calc'?parseInt(document.getElementById('f_displayRight').value):null,
-    hint:        document.getElementById('f_hint').value.trim(),
-    explanation: document.getElementById('f_explanation').value.trim(),
-    isPublished: document.getElementById('f_isPublished').checked,
-  };
-
-  document.getElementById('saveBtn').textContent='保存中…';
-  document.getElementById('saveBtn').disabled=true;
+  const data={subjectId:document.getElementById('f_subjectId').value,unitId:document.getElementById('f_unitId').value,gradeId:'g2',stageId:parseInt(document.getElementById('f_stageId').value),questionType,question,answer,choices,displayType:questionType==='choice'?'text':displayType,displayLeft:displayType==='calc'?parseInt(document.getElementById('f_displayLeft').value):null,displayOp:displayType==='calc'?document.getElementById('f_displayOp').value:null,displayRight:displayType==='calc'?parseInt(document.getElementById('f_displayRight').value):null,hint:document.getElementById('f_hint').value.trim(),explanation:document.getElementById('f_explanation').value.trim(),isPublished:document.getElementById('f_isPublished').checked};
+  document.getElementById('saveBtn').textContent='保存中…';document.getElementById('saveBtn').disabled=true;
   const ok=editingId?await updateProblem(editingId,data):!!(await addProblem(data));
-  document.getElementById('saveBtn').textContent='保存する';
-  document.getElementById('saveBtn').disabled=false;
-  if(ok){snack(editingId?'問題を更新しました':'問題を追加しました');closeModal();await loadProblems();}
-  else snack('エラーが発生しました',true);
+  document.getElementById('saveBtn').textContent='保存する';document.getElementById('saveBtn').disabled=false;
+  if(ok){snack(editingId?'問題を更新しました':'問題を追加しました');closeModal();await loadProblems();}else snack('エラーが発生しました',true);
 });
 
 async function handleDelete(id){
   const p=allProblems.find(p=>p.id===id);if(!p)return;
   if(!confirm(`「${p.question}」を削除しますか？`))return;
   const ok=await deleteProblem(id);
-  if(ok){snack('削除しました');await loadProblems();}
-  else snack('削除に失敗しました',true);
+  if(ok){snack('削除しました');await loadProblems();}else snack('削除に失敗しました',true);
 }
+
+/* ============================================================
+   動画URL管理
+============================================================ */
+async function loadVideos(){
+  allVideos=await getAllUnitVideos();
+  renderVideoGrid();
+}
+
+function renderVideoGrid(){
+  const grid=document.getElementById('videoUnitGrid');
+  grid.innerHTML=ALL_UNIT_IDS.map(uid=>{
+    const vdata=allVideos[uid]||{};
+    const subject=UNIT_SUBJECT[uid];
+    const stageRows=[1,2,3].map(sid=>{
+      const url=vdata[`s${sid}`];
+      const hasvideo=!!url;
+      return`<div class="vuc-stage-row">
+        <div class="vuc-stage-label">${STAGE_ICONS[sid]} ST${sid}</div>
+        <div class="vuc-stage-status">
+          <span class="badge ${hasvideo?'badge-video':'badge-novideo'}">${hasvideo?'🎬 あり':'なし'}</span>
+        </div>
+      </div>`;
+    }).join('');
+    return`<div class="video-unit-card">
+      <div class="vuc-header">
+        <div class="vuc-icon">${UNIT_ICONS[uid]||'📚'}</div>
+        <div>
+          <div class="vuc-name">${UNIT_NAMES[uid]}</div>
+          <div class="vuc-subject">${SUBJECT_NAMES[subject]||subject}</div>
+        </div>
+        <button class="vuc-edit-btn" data-uid="${uid}" style="margin-left:auto">✏️ 編集</button>
+      </div>
+      <div class="vuc-stages">${stageRows}</div>
+    </div>`;
+  }).join('');
+
+  grid.querySelectorAll('.vuc-edit-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>openVideoModal(btn.dataset.uid));
+  });
+}
+
+function openVideoModal(unitId){
+  editingVideoUnitId=unitId;
+  const vdata=allVideos[unitId]||{};
+  document.getElementById('videoModalTitle').textContent=`🎬 ${UNIT_NAMES[unitId]} の動画URL設定`;
+
+  const content=[1,2,3].map(sid=>{
+    const url=vdata[`s${sid}`]||'';
+    return`<div class="stage-section">
+      <div class="stage-section-title">${STAGE_ICONS[sid]} ステージ${sid}「${STAGE_NAMES[sid]}」</div>
+      <div class="url-hint">
+        YouTubeのURLをそのまま貼り付けてください。<br>
+        例：<code>https://www.youtube.com/watch?v=XXXXXXX</code><br>
+        または：<code>https://youtu.be/XXXXXXX</code>
+      </div>
+      <input class="video-url-input" id="vurl_${sid}" type="url"
+             placeholder="https://www.youtube.com/watch?v=..." value="${url}"/>
+      <div>
+        <button class="btn-preview-video" data-sid="${sid}">▶ プレビュー</button>
+        <button class="btn-clear-url" data-sid="${sid}">✕ クリア</button>
+      </div>
+      <iframe class="video-preview" id="vprev_${sid}" src="" allowfullscreen></iframe>
+    </div>`;
+  }).join('');
+
+  document.getElementById('videoModalContent').innerHTML=content;
+
+  /* プレビューボタン */
+  document.querySelectorAll('.btn-preview-video').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const sid=btn.dataset.sid;
+      const url=document.getElementById(`vurl_${sid}`).value.trim();
+      const embed=toYouTubeEmbedUrl(url);
+      const iframe=document.getElementById(`vprev_${sid}`);
+      if(embed){iframe.src=embed;iframe.classList.add('active');}
+      else{snack('有効なYouTube URLを入力してください',true);}
+    });
+  });
+
+  /* クリアボタン */
+  document.querySelectorAll('.btn-clear-url').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const sid=btn.dataset.sid;
+      document.getElementById(`vurl_${sid}`).value='';
+      const iframe=document.getElementById(`vprev_${sid}`);
+      iframe.src='';iframe.classList.remove('active');
+    });
+  });
+
+  document.getElementById('videoModal').classList.add('active');
+}
+
+document.getElementById('videoCancelBtn').addEventListener('click',closeVideoModal);
+document.getElementById('videoModal').addEventListener('click',e=>{
+  if(e.target===document.getElementById('videoModal')){
+    /* iframeを停止してから閉じる */
+    [1,2,3].forEach(sid=>{const f=document.getElementById(`vprev_${sid}`);if(f){f.src='';f.classList.remove('active');}});
+    closeVideoModal();
+  }
+});
+function closeVideoModal(){document.getElementById('videoModal').classList.remove('active');editingVideoUnitId=null;}
+
+document.getElementById('videoSaveBtn').addEventListener('click',async()=>{
+  if(!editingVideoUnitId)return;
+  const urls={};
+  [1,2,3].forEach(sid=>{
+    const val=document.getElementById(`vurl_${sid}`)?.value.trim();
+    if(val)urls[`s${sid}`]=val;else urls[`s${sid}`]='';
+  });
+  document.getElementById('videoSaveBtn').textContent='保存中…';
+  document.getElementById('videoSaveBtn').disabled=true;
+  const ok=await saveUnitVideos(editingVideoUnitId,urls);
+  document.getElementById('videoSaveBtn').textContent='保存する';
+  document.getElementById('videoSaveBtn').disabled=false;
+  if(ok){
+    snack('動画URLを保存しました');
+    allVideos[editingVideoUnitId]={...urls};
+    renderVideoGrid();
+    closeVideoModal();
+  } else {
+    snack('保存に失敗しました',true);
+  }
+});
 
 /* ============================================================
    テンプレートダウンロード
@@ -680,11 +744,11 @@ async function handleDelete(id){
 document.getElementById('downloadTemplateBtn').addEventListener('click',()=>{
   const headers=['科目ID','単元ID','ステージ','問題文','問題タイプ','答え','選択肢A','選択肢B','選択肢C','選択肢D','ヒント','解説','表示タイプ','筆算（左）','演算子','筆算（右）','公開'];
   const examples=[
-    ['math','add','1','23 ＋ 47 は いくつですか？','number','70','','','','','一の位から計算しよう','3＋7＝10、くり上がりに注意！','calc','23','+','47','true'],
-    ['math','mul','1','3 × 4 は いくつですか？','number','12','','','','','3のだんを順番にとなえよう','3×4＝12だよ！','text','','','','true'],
-    ['japanese','kanji2','1','「山」のかきじゅんは なんかくですか？','number','3','','','','','かん字の形をよく見てみよう','山は3かくだよ！','text','','','','true'],
-    ['japanese','kotoba2','1','「うれしい」のはんたいのことばは？','choice','2','あ）たのしい','い）かなしい','う）かなしい','え）おもしろい','はんたいのことばを考えよう','うれしいのはんたいはかなしいだよ！','text','','','','true'],
-    ['science','konchu3','1','こん虫のあしは なんぼんありますか？','number','6','','','','','こん虫のからだをよく見てみよう','こん虫のあしは6本だよ！','text','','','','true'],
+    ['math','add','1','23 ＋ 47 は いくつですか？','number','70','','','','','一の位から計算しよう','くり上がりに注意！','calc','23','+','47','true'],
+    ['math','mul','1','3 × 4 は いくつですか？','number','12','','','','','3のだんをとなえよう','3×4＝12！','text','','','','true'],
+    ['japanese','kanji2','1','「山」のかきじゅんは なんかくですか？','number','3','','','','','かん字の形をよく見よう','山は3かくだよ！','text','','','','true'],
+    ['japanese','kotoba2','1','「うれしい」のはんたいのことばは？','choice','1','あ）たのしい','い）かなしい','う）おもしろい','え）すごい','はんたいのことばを考えよう','うれしいのはんたいはかなしいだよ！','text','','','','true'],
+    ['science','konchu3','1','こん虫のあしは なんぼんありますか？','number','6','','','','','からだをよく見よう','こん虫のあしは6本だよ！','text','','','','true'],
   ];
   const csv=[headers,...examples].map(r=>r.map(c=>`"${c}"`).join(',')).join('\r\n');
   const blob=new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
@@ -693,7 +757,7 @@ document.getElementById('downloadTemplateBtn').addEventListener('click',()=>{
 });
 
 /* ============================================================
-   ファイルアップロード
+   ファイルアップロード・インポート
 ============================================================ */
 const dropZone=document.getElementById('dropZone');
 const fileInput=document.getElementById('fileInput');
@@ -706,27 +770,15 @@ fileInput.addEventListener('change',()=>{const f=fileInput.files[0];if(f)handleF
 function handleFile(file){
   const ext=file.name.split('.').pop().toLowerCase();
   document.getElementById('dropFilename').textContent='📄 '+file.name;
-  if(ext==='csv'){
-    const reader=new FileReader();
-    reader.onload=e=>parseCSV(e.target.result);
-    reader.readAsText(file,'UTF-8');
-  } else if(ext==='xlsx'||ext==='xls'){
-    const reader=new FileReader();
-    reader.onload=e=>{const wb=XLSX.read(e.target.result,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];parseCSV(XLSX.utils.sheet_to_csv(ws));};
-    reader.readAsArrayBuffer(file);
-  } else {
-    snack('CSV または Excel ファイルを選択してください',true);
-  }
+  if(ext==='csv'){const reader=new FileReader();reader.onload=e=>parseCSV(e.target.result);reader.readAsText(file,'UTF-8');}
+  else if(ext==='xlsx'||ext==='xls'){const reader=new FileReader();reader.onload=e=>{const wb=XLSX.read(e.target.result,{type:'array'});const ws=wb.Sheets[wb.SheetNames[0]];parseCSV(XLSX.utils.sheet_to_csv(ws));};reader.readAsArrayBuffer(file);}
+  else snack('CSV または Excel ファイルを選択してください',true);
 }
 
 function parseCSV(csvText){
   const result=Papa.parse(csvText,{header:true,skipEmptyLines:true,trimHeaders:true});
   if(!result.data.length){snack('ファイルの読み込みに失敗しました',true);return;}
-  const normalized=result.data.map(row=>{
-    const nr={};
-    Object.entries(row).forEach(([k,v])=>{const mapped=COL_MAP[k.toLowerCase().trim()]||COL_MAP[k.trim()]||k;nr[mapped]=v?.toString().trim();});
-    return nr;
-  });
+  const normalized=result.data.map(row=>{const nr={};Object.entries(row).forEach(([k,v])=>{const mapped=COL_MAP[k.toLowerCase().trim()]||COL_MAP[k.trim()]||k;nr[mapped]=v?.toString().trim();});return nr;});
   parsedRows=normalized.map((row,i)=>validateRow(row,i+2));
   renderPreview();
 }
@@ -739,80 +791,38 @@ function validateRow(row,lineNum){
   const questionType=(row.questionType||'number').toLowerCase();
   const answer=parseInt(row.answer);
   const displayType=(row.displayType||'text').toLowerCase();
-  if(!VALID_SUBJECTS.includes(subjectId)) errors.push(`科目ID「${row.subjectId||''}」が無効`);
-  if(!VALID_UNITS.includes(unitId))       errors.push(`単元ID「${row.unitId||''}」が無効`);
-  if(![1,2,3].includes(stageId))          errors.push(`ステージは1・2・3のいずれか`);
-  if(!row.question)                        errors.push('問題文が空です');
-  if(questionType==='choice'){
-    if(![row.choiceA,row.choiceB,row.choiceC,row.choiceD].every(c=>c)) errors.push('選択肢A〜Dをすべて入力');
-    if(![0,1,2,3].includes(answer)) errors.push(`答え（0〜3）が無効`);
-  } else {
-    if(isNaN(answer)) errors.push(`答え「${row.answer}」は数字を入力`);
-  }
+  if(!VALID_SUBJECTS.includes(subjectId))errors.push(`科目ID「${row.subjectId||''}」が無効`);
+  if(!VALID_UNITS.includes(unitId))errors.push(`単元ID「${row.unitId||''}」が無効`);
+  if(![1,2,3].includes(stageId))errors.push('ステージは1・2・3のいずれか');
+  if(!row.question)errors.push('問題文が空です');
+  if(questionType==='choice'){if(![row.choiceA,row.choiceB,row.choiceC,row.choiceD].every(c=>c))errors.push('選択肢A〜Dをすべて入力');if(![0,1,2,3].includes(answer))errors.push('答え（0〜3）が無効');}
+  else{if(isNaN(answer))errors.push(`答え「${row.answer}」は数字を入力`);}
   const choices=questionType==='choice'?[row.choiceA,row.choiceB,row.choiceC,row.choiceD]:null;
   const isPublished=String(row.isPublished||'true').toLowerCase()!=='false';
-  return {
-    lineNum,row,errors,
-    data:{
-      subjectId,unitId,gradeId:'g2',stageId,questionType,
-      question:row.question,answer,choices,
-      hint:row.hint||'',explanation:row.explanation||'',
-      displayType:displayType==='calc'?'calc':'text',
-      displayLeft:displayType==='calc'?parseInt(row.displayLeft):null,
-      displayOp:displayType==='calc'?(row.displayOp||'+'):null,
-      displayRight:displayType==='calc'?parseInt(row.displayRight):null,
-      isPublished,
-    },
-  };
+  return{lineNum,row,errors,data:{subjectId,unitId,gradeId:'g2',stageId,questionType,question:row.question,answer,choices,hint:row.hint||'',explanation:row.explanation||'',displayType:displayType==='calc'?'calc':'text',displayLeft:displayType==='calc'?parseInt(row.displayLeft):null,displayOp:displayType==='calc'?(row.displayOp||'+'):null,displayRight:displayType==='calc'?parseInt(row.displayRight):null,isPublished}};
 }
 
 function renderPreview(){
   const step=document.getElementById('previewStep');step.style.display='block';
   const okCount=parsedRows.filter(r=>r.errors.length===0).length;
   const errCount=parsedRows.length-okCount;
-  document.getElementById('previewSummary').innerHTML=`
-    <span class="preview-count ok">✅ 有効：${okCount}件</span>
-    ${errCount>0?`<span class="preview-count err">❌ エラー：${errCount}件</span>`:''}
-    <span style="font-size:12px;color:var(--muted)">合計${parsedRows.length}件</span>`;
+  document.getElementById('previewSummary').innerHTML=`<span class="preview-count ok">✅ 有効：${okCount}件</span>${errCount>0?`<span class="preview-count err">❌ エラー：${errCount}件</span>`:''}<span style="font-size:12px;color:var(--muted)">合計${parsedRows.length}件</span>`;
   document.getElementById('importRunBtn').disabled=okCount===0;
   document.getElementById('importRunBtn').textContent=`✅ ${okCount}件をインポート`;
-  document.getElementById('previewBody').innerHTML=parsedRows.map(r=>`
-    <tr class="${r.errors.length?'row-err':''}">
-      <td style="color:var(--muted)">${r.lineNum}</td>
-      <td><span class="badge ${SUBJECT_BADGE[r.data.subjectId]||'badge-stage'}">${SUBJECT_NAMES[r.data.subjectId]||r.data.subjectId||'—'}</span></td>
-      <td style="font-size:12px">${UNIT_NAMES[r.data.unitId]||r.data.unitId||'—'}</td>
-      <td>${r.data.stageId||'—'}</td>
-      <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.row.question||'—'}</td>
-      <td><span class="badge badge-stage">${r.data.questionType==='choice'?'選択肢':'数字'}</span></td>
-      <td>${r.row.answer||'—'}</td>
-      <td>${r.errors.length===0?'<span class="badge badge-ok">✅ OK</span>':`<span class="badge badge-err">❌</span><div class="err-msg">${r.errors.join('<br>')}</div>`}</td>
-    </tr>`).join('');
+  document.getElementById('previewBody').innerHTML=parsedRows.map(r=>`<tr class="${r.errors.length?'row-err':''}"><td style="color:var(--muted)">${r.lineNum}</td><td><span class="badge ${SUBJECT_BADGE[r.data.subjectId]||'badge-stage'}">${SUBJECT_NAMES[r.data.subjectId]||'—'}</span></td><td>${UNIT_NAMES[r.data.unitId]||r.data.unitId||'—'}</td><td>${r.data.stageId||'—'}</td><td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.row.question||'—'}</td><td><span class="badge badge-stage">${r.data.questionType==='choice'?'選択肢':'数字'}</span></td><td>${r.row.answer||'—'}</td><td>${r.errors.length===0?'<span class="badge badge-ok">✅ OK</span>':`<span class="badge badge-err">❌</span><div class="err-msg">${r.errors.join('<br>')}</div>`}</td></tr>`).join('');
   step.scrollIntoView({behavior:'smooth'});
 }
 
 document.getElementById('importRunBtn').addEventListener('click',async()=>{
   const validRows=parsedRows.filter(r=>r.errors.length===0);if(!validRows.length)return;
-  document.getElementById('importRunBtn').disabled=true;
-  document.getElementById('importCancelBtn').style.display='none';
+  document.getElementById('importRunBtn').disabled=true;document.getElementById('importCancelBtn').style.display='none';
   const pw=document.getElementById('progressWrap'),pf=document.getElementById('progressFill'),pl=document.getElementById('progressLabel');
-  pw.style.display='block';
-  let done=0;
-  for(const r of validRows){
-    await addProblem(r.data);done++;
-    const pct=Math.round(done/validRows.length*100);
-    pf.style.width=pct+'%';pl.textContent=`インポート中… ${done}/${validRows.length}件`;
-  }
-  pl.textContent=`✅ ${done}件のインポートが完了しました！`;
-  snack(`${done}件をインポートしました`);
-  await loadProblems();
+  pw.style.display='block';let done=0;
+  for(const r of validRows){await addProblem(r.data);done++;const pct=Math.round(done/validRows.length*100);pf.style.width=pct+'%';pl.textContent=`インポート中… ${done}/${validRows.length}件`;}
+  pl.textContent=`✅ ${done}件のインポートが完了しました！`;snack(`${done}件をインポートしました`);await loadProblems();
   setTimeout(()=>{document.getElementById('previewStep').style.display='none';document.getElementById('dropFilename').textContent='';fileInput.value='';parsedRows=[];pw.style.display='none';document.getElementById('importCancelBtn').style.display='';document.getElementById('importRunBtn').disabled=false;},3000);
 });
-
-document.getElementById('importCancelBtn').addEventListener('click',()=>{
-  document.getElementById('previewStep').style.display='none';
-  document.getElementById('dropFilename').textContent='';
-  fileInput.value='';parsedRows=[];
-});
+document.getElementById('importCancelBtn').addEventListener('click',()=>{document.getElementById('previewStep').style.display='none';document.getElementById('dropFilename').textContent='';fileInput.value='';parsedRows=[];});
 </script>
 </body>
 </html>
