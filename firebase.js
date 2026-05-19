@@ -1,5 +1,5 @@
 /* ============================================================
-   firebase.js — 動画URL管理対応版
+   firebase.js — 動画URL管理対応版  updated 2026/25/19
    追加機能:
      getUnitVideos()   単元ごとの動画URLを取得
      saveUnitVideos()  動画URLを保存
