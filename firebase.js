@@ -1,8 +1,5 @@
 /* ============================================================
-   firebase.js — 動画URL管理対応版  updated 2026/25/19
-   追加機能:
-     getUnitVideos()   単元ごとの動画URLを取得
-     saveUnitVideos()  動画URLを保存
+   firebase.js — 多学年対応版（g2・g3以降）
 ============================================================ */
 
 import { initializeApp }
@@ -94,6 +91,7 @@ export async function saveProgress(uid, name, progress) {
 
 /* ============================================================
    セッション保存
+   gradeId を含めて保存することで学年別の分析が可能
 ============================================================ */
 export async function saveSession(uid, sessionData) {
   try {
@@ -135,62 +133,27 @@ export async function getUserByName(name) {
 }
 
 /* ============================================================
-   動画URL管理
-   Firestoreのデータ構造:
-   unitVideos/{unitId}
-     unitId:  "add"
-     s1: "https://www.youtube.com/watch?v=xxxxx"  ← ステージ1の動画
-     s2: "https://www.youtube.com/watch?v=yyyyy"  ← ステージ2の動画
-     s3: "https://www.youtube.com/watch?v=zzzzz"  ← ステージ3の動画
-     updatedAt: timestamp
-============================================================ */
-
-/* 全単元の動画URLを一括取得 */
-export async function getAllUnitVideos() {
-  try {
-    const snap = await getDocs(collection(db, "unitVideos"));
-    const result = {};
-    snap.docs.forEach(d => { result[d.id] = d.data(); });
-    return result;
-  } catch (e) { console.error("getAllUnitVideos:", e); return {}; }
-}
-
-/* 特定単元の動画URLを取得 */
-export async function getUnitVideos(unitId) {
-  try {
-    const snap = await getDoc(doc(db, "unitVideos", unitId));
-    return snap.exists() ? snap.data() : {};
-  } catch (e) { console.error("getUnitVideos:", e); return {}; }
-}
-
-/* 動画URLを保存（先生用） */
-export async function saveUnitVideos(unitId, urls) {
-  try {
-    await setDoc(
-      doc(db, "unitVideos", unitId),
-      { unitId, ...urls, updatedAt: serverTimestamp() },
-      { merge: true }
-    );
-    return true;
-  } catch (e) { console.error("saveUnitVideos:", e); return false; }
-}
-
-/* YouTubeのURLから埋め込みURLに変換するユーティリティ */
-export function toYouTubeEmbedUrl(url) {
-  if (!url) return null;
-  // 通常URL: https://www.youtube.com/watch?v=VIDEOID
-  const m1 = url.match(/[?&]v=([^&]+)/);
-  if (m1) return `https://www.youtube.com/embed/${m1[1]}`;
-  // 短縮URL: https://youtu.be/VIDEOID
-  const m2 = url.match(/youtu\.be\/([^?&]+)/);
-  if (m2) return `https://www.youtube.com/embed/${m2[1]}`;
-  // すでに埋め込みURL
-  if (url.includes('/embed/')) return url;
-  return null;
-}
-
-/* ============================================================
    問題の取得（子ども用）
+   unitId は学年をまたいで一意なので unitId + stageId で絞り込み可能
+   Firestoreのデータ構造:
+   problems/{自動ID}
+     subjectId:    "math" / "japanese" / "science"
+     gradeId:      "g2" / "g3" / ...
+     unitId:       "add"（2年算数）/ "div3"（3年算数）など
+     stageId:      1 / 2 / 3
+     questionType: "number" / "choice"
+     question:     "問題文"
+     answer:       数値
+     choices:      null / ["あ）…","い）…","う）…","え）…"]
+     hint:         "ヒント"
+     explanation:  "解説"
+     displayType:  "text" / "calc"
+     displayLeft:  数値（calcのとき）
+     displayOp:    "+" / "−"（calcのとき）
+     displayRight: 数値（calcのとき）
+     isPublished:  true
+     createdAt:    timestamp
+     updatedAt:    timestamp
 ============================================================ */
 export async function getProblems(unitId, stageId) {
   try {
@@ -214,6 +177,52 @@ function shuffleArray(arr) {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+/* ============================================================
+   動画URL管理
+   unitVideos/{unitId}
+     s1: "https://www.youtube.com/watch?v=xxxxx"
+     s2: "https://www.youtube.com/watch?v=yyyyy"
+     s3: "https://www.youtube.com/watch?v=zzzzz"
+     updatedAt: timestamp
+============================================================ */
+export async function getAllUnitVideos() {
+  try {
+    const snap = await getDocs(collection(db, "unitVideos"));
+    const result = {};
+    snap.docs.forEach(d => { result[d.id] = d.data(); });
+    return result;
+  } catch (e) { console.error("getAllUnitVideos:", e); return {}; }
+}
+
+export async function getUnitVideos(unitId) {
+  try {
+    const snap = await getDoc(doc(db, "unitVideos", unitId));
+    return snap.exists() ? snap.data() : {};
+  } catch (e) { console.error("getUnitVideos:", e); return {}; }
+}
+
+export async function saveUnitVideos(unitId, urls) {
+  try {
+    await setDoc(
+      doc(db, "unitVideos", unitId),
+      { unitId, ...urls, updatedAt: serverTimestamp() },
+      { merge: true }
+    );
+    return true;
+  } catch (e) { console.error("saveUnitVideos:", e); return false; }
+}
+
+/* YouTubeのURLを埋め込みURLに変換 */
+export function toYouTubeEmbedUrl(url) {
+  if (!url) return null;
+  const m1 = url.match(/[?&]v=([^&]+)/);
+  if (m1) return `https://www.youtube.com/embed/${m1[1]}`;
+  const m2 = url.match(/youtu\.be\/([^?&]+)/);
+  if (m2) return `https://www.youtube.com/embed/${m2[1]}`;
+  if (url.includes('/embed/')) return url;
+  return null;
 }
 
 /* ============================================================
