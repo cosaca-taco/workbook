@@ -11,7 +11,6 @@
       --green:#2D7A4F;--green-l:#E1F5EE;
       --red:#E24B4A;--red-l:#FCEBEB;
       --blue:#2563EB;--blue-l:#EFF6FF;
-      --purple:#7C3AED;--purple-l:#F5F3FF;
       --bg:#FFFBF4;--card:#FFFFFF;--border:#E8E0D0;
       --text:#1A1208;--muted:#8A7A60;--shadow:0 2px 12px rgba(0,0,0,.07);
     }
@@ -21,116 +20,98 @@
     .loading{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:var(--muted);}
     .spinner{width:32px;height:32px;border:3px solid var(--amber-l);border-top-color:var(--amber);border-radius:50%;animation:spin .8s linear infinite;}
     @keyframes spin{to{transform:rotate(360deg)}}
-
-    /* ボタン */
     .btn-p{width:100%;padding:13px;font-size:16px;font-weight:700;background:var(--amber);color:#3D2000;border:none;border-radius:14px;cursor:pointer;font-family:inherit;box-shadow:0 4px 0 var(--amber-d);transition:transform .1s,opacity .15s;}
-    .btn-p:hover{opacity:.9;}.btn-p:active{transform:translateY(2px);box-shadow:0 2px 0 var(--amber-d);}.btn-p:disabled{opacity:.4;cursor:default;box-shadow:none;}
+    .btn-p:hover{opacity:.9}.btn-p:active{transform:translateY(2px);box-shadow:0 2px 0 var(--amber-d)}.btn-p:disabled{opacity:.4;cursor:default;box-shadow:none}
     .btn-s{width:100%;padding:11px;font-size:14px;font-weight:500;background:#F0EDE8;color:#555;border:1px solid var(--border);border-radius:12px;cursor:pointer;font-family:inherit;margin-top:8px;}
-    .btn-s:hover{background:#E8E4DE;}
+    .btn-s:hover{background:#E8E4DE}
 
-    /* ============================================================
-       検索画面
-    ============================================================ */
+    /* 検索画面 */
     .search-card{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:2.5rem 2rem;margin:2rem auto;text-align:center;max-width:360px;box-shadow:var(--shadow);}
     .logo{font-size:52px;margin-bottom:8px;animation:float 3s ease-in-out infinite;}
     @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
     .page-title{font-size:22px;font-weight:700;margin-bottom:4px;}
     .page-sub{font-size:13px;color:var(--muted);margin-bottom:1.75rem;}
     .search-input{width:100%;padding:13px;font-size:18px;border:2.5px solid #FAC775;border-radius:14px;text-align:center;background:var(--bg);outline:none;margin-bottom:1rem;font-family:inherit;font-weight:500;}
-    .search-input:focus{border-color:var(--amber);}
+    .search-input:focus{border-color:var(--amber)}
     .search-status{font-size:12px;color:var(--muted);margin-top:8px;min-height:16px;}
     .search-note{font-size:11px;color:var(--muted);margin-top:1rem;line-height:1.7;background:var(--amber-ll);border-radius:10px;padding:10px 12px;}
 
     /* 候補リスト */
     .candidate-list{display:flex;flex-direction:column;gap:8px;margin-top:1rem;}
     .candidate-item{background:var(--bg);border:1.5px solid var(--border);border-radius:12px;padding:12px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:border-color .15s;}
-    .candidate-item:hover{border-color:var(--amber);}
+    .candidate-item:hover{border-color:var(--amber)}
     .candidate-avatar{width:36px;height:36px;border-radius:50%;background:var(--amber-l);border:2px solid var(--amber);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
     .candidate-name{font-size:15px;font-weight:700;}
     .candidate-meta{font-size:11px;color:var(--muted);}
 
-    /* ============================================================
-       ダッシュボード共通
-    ============================================================ */
+    /* ダッシュボード */
     .dash-header{display:flex;align-items:center;gap:12px;margin-bottom:1.5rem;}
     .dash-avatar{width:52px;height:52px;border-radius:50%;background:var(--amber-l);border:2.5px solid var(--amber);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;}
     .dash-name{font-size:20px;font-weight:700;}
     .dash-sub{font-size:12px;color:var(--muted);margin-top:2px;}
     .back-btn{margin-left:auto;padding:7px 14px;font-size:13px;border:1px solid var(--border);border-radius:10px;background:transparent;color:var(--muted);cursor:pointer;}
-    .back-btn:hover{background:var(--bg);}
+    .back-btn:hover{background:var(--bg)}
 
-    /* サマリーカード */
+    /* サマリー */
     .summary-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.25rem;}
     .sum-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 10px;text-align:center;box-shadow:var(--shadow);}
-    .sum-label{font-size:11px;color:var(--muted);margin-bottom:5px;line-height:1.3;}
+    .sum-label{font-size:11px;color:var(--muted);margin-bottom:5px;line-height:1.4;}
     .sum-value{font-size:26px;font-weight:700;}
     .sum-unit{font-size:11px;color:var(--muted);margin-top:2px;}
 
     /* 理解度ゲージ */
     .gauge-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.25rem;margin-bottom:1.25rem;box-shadow:var(--shadow);display:flex;align-items:center;gap:1.5rem;}
     .gauge-wrap{display:flex;flex-direction:column;align-items:center;flex-shrink:0;}
-    .gauge-label{font-size:12px;color:var(--muted);margin-top:4px;text-align:center;}
+    .gauge-label{font-size:12px;margin-top:4px;text-align:center;font-weight:700;}
     .gauge-info{flex:1;}
-    .gauge-info-title{font-size:14px;font-weight:700;margin-bottom:8px;}
-    .score-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
-    .score-bar-label{font-size:12px;color:var(--muted);width:72px;flex-shrink:0;}
+    .gauge-info-title{font-size:14px;font-weight:700;margin-bottom:10px;}
+    .score-bar-row{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
+    .score-bar-label{font-size:12px;color:var(--muted);width:68px;flex-shrink:0;}
     .score-bar{flex:1;height:7px;background:#EEE;border-radius:4px;overflow:hidden;}
     .score-bar-fill{height:100%;border-radius:4px;}
     .score-bar-val{font-size:12px;font-weight:700;width:28px;text-align:right;flex-shrink:0;}
 
-    /* ============================================================
-       単元進捗（学年・科目グループ別）
-    ============================================================ */
-    .section-title{font-size:16px;font-weight:700;margin-bottom:.75rem;margin-top:1.25rem;display:flex;align-items:center;gap:8px;}
-    .grade-badge{font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;background:var(--text);color:#fff;}
-
-    .subject-group{margin-bottom:1rem;}
+    /* 単元進捗グループ */
+    .section-title{font-size:15px;font-weight:700;margin-bottom:.75rem;margin-top:1.25rem;}
+    .grade-group{margin-bottom:1.5rem;}
+    .grade-label{display:inline-flex;align-items:center;gap:6px;background:var(--text);color:#fff;font-size:13px;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:.75rem;}
+    .subject-group{margin-bottom:.75rem;}
     .subject-header{display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;margin-bottom:6px;font-size:13px;font-weight:700;}
-    .subject-header.math    {background:var(--amber-l);color:var(--amber-d);}
-    .subject-header.japanese{background:var(--green-l);color:var(--green);}
-    .subject-header.science {background:var(--blue-l);color:var(--blue);}
-    .subject-icon{font-size:18px;}
-
-    .unit-list{display:flex;flex-direction:column;gap:6px;}
+    .unit-list{display:flex;flex-direction:column;gap:5px;}
     .unit-row{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 14px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);}
     .unit-row.cleared{border-color:var(--green);background:#F4FBF7;}
-    .unit-row.untouched{opacity:.6;}
+    .unit-row.untouched{opacity:.55;}
     .unit-icon{font-size:20px;flex-shrink:0;}
     .unit-info{flex:1;}
     .unit-name{font-size:13px;font-weight:700;margin-bottom:3px;}
     .unit-stars{font-size:13px;}
-    .unit-score{font-size:12px;font-weight:700;flex-shrink:0;}
-    .unit-score.good{color:var(--green);}
-    .unit-score.ok{color:var(--blue);}
-    .unit-score.low{color:var(--amber);}
-    .unit-score.none{color:var(--muted);}
+    .unit-score{font-size:12px;font-weight:700;flex-shrink:0;padding:3px 8px;border-radius:10px;}
+    .unit-score.good{background:var(--green-l);color:var(--green);}
+    .unit-score.ok{background:var(--blue-l);color:var(--blue);}
+    .unit-score.low{background:var(--amber-l);color:var(--amber-d);}
+    .unit-score.none{background:#F0EDE8;color:var(--muted);}
 
-    /* 最近の学習履歴 */
+    /* 学習履歴 */
     .history-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:1.25rem;box-shadow:var(--shadow);margin-bottom:1rem;}
-    .history-title{font-size:14px;font-weight:700;margin-bottom:.75rem;display:flex;align-items:center;gap:6px;}
+    .history-title{font-size:14px;font-weight:700;margin-bottom:.75rem;}
     .history-item{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #F0EDE8;}
     .history-item:last-child{border-bottom:none;}
     .history-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0;margin-top:4px;}
     .history-body{flex:1;}
-    .history-top{display:flex;align-items:center;gap:6px;margin-bottom:3px;flex-wrap:wrap;}
+    .history-top{display:flex;align-items:center;gap:5px;margin-bottom:3px;flex-wrap:wrap;}
     .history-unit{font-size:13px;font-weight:700;}
     .history-badge{font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;}
-    .badge-math   {background:var(--amber-l);color:var(--amber-d);}
-    .badge-japanese{background:var(--green-l);color:var(--green);}
-    .badge-science {background:var(--blue-l);color:var(--blue);}
-    .badge-g2{background:var(--purple-l);color:var(--purple);}
-    .badge-g3{background:#FFF0F0;color:#901010;}
-    .badge-cleared{background:var(--green-l);color:var(--green);}
-    .badge-not-cleared{background:#F0EDE8;color:var(--muted);}
     .history-meta{font-size:11px;color:var(--muted);}
     .history-advice{font-size:12px;color:var(--muted);font-style:italic;line-height:1.5;margin-top:3px;}
     .history-score{font-size:14px;font-weight:700;flex-shrink:0;}
+    .badge-cleared{background:var(--green-l);color:var(--green);}
+    .badge-not-cleared{background:#F0EDE8;color:var(--muted);}
 
     /* フッター */
     .site-footer{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(255,251,244,.92);backdrop-filter:blur(6px);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:center;gap:12px;padding:6px 16px;}
     .footer-version{font-size:11px;font-weight:700;background:var(--amber-l);color:var(--amber-d);padding:2px 8px;border-radius:10px;}
     .footer-license{font-size:11px;color:var(--muted);}
-    .empty-state{text-align:center;padding:1.5rem;color:var(--muted);font-size:13px;}
+    .empty-note{text-align:center;padding:1.5rem;color:var(--muted);font-size:13px;}
   </style>
 </head>
 <body>
@@ -164,127 +145,47 @@
 
   <!-- ダッシュボード -->
   <div id="S_dashboard" class="screen">
-    <!-- ヘッダー -->
     <div class="dash-header">
       <div class="dash-avatar">🐻</div>
       <div>
         <div class="dash-name" id="dashName"></div>
-        <div class="dash-sub" id="dashSub"></div>
+        <div class="dash-sub"  id="dashSub"></div>
       </div>
       <button class="back-btn" id="backBtn">← もどる</button>
     </div>
-
-    <!-- サマリー -->
-    <div class="summary-row" id="summaryRow">
-      <div class="loading"><div class="spinner"></div></div>
-    </div>
-
-    <!-- 理解度ゲージ -->
+    <div class="summary-row"    id="summaryRow"><div class="loading"><div class="spinner"></div></div></div>
     <div id="gaugeSection"></div>
-
-    <!-- 単元別進捗 -->
     <div id="progressSection"></div>
-
-    <!-- 最近の学習履歴 -->
     <div id="historySection"></div>
-
     <button class="btn-s" id="backBtn2">← さがしなおす</button>
   </div>
 
 </div>
 
 <footer class="site-footer">
-  <span class="footer-version">v1.2.0</span>
+  <span class="footer-version">v1.3.0</span>
   <span class="footer-license">© 2025 @ena-gifu.com All rights reserved.</span>
 </footer>
 
 <script type="module">
-import { signInUser, getUserByName, getUserSessions } from "../firebase.js";
+import { signInUser, getUserByName, getUserSessions, getMasterData } from "../firebase.js";
 
 /* ============================================================
-   学年・科目・単元 定義（index.html と同じ構成）
+   マスターデータ（Firestoreから取得）
 ============================================================ */
-const GRADES = [
-  { id:'g2', label:'2年生' },
-  { id:'g3', label:'3年生' },
-];
+let masterGrades=[], masterSubjects=[], masterUnits=[];
 
-const SUBJECTS = [
-  { id:'math',     icon:'🔢', name:'算数', cls:'math' },
-  { id:'japanese', icon:'📝', name:'国語', cls:'japanese' },
-  { id:'science',  icon:'🔬', name:'理科', cls:'science' },
-];
-
-const ALL_UNITS = {
-  g2: {
-    math: [
-      {id:'add',  icon:'➕',name:'たし算の筆算'},
-      {id:'sub',  icon:'➖',name:'ひき算の筆算'},
-      {id:'num',  icon:'🔢',name:'1000までの数'},
-      {id:'len',  icon:'📏',name:'長さ'},
-      {id:'vol',  icon:'🫙',name:'かさ'},
-      {id:'time', icon:'⏰',name:'時こくと時間'},
-      {id:'mul',  icon:'✖️',name:'かけ算（九九）'},
-      {id:'shape',icon:'🔷',name:'三角形と四角形'},
-    ],
-    japanese: [
-      {id:'kanji2',  icon:'🔤',name:'かん字'},
-      {id:'reading2',icon:'📖',name:'よむこと'},
-      {id:'kotoba2', icon:'💬',name:'ことば'},
-      {id:'bunpo2',  icon:'✍️',name:'文のしくみ'},
-    ],
-    science: [
-      {id:'shizen3', icon:'🌱',name:'しぜんのかんさつ'},
-      {id:'konchu3', icon:'🐛',name:'こん虫'},
-      {id:'kage3',   icon:'☀️',name:'日光とかげ'},
-      {id:'jishaku3',icon:'🧲',name:'じしゃく'},
-    ],
-  },
-  g3: {
-    math: [
-      {id:'div3',      icon:'➗',name:'わり算'},
-      {id:'remDiv3',   icon:'📐',name:'あまりのあるわり算'},
-      {id:'bigNum3',   icon:'🔢',name:'大きい数（万）'},
-      {id:'decimal3',  icon:'🔸',name:'小数'},
-      {id:'fraction3', icon:'🍕',name:'分数'},
-      {id:'km3',       icon:'📏',name:'長さ（km）'},
-      {id:'weight3',   icon:'⚖️',name:'重さ'},
-      {id:'circle3',   icon:'⭕',name:'円と球'},
-      {id:'barGraph3', icon:'📊',name:'棒グラフ'},
-      {id:'timeCalc3', icon:'⏱️',name:'時間の計算'},
-    ],
-    japanese: [
-      {id:'kanji3',   icon:'🔤',name:'漢字（3年）'},
-      {id:'kotowaza3',icon:'📜',name:'ことわざ'},
-      {id:'romaji3',  icon:'🔡',name:'ローマ字'},
-      {id:'reading3', icon:'📖',name:'文章読解'},
-    ],
-    science: [
-      {id:'plant3',  icon:'🌱',name:'植物の育ち'},
-      {id:'insect3', icon:'🐛',name:'こん虫'},
-      {id:'sun3',    icon:'☀️',name:'太陽と地面'},
-      {id:'magnet3', icon:'🧲',name:'磁石'},
-    ],
-  },
-};
-
-/* 全単元数（学年・科目ごと） */
-function totalStages(grade, subject) {
-  return ((ALL_UNITS[grade]||{})[subject]||[]).length * 3;
-}
+function gradeName(id){ return masterGrades.find(g=>g.id===id)?.name||id||'—'; }
+function subjectMeta(id){ return masterSubjects.find(s=>s.id===id)||{name:id,icon:'',color:'#888'}; }
+function unitMeta(id){ return masterUnits.find(u=>u.id===id)||{name:id,icon:'📚'}; }
+function filterUnits(gradeId,subjectId){ return masterUnits.filter(u=>u.gradeId===gradeId&&u.subjectId===subjectId); }
 
 /* ============================================================
    ユーティリティ
 ============================================================ */
-function scoreColor(s){
-  if(s>=80)return'var(--green)';if(s>=60)return'var(--blue)';if(s>=40)return'var(--amber)';return'var(--red)';
-}
-function scoreClass(s){
-  if(s>=80)return'good';if(s>=60)return'ok';if(s>=40)return'low';return'none';
-}
-function scoreLabel(s){
-  if(s>=90)return'かんぺき！';if(s>=70)return'よくできました';if(s>=50)return'がんばっているよ';return'もう少し！';
-}
+function scoreColor(s){if(s>=80)return'var(--green)';if(s>=60)return'var(--blue)';if(s>=40)return'var(--amber)';return'var(--red)';}
+function scoreClass(s){if(s>=80)return'good';if(s>=60)return'ok';if(s>=40)return'low';return'none';}
+function scoreLabel(s){if(s>=90)return'かんぺき！';if(s>=70)return'よくできました';if(s>=50)return'がんばっているよ';return'もう少し！';}
 function formatDate(ts){
   if(!ts)return'—';
   const d=ts.toDate?ts.toDate():new Date(ts);
@@ -295,46 +196,29 @@ function daysSince(ts){
   const d=ts.toDate?ts.toDate():new Date(ts);
   return Math.floor((Date.now()-d.getTime())/86400000);
 }
-function getGradeName(gradeId){ return GRADES.find(g=>g.id===gradeId)?.label || gradeId || '—'; }
-function getSubjectMeta(subjectId){ return SUBJECTS.find(s=>s.id===subjectId)||{name:subjectId,icon:'',cls:''}; }
-
-/* 進捗から単元のベスト理解度・クリア数を取得 */
-function getUnitProgress(progress, unitId) {
-  const up = progress[unitId] || {};
-  let cleared = 0, bestUs = 0;
-  [1,2,3].forEach(sid=>{
-    const s = up[`s${sid}`]||{};
-    if(s.cleared) cleared++;
-    if((s.bestUnderstandingScore||0)>bestUs) bestUs=s.bestUnderstandingScore||0;
-  });
-  return { cleared, bestUs, touched: cleared>0 || Object.keys(up).length>0 };
+function getUnitProgress(progress,unitId){
+  const up=progress[unitId]||{};
+  let cleared=0,bestUs=0;
+  [1,2,3].forEach(sid=>{const s=up[`s${sid}`]||{};if(s.cleared)cleared++;if((s.bestUnderstandingScore||0)>bestUs)bestUs=s.bestUnderstandingScore||0;});
+  return{cleared,bestUs,touched:cleared>0||Object.keys(up).length>0};
 }
-
-/* 全単元クリア数 */
 function countTotalCleared(progress){
-  let n=0;
-  Object.values(progress||{}).forEach(u=>{
-    Object.values(u).forEach(s=>{if(s.cleared)n++;});
-  });
-  return n;
+  let n=0;Object.values(progress||{}).forEach(u=>{Object.values(u).forEach(s=>{if(s.cleared)n++;});});return n;
 }
-
-/* 平均理解度 */
 function avgScore(sessions){
   const sc=sessions.map(s=>s.understandingScore).filter(s=>s!=null);
   if(!sc.length)return null;
   return Math.round(sc.reduce((a,b)=>a+b,0)/sc.length);
 }
-
-function show(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
 
 /* ============================================================
-   匿名サインイン（Firestoreを読むために必要）
+   起動：マスターデータ取得 + 匿名サインイン
 ============================================================ */
-await signInUser();
+const [,master] = await Promise.all([signInUser(), getMasterData()]);
+masterGrades   = master.grades;
+masterSubjects = master.subjects;
+masterUnits    = master.units;
 
 /* ============================================================
    検索
@@ -342,13 +226,10 @@ await signInUser();
 document.getElementById('searchInput').addEventListener('input',function(){
   document.getElementById('searchBtn').disabled=!this.value.trim();
 });
-document.getElementById('searchInput').addEventListener('keydown',e=>{
-  if(e.key==='Enter')document.getElementById('searchBtn').click();
-});
+document.getElementById('searchInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('searchBtn').click();});
 
 document.getElementById('searchBtn').addEventListener('click',async()=>{
-  const name=document.getElementById('searchInput').value.trim();
-  if(!name)return;
+  const name=document.getElementById('searchInput').value.trim();if(!name)return;
   document.getElementById('searchBtn').disabled=true;
   document.getElementById('searchStatus').textContent='けんさく中…';
   const users=await getUserByName(name);
@@ -366,19 +247,13 @@ document.getElementById('searchBtn').addEventListener('click',async()=>{
   showCandidates(users);
 });
 
-/* ============================================================
-   候補選択
-============================================================ */
 function showCandidates(users){
   document.getElementById('candidateList').innerHTML=users.map((u,i)=>{
     const days=daysSince(u.updatedAt);
     const lastStr=days===0?'今日':days===1?'昨日':days<7?`${days}日前`:'1週間以上前';
     return`<div class="candidate-item" data-idx="${i}">
       <div class="candidate-avatar">🐻</div>
-      <div>
-        <div class="candidate-name">${u.name}</div>
-        <div class="candidate-meta">さいごの学習：${lastStr}</div>
-      </div>
+      <div><div class="candidate-name">${u.name}</div><div class="candidate-meta">さいごの学習：${lastStr}</div></div>
     </div>`;
   }).join('');
   document.querySelectorAll('.candidate-item').forEach(el=>{
@@ -389,27 +264,22 @@ function showCandidates(users){
 document.getElementById('backToSearch').addEventListener('click',()=>show('S_search'));
 
 /* ============================================================
-   ダッシュボード表示
+   ダッシュボード
 ============================================================ */
 async function showDashboard(user){
   show('S_dashboard');
-
-  /* ヘッダー */
   document.getElementById('dashName').textContent=user.name+'さん';
   document.getElementById('dashSub').textContent='よみこみ中…';
-
-  /* ローディング */
   ['summaryRow','gaugeSection','progressSection','historySection'].forEach(id=>{
     document.getElementById(id).innerHTML='<div class="loading" style="height:80px"><div class="spinner"></div></div>';
   });
 
-  /* データ取得 */
   const sessions=await getUserSessions(user.uid,50);
   const progress=user.progress||{};
   const cleared=countTotalCleared(progress);
   const avg=avgScore(sessions);
+  const totalStages=masterUnits.length*3;
 
-  /* 最終学習日 */
   const days=daysSince(user.updatedAt);
   const lastStr=days===0?'今日学習しました':days===1?'昨日学習しました':days<7?`${days}日前に学習しました`:'しばらく学習していません';
   document.getElementById('dashSub').textContent=lastStr;
@@ -419,7 +289,7 @@ async function showDashboard(user){
     <div class="sum-card">
       <div class="sum-label">ステージ<br>クリア数</div>
       <div class="sum-value" style="color:var(--green)">${cleared}</div>
-      <div class="sum-unit">/ 66ステージ</div>
+      <div class="sum-unit">/ ${totalStages}</div>
     </div>
     <div class="sum-card">
       <div class="sum-label">学習<br>回数</div>
@@ -437,6 +307,27 @@ async function showDashboard(user){
     const circ=2*Math.PI*36;
     const offset=circ-(avg/100)*circ;
     const color=scoreColor(avg);
+
+    /* 科目別スコアバー */
+    const subjectScores={};
+    sessions.forEach(s=>{
+      if(s.subjectId&&s.understandingScore!=null){
+        if(!subjectScores[s.subjectId])subjectScores[s.subjectId]=[];
+        subjectScores[s.subjectId].push(s.understandingScore);
+      }
+    });
+    const bars=masterSubjects.map(sub=>{
+      const sc=subjectScores[sub.id]||[];
+      if(!sc.length)return'';
+      const a=Math.round(sc.reduce((x,y)=>x+y,0)/sc.length);
+      const c=scoreColor(a);
+      return`<div class="score-bar-row">
+        <div class="score-bar-label">${sub.icon} ${sub.name}</div>
+        <div class="score-bar"><div class="score-bar-fill" style="width:${a}%;background:${c}"></div></div>
+        <div class="score-bar-val" style="color:${c}">${a}</div>
+      </div>`;
+    }).join('');
+
     document.getElementById('gaugeSection').innerHTML=`
       <div class="gauge-card">
         <div class="gauge-wrap">
@@ -449,82 +340,84 @@ async function showDashboard(user){
             <text x="50" y="45" text-anchor="middle" font-size="20" font-weight="bold" fill="${color}" font-family="inherit">${avg}</text>
             <text x="50" y="59" text-anchor="middle" font-size="9" fill="#8A7A60" font-family="inherit">てん</text>
           </svg>
-          <div class="gauge-label" style="color:${color};font-weight:700">${scoreLabel(avg)}</div>
+          <div class="gauge-label" style="color:${color}">${scoreLabel(avg)}</div>
         </div>
         <div class="gauge-info">
-          <div class="gauge-info-title">📊 平均理解度スコア</div>
-          ${buildScoreBars(sessions)}
+          <div class="gauge-info-title">📊 科目別 平均理解度</div>
+          ${bars||'<div style="font-size:12px;color:var(--muted)">データなし</div>'}
         </div>
       </div>`;
   } else {
     document.getElementById('gaugeSection').innerHTML='';
   }
 
-  /* ── 単元別進捗（学年・科目グループ） ── */
-  let progressHTML=`<div class="section-title">📚 単元べつのようす</div>`;
-  GRADES.forEach(gr=>{
-    progressHTML+=`<div style="margin-bottom:1.25rem">`;
-    progressHTML+=`<div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem"><span class="grade-badge">🎒 ${gr.label}</span></div>`;
-    SUBJECTS.forEach(sub=>{
-      const units=(ALL_UNITS[gr.id]||{})[sub.id]||[];
+  /* ── 単元別進捗（マスターデータで動的生成） ── */
+  let html=`<div class="section-title">📚 単元べつのようす</div>`;
+  masterGrades.forEach(gr=>{
+    /* この学年に単元があるか確認 */
+    const gradeUnits=masterUnits.filter(u=>u.gradeId===gr.id);
+    if(!gradeUnits.length)return;
+
+    html+=`<div class="grade-group">`;
+    html+=`<div class="grade-label">🎒 ${gr.name}</div>`;
+
+    masterSubjects.forEach(sub=>{
+      const units=filterUnits(gr.id,sub.id);
       if(!units.length)return;
-      const touchedUnits=units.filter(u=>getUnitProgress(progress,u.id).touched);
-      const clearedUnits=units.filter(u=>getUnitProgress(progress,u.id).cleared>0);
-      progressHTML+=`
-        <div class="subject-group">
-          <div class="subject-header ${sub.cls}">
-            <span class="subject-icon">${sub.icon}</span>
-            <span>${sub.name}</span>
-            <span style="margin-left:auto;font-size:11px;font-weight:500;opacity:.8">${clearedUnits.length}/${units.length}単元 学習済み</span>
-          </div>
-          <div class="unit-list">
-            ${units.map(u=>{
-              const up=getUnitProgress(progress,u.id);
-              const stars='⭐'.repeat(up.cleared)+'☆'.repeat(3-up.cleared);
-              const scoreStr=up.bestUs>0?`${up.bestUs}点`:'—';
-              const scoreCls=scoreClass(up.bestUs);
-              const rowCls=up.cleared>=3?'cleared':up.touched?'':'untouched';
-              return`<div class="unit-row ${rowCls}">
-                <div class="unit-icon">${u.icon}</div>
-                <div class="unit-info">
-                  <div class="unit-name">${u.name}</div>
-                  <div class="unit-stars">${stars}</div>
-                </div>
-                <div class="unit-score ${scoreCls}">${up.touched?scoreStr:'未学習'}</div>
-              </div>`;
-            }).join('')}
-          </div>
-        </div>`;
+
+      const clearedCount=units.filter(u=>getUnitProgress(progress,u.id).cleared>0).length;
+      html+=`<div class="subject-group">
+        <div class="subject-header" style="background:${sub.color}18;color:${sub.color}">
+          <span style="font-size:18px">${sub.icon}</span>
+          <span>${sub.name}</span>
+          <span style="margin-left:auto;font-size:11px;opacity:.8">${clearedCount}/${units.length}単元 学習済み</span>
+        </div>
+        <div class="unit-list">
+          ${units.map(u=>{
+            const up=getUnitProgress(progress,u.id);
+            const stars='⭐'.repeat(up.cleared)+'☆'.repeat(3-up.cleared);
+            const scoreCls=scoreClass(up.bestUs);
+            const scoreStr=up.touched?(up.bestUs>0?`${up.bestUs}点`:'—'):'未学習';
+            const rowCls=up.cleared>=3?'cleared':up.touched?'':'untouched';
+            return`<div class="unit-row ${rowCls}">
+              <div class="unit-icon">${u.icon||'📚'}</div>
+              <div class="unit-info">
+                <div class="unit-name">${u.name}</div>
+                <div class="unit-stars">${stars}</div>
+              </div>
+              <div class="unit-score ${up.touched?scoreCls:'none'}">${scoreStr}</div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>`;
     });
-    progressHTML+=`</div>`;
+    html+=`</div>`;
   });
-  document.getElementById('progressSection').innerHTML=progressHTML;
+  document.getElementById('progressSection').innerHTML=html;
 
   /* ── 最近の学習履歴 ── */
   if(!sessions.length){
     document.getElementById('historySection').innerHTML=`
       <div class="history-card">
         <div class="history-title">📖 さいきんのがくしゅう</div>
-        <div class="empty-state">まだ学習記録がありません</div>
+        <div class="empty-note">まだ学習記録がありません</div>
       </div>`;
   } else {
     const histHTML=sessions.slice(0,15).map(s=>{
       const score=s.understandingScore||0;
       const color=scoreColor(score);
-      const sub=getSubjectMeta(s.subjectId);
-      const gradeName=getGradeName(s.gradeId);
+      const sub=subjectMeta(s.subjectId);
+      const gname=gradeName(s.gradeId);
       return`<div class="history-item">
         <div class="history-dot" style="background:${s.cleared?'var(--green)':'var(--amber)'}"></div>
         <div class="history-body">
           <div class="history-top">
             <span class="history-unit">${s.unitName||s.unitId}</span>
-            <span class="history-badge badge-${s.subjectId||'math'}">${sub.icon} ${sub.name}</span>
-            <span class="history-badge badge-${s.gradeId||'g2'}">${gradeName}</span>
+            <span class="history-badge" style="background:${sub.color}18;color:${sub.color}">${sub.icon} ${sub.name}</span>
+            <span class="history-badge" style="background:#F5F1EB;color:var(--muted)">🎒 ${gname}</span>
             <span class="history-badge ${s.cleared?'badge-cleared':'badge-not-cleared'}">${s.cleared?'✅ クリア':'未クリア'}</span>
           </div>
-          <div class="history-meta">
-            ${formatDate(s.createdAt)}　ST${s.stageId}「${s.stageName||''}」　ヒント${s.hintCount||0}回
-          </div>
+          <div class="history-meta">${formatDate(s.createdAt)}　ST${s.stageId}「${s.stageName||''}」　ヒント${s.hintCount||0}回</div>
           ${s.advice?`<div class="history-advice">🦉「${s.advice}」</div>`:''}
         </div>
         <div class="history-score" style="color:${color}">${score}点</div>
@@ -536,28 +429,6 @@ async function showDashboard(user){
         ${histHTML}
       </div>`;
   }
-}
-
-/* 科目別スコアバー */
-function buildScoreBars(sessions){
-  const subjectScores={};
-  sessions.forEach(s=>{
-    if(s.subjectId&&s.understandingScore!=null){
-      if(!subjectScores[s.subjectId])subjectScores[s.subjectId]=[];
-      subjectScores[s.subjectId].push(s.understandingScore);
-    }
-  });
-  return SUBJECTS.map(sub=>{
-    const scores=subjectScores[sub.id]||[];
-    if(!scores.length)return'';
-    const avg=Math.round(scores.reduce((a,b)=>a+b,0)/scores.length);
-    const color=scoreColor(avg);
-    return`<div class="score-bar-row">
-      <div class="score-bar-label">${sub.icon} ${sub.name}</div>
-      <div class="score-bar"><div class="score-bar-fill" style="width:${avg}%;background:${color}"></div></div>
-      <div class="score-bar-val" style="color:${color}">${avg}</div>
-    </div>`;
-  }).join('');
 }
 
 /* ============================================================
