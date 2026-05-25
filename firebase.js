@@ -298,13 +298,15 @@ export async function getUserByName(name) {
 ============================================================ */
 export async function getProblems(unitId, stageId) {
   try {
+    /* unitId だけで絞り込み、stageId と isPublished は JS でフィルタ
+       → Firestore の複合インデックスが不要になる */
     const snap = await getDocs(query(
       collection(db,"problems"),
-      where("unitId","==",unitId),
-      where("stageId","==",stageId),
-      where("isPublished","==",true)
+      where("unitId","==",unitId)
     ));
-    const list = snap.docs.map(d=>({id:d.id,...d.data()}));
+    const list = snap.docs
+      .map(d=>({id:d.id,...d.data()}))
+      .filter(p => p.stageId === stageId && p.isPublished === true);
     if(list.length<5) return [];
     return shuffleArray(list).slice(0,5);
   } catch(e) { console.error("getProblems:",e); return []; }
