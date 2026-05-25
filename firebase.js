@@ -75,28 +75,31 @@ export async function signOutUser() {
 ============================================================ */
 export async function getGrades() {
   try {
-    const snap = await getDocs(
-      query(collection(db,"grades"), where("isPublished","==",true), orderBy("order"))
-    );
-    return snap.docs.map(d=>({id:d.id,...d.data()}));
+    const snap = await getDocs(collection(db,"grades"));
+    return snap.docs
+      .map(d=>({id:d.id,...d.data()}))
+      .filter(g=>g.isPublished!==false)
+      .sort((a,b)=>(a.order||0)-(b.order||0));
   } catch(e) { console.error("getGrades:",e); return []; }
 }
 
 export async function getSubjects() {
   try {
-    const snap = await getDocs(
-      query(collection(db,"subjects"), where("isPublished","==",true), orderBy("order"))
-    );
-    return snap.docs.map(d=>({id:d.id,...d.data()}));
+    const snap = await getDocs(collection(db,"subjects"));
+    return snap.docs
+      .map(d=>({id:d.id,...d.data()}))
+      .filter(s=>s.isPublished!==false)
+      .sort((a,b)=>(a.order||0)-(b.order||0));
   } catch(e) { console.error("getSubjects:",e); return []; }
 }
 
 export async function getUnits() {
   try {
-    const snap = await getDocs(
-      query(collection(db,"units"), where("isPublished","==",true), orderBy("order"))
-    );
-    return snap.docs.map(d=>({id:d.id,...d.data()}));
+    const snap = await getDocs(collection(db,"units"));
+    return snap.docs
+      .map(d=>({id:d.id,...d.data()}))
+      .filter(u=>u.isPublished!==false)
+      .sort((a,b)=>(a.order||0)-(b.order||0));
   } catch(e) { console.error("getUnits:",e); return []; }
 }
 
@@ -298,18 +301,30 @@ export async function getUserByName(name) {
 ============================================================ */
 export async function getProblems(unitId, stageId) {
   try {
-    /* unitId だけで絞り込み、stageId と isPublished は JS でフィルタ
-       → Firestore の複合インデックスが不要になる */
     const snap = await getDocs(query(
       collection(db,"problems"),
       where("unitId","==",unitId)
     ));
-    const list = snap.docs
-      .map(d=>({id:d.id,...d.data()}))
-      .filter(p => p.stageId === stageId && p.isPublished === true);
+    const all = snap.docs.map(d=>({id:d.id,...d.data()}));
+
+    /* デバッグログ */
+    console.log(`[getProblems] unitId="${unitId}" stageId=${stageId}(${typeof stageId})`);
+    console.log(`[getProblems] Firestoreから ${all.length} 件取得`);
+    all.forEach((p,i)=>{
+      console.log(`  [${i}] stageId=${p.stageId}(${typeof p.stageId}) isPublished=${p.isPublished}(${typeof p.isPublished}) unitId=${p.unitId}`);
+    });
+
+    /* stageId の型を合わせてフィルタ */
+    const list = all.filter(p => {
+      const stageMatch = Number(p.stageId) === Number(stageId);
+      const pubMatch   = p.isPublished === true || p.isPublished === "true";
+      return stageMatch && pubMatch;
+    });
+    console.log(`[getProblems] フィルタ後 ${list.length} 件`);
+
     if(list.length<5) return [];
     return shuffleArray(list).slice(0,5);
-  } catch(e) { console.error("getProblems:",e); return []; }
+  } catch(e) { console.error("[getProblems] エラー:",e); return []; }
 }
 function shuffleArray(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 
